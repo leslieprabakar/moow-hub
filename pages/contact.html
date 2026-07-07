@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Moow.Hub</title>
+  <meta name="description" content="Get in touch with Moow.Hub — become a partner, place an order, or learn about our wellness programmes.">
+  <meta name="keywords" content="contact Moow Hub, wellness partnership, place order, wellness programmes, get in touch, Moow Hub contact">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Contact — Moow.Hub">
+  <meta property="og:description" content="Get in touch with Moow.Hub — become a partner, place an order, or learn about our wellness programmes.">
+  <meta property="og:image" content="images/corporate-wellness.jpg">
+  <meta property="og:url" content="https://moow.hub/pages/contact.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Moow.Hub">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contact — Moow.Hub">
+  <meta name="twitter:description" content="Get in touch with Moow.Hub — become a partner, place an order, or learn about our wellness programmes.">
+  <meta name="twitter:image" content="images/corporate-wellness.jpg">
+  <link rel="canonical" href="https://moow.hub/pages/contact.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+</head>
+<body class="page-transition">
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li><a href="contact.html" class="nav-cta active">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contact Hero -->
+  <section class="hero" style="min-height: auto; padding: 8rem 0 3rem;">
+    <div class="container" style="text-align: center; max-width: 800px;">
+      <div class="hero-eyebrow" style="justify-content: center;">Moow.Hub<sup>&reg;</sup> — Let's Connect</div>
+      <h1>Get in <span class="italic-gold">touch.</span></h1>
+      <p class="hero-description" style="margin: 1.5rem auto 0; max-width: 600px;">Whether you want to become a partner, place an order, or learn about our wellness programmes — we're here to help.</p>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="section" style="padding-top: 2rem;">
+    <div class="container">
+      <div class="ecosystem-grid" style="gap: 3rem;">
+
+        <!-- Contact Form (Dark) -->
+        <div class="contact-form-dark reveal">
+          <h3>Request Agreement Draft</h3>
+          <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+
+          <form id="contactForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" required minlength="2" maxlength="50" placeholder="First name">
+                <span class="error-message"></span>
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" required minlength="2" maxlength="50" placeholder="Last name">
+                <span class="error-message"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" required maxlength="100" placeholder="you@organisation.com">
+              <span class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone" pattern="[\+]?[0-9\s\-\(\)]{7,20}" placeholder="+1 (555) 000-0000">
+              <span class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="organisation">Organization *</label>
+              <input type="text" id="organisation" name="organisation" required minlength="2" maxlength="100" placeholder="Rotary District 3232, Ministry of AYUSH...">
+              <span class="error-message"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="location">Location *</label>
+                <input type="text" id="location" name="location" required minlength="2" maxlength="100" placeholder="Mumbai, India">
+                <span class="error-message"></span>
+              </div>
+              <div class="form-group">
+                <label for="quantity">Estimated Quantity</label>
+                <input type="text" id="quantity" name="quantity" maxlength="50" placeholder="500 shirts, ongoing program...">
+                <span class="error-message"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="type">I am a... *</label>
+              <select id="type" name="type" required>
+                <option value="">Select your organisation type</option>
+                <option value="school">School / University</option>
+                <option value="hospital">Hospital / Clinic</option>
+                <option value="corporate">Corporate</option>
+                <option value="ngo">NGO / Charity</option>
+                <option value="rotary">Rotary / Lions Club</option>
+                <option value="government">Government Body</option>
+                <option value="distributor">Distributor / Retailer</option>
+                <option value="community">Community Organisation</option>
+              </select>
+              <span class="error-message"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="vision">Tell us about your vision *</label>
+              <textarea id="vision" name="vision" required minlength="10" maxlength="1000" placeholder="Tell us about your vision..."></textarea>
+              <span class="error-message"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 1rem 2rem; font-size: 1rem;">
+              Request agreement draft <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Partner Benefits Sidebar -->
+        <div>
+          <div class="info-cards">
+            <div class="feature-card reveal">
+              <h4 style="color: var(--primary); margin-bottom: 0.75rem;">Partner Benefits</h4>
+              <ul class="asana-benefits" style="margin-bottom: 0;">
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                  Featured listing on Moow.Hub<sup>&reg;</sup> directory
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                  Revenue share from QR-driven signups
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                  Social impact reporting & certificates
+                </li>
+              </ul>
+            </div>
+
+            <div class="info-card reveal reveal-delay-1">
+              <div class="info-card-icon"><img src="../images/digital-ecosystem.jpg" alt="Digital wellness ecosystem - email us at hello@moow.hub" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div>
+                <h4>Email Us</h4>
+                <p>hello@moow.hub</p>
+              </div>
+            </div>
+
+            <div class="info-card reveal reveal-delay-2">
+              <div class="info-card-icon"><img src="../images/corporate-wellness.jpg" alt="Corporate wellness programme - call us at +1 (555) 000-MOOO" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div>
+                <h4>Call Us</h4>
+                <p>+1 (555) 000-MOOO</p>
+              </div>
+            </div>
+
+            <div class="info-card reveal reveal-delay-3">
+              <div class="info-card-icon"><img src="../images/yoga-group-park.jpg" alt="Global Reach" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div>
+                <h4>Global Reach</h4>
+                <p>25+ Countries</p>
+              </div>
+            </div>
+
+            <div class="info-card reveal reveal-delay-4">
+              <div class="info-card-icon"><img src="../images/vrksasana-hero.jpg" alt="Response Time" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div>
+                <h4>Response Time</h4>
+                <p>Within 24 Hours</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" style="background: var(--white); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+    <div class="container">
+      <div class="section-header section-header-center">
+        <div class="label">FAQ</div>
+        <h2 style="margin-top: 0.5rem;">Frequently <span class="italic-gold">asked</span> questions</h2>
+      </div>
+      <div class="features-grid" style="max-width: 1000px; margin: 0 auto;">
+        <div class="feature-card reveal">
+          <h4 style="color: var(--primary); margin-bottom: 0.5rem;">How do I become a partner?</h4>
+          <p>Fill out the contact form above or email us directly. We'll schedule a call to discuss your wellness goals and partnership options.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <h4 style="color: var(--navy); margin-bottom: 0.5rem;">What are the payment terms?</h4>
+          <p>Default terms: 50% advance and balance before dispatch. Custom terms can be arranged for large orders through purchase orders.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <h4 style="color: var(--gold); margin-bottom: 0.5rem;">Do you ship internationally?</h4>
+          <p>Yes! We serve partners across 25+ countries. Shipping, duties, and customs are defined in the applicable purchase order.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-3">
+          <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Can we co-brand products?</h4>
+          <p>Yes, co-branding is available for Impact Programme partners. All co-branding requires prior written approval per the Brand Guidelines.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../index.html" class="nav-logo" style="font-size: 1.3rem;">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+          <p>Moow.Hub<sup>&reg;</sup> begins with a single t-shirt and grows into a global wellness ecosystem.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="about.html">About</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="partners.html">Partners</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="agreement.html">Agreement</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
