@@ -5,3 +5,5 @@ Thumbs.db
 *.log
 
 .vercel
+.env*.local
+nul

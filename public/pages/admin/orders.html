@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Orders — Moow.Hub Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .admin-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+    .admin-sidebar { background: var(--navy); color: white; padding: 2rem 0; position: fixed; width: 250px; height: 100vh; }
+    .admin-logo { padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .admin-logo h2 { color: white; font-family: var(--font-serif); font-size: 1.3rem; margin: 0; }
+    .admin-logo span { color: var(--primary); }
+    .admin-nav { padding: 0 1rem; }
+    .admin-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; color: rgba(255,255,255,0.7); border-radius: var(--radius); margin-bottom: 0.25rem; cursor: pointer; transition: var(--transition); font-size: 0.9rem; text-decoration: none; }
+    .admin-nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .admin-nav-item.active { background: var(--primary); color: white; }
+    .admin-nav-item svg { width: 18px; height: 18px; }
+    
+    .admin-main { margin-left: 250px; padding: 2rem; background: var(--bg); min-height: 100vh; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .admin-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
+    
+    .filter-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .filter-bar select, .filter-bar input { padding: 0.6rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.9rem; }
+    .filter-bar input { flex: 1; min-width: 200px; }
+    
+    .admin-table { background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .admin-table table { width: 100%; border-collapse: collapse; }
+    .admin-table th { background: var(--bg); padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    .admin-table td { padding: 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+    .admin-table tr:hover td { background: var(--bg); }
+    
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d1ecf1; color: #0c5460; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    
+    .action-btn { padding: 0.4rem 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; transition: var(--transition); }
+    .action-btn-primary { background: var(--primary); color: white; }
+    .action-btn-primary:hover { background: var(--primary-hover); }
+    
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+    .pagination-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); background: var(--white); border-radius: var(--radius); cursor: pointer; }
+    .pagination-info { font-size: 0.9rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <h2>Moow<span>.</span>Hub</h2>
+        <p style="font-size:0.8rem;opacity:0.7;margin:0.25rem 0 0;">Admin Panel</p>
+      </div>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="admin-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="orders.html" class="admin-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Orders
+        </a>
+        <a href="products.html" class="admin-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Products
+        </a>
+        <a href="customers.html" class="admin-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Customers
+        </a>
+        <a href="../pages/products.html" class="admin-nav-item" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View Store
+        </a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>Orders</h1>
+      </div>
+
+      <div class="filter-bar">
+        <select id="statusFilter" onchange="loadOrders()">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Search by order number..." onkeyup="loadOrders()">
+      </div>
+
+      <div class="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable">
+            <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="pagination" class="pagination"></div>
+    </main>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    let currentPage = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
+        window.location.href = '/pages/login.html';
+        return;
+      }
+      loadOrders();
+    });
+
+    async function loadOrders(page = 1) {
+      currentPage = page;
+      const status = document.getElementById('statusFilter').value;
+      const search = document.getElementById('searchInput').value;
+
+      const params = new URLSearchParams({ page, limit: 20 });
+      if (status) params.append('status', status);
+      if (search) params.append('search', search);
+
+      try {
+        const response = await Auth.authenticatedFetch(`/api/admin/orders?${params}`);
+        if (!response || !response.ok) throw new Error('Failed');
+
+        const data = await response.json();
+        renderOrders(data.data, data.pagination);
+      } catch (error) {
+        console.error('Load orders error:', error);
+      }
+    }
+
+    function renderOrders(orders, pagination) {
+      const tbody = document.getElementById('ordersTable');
+
+      if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No orders found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = orders.map(order => {
+        const date = new Date(order.created_at).toLocaleDateString();
+        const statusClass = 'status-' + order.status;
+
+        return `
+          <tr>
+            <td><strong>${order.order_number}</strong></td>
+            <td>${order.customer}</td>
+            <td>${order.items_count}</td>
+            <td>${order.currency} ${Number(order.total).toFixed(2)}</td>
+            <td>${order.payment_method || '-'}</td>
+            <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+            <td>${date}</td>
+            <td>
+              <select onchange="updateOrderStatus('${order.id}', this.value)" style="padding:0.3rem;font-size:0.8rem;">
+                <option value="">Update Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Pagination
+      const paginationDiv = document.getElementById('pagination');
+      if (pagination.total > pagination.limit) {
+        const pages = Math.ceil(pagination.total / pagination.limit);
+        paginationDiv.innerHTML = `
+          ${currentPage > 1 ? `<button class="pagination-btn" onclick="loadOrders(${currentPage - 1})">← Prev</button>` : ''}
+          <span class="pagination-info">Page ${currentPage} of ${pages}</span>
+          ${currentPage < pages ? `<button class="pagination-btn" onclick="loadOrders(${currentPage + 1})">Next →</button>` : ''}
+        `;
+      } else {
+        paginationDiv.innerHTML = '';
+      }
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      if (!newStatus) return;
+
+      try {
+        const response = await Auth.authenticatedFetch('/api/admin/orders', {
+          method: 'PUT',
+          body: JSON.stringify({ id: orderId, status: newStatus })
+        });
+
+        if (!response || !response.ok) {
+          alert('Failed to update order status');
+          return;
+        }
+
+        loadOrders(currentPage);
+      } catch (error) {
+        alert('Failed to update order status');
+      }
+    }
+  </script>
+</body>
+</html>

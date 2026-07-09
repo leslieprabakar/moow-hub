@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders — Moow.Hub</title>
+  <meta name="description" content="View and manage your orders.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .orders-page { padding: 8rem 0 4rem; min-height: 100vh; }
+    .orders-container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .orders-header { margin-bottom: 2rem; }
+    .orders-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
+    
+    /* Filters */
+    .order-filters { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .filter-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); background: var(--white); border-radius: var(--radius-pill); font-size: 0.85rem; cursor: pointer; transition: var(--transition); }
+    .filter-btn:hover { border-color: var(--primary); }
+    .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    
+    /* Order cards */
+    .orders-list { display: flex; flex-direction: column; gap: 1rem; }
+    .order-card { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); transition: var(--transition); }
+    .order-card:hover { box-shadow: var(--shadow); }
+    .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .order-number { font-weight: 600; color: var(--navy); font-size: 1.1rem; }
+    .order-date { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .order-status { padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d1ecf1; color: #0c5460; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    
+    .order-items-preview { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .order-item-thumb { width: 50px; height: 50px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg); }
+    .order-item-more { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background: var(--bg); border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text-muted); }
+    
+    .order-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+    .order-total { font-weight: 600; color: var(--navy); }
+    .order-actions { display: flex; gap: 0.5rem; }
+    .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+    
+    /* Empty state */
+    .orders-empty { text-align: center; padding: 4rem 2rem; }
+    .orders-empty h2 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1rem; }
+    .orders-empty p { color: var(--text-light); margin-bottom: 2rem; }
+    
+    /* Loading */
+    .orders-loading { text-align: center; padding: 4rem; color: var(--text-light); }
+    
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem; }
+    .pagination-btn { padding: 0.5rem 1rem; border: 1px solid var(--border); background: var(--white); border-radius: var(--radius); cursor: pointer; font-size: 0.9rem; }
+    .pagination-btn:hover { border-color: var(--primary); }
+    .pagination-info { font-size: 0.9rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li data-auth style="display:none;">
+          <a href="cart.html" class="nav-cart" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--primary);color:white;font-size:11px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">0</span>
+          </a>
+        </li>
+        <li data-auth style="display:none;"><a href="account.html">Account</a></li>
+        <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="orders-page">
+    <div class="orders-container">
+      <div class="orders-header">
+        <h1>My Orders</h1>
+      </div>
+
+      <div class="order-filters">
+        <button class="filter-btn active" data-status="" onclick="Orders.filterByStatus('')">All</button>
+        <button class="filter-btn" data-status="pending" onclick="Orders.filterByStatus('pending')">Pending</button>
+        <button class="filter-btn" data-status="confirmed" onclick="Orders.filterByStatus('confirmed')">Confirmed</button>
+        <button class="filter-btn" data-status="processing" onclick="Orders.filterByStatus('processing')">Processing</button>
+        <button class="filter-btn" data-status="shipped" onclick="Orders.filterByStatus('shipped')">Shipped</button>
+        <button class="filter-btn" data-status="delivered" onclick="Orders.filterByStatus('delivered')">Delivered</button>
+        <button class="filter-btn" data-status="cancelled" onclick="Orders.filterByStatus('cancelled')">Cancelled</button>
+      </div>
+
+      <div id="ordersLoading" class="orders-loading">Loading orders...</div>
+      
+      <div id="ordersEmpty" class="orders-empty" style="display:none;">
+        <h2>No orders found</h2>
+        <p>You haven't placed any orders yet.</p>
+        <a href="products.html" class="btn btn-primary">Browse Products</a>
+      </div>
+
+      <div id="ordersList" class="orders-list" style="display:none;"></div>
+      
+      <div id="pagination" class="pagination"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/orders.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/pages/login.html?redirect=/pages/orders.html';
+        return;
+      }
+      Orders.loadOrders();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Wishlist — Moow.Hub</title>
+  <meta name="description" content="Your saved products and favorites.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .wishlist-page { padding: 8rem 0 4rem; min-height: 100vh; }
+    .wishlist-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .wishlist-header { margin-bottom: 2rem; }
+    .wishlist-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
+    
+    .wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+    
+    .wishlist-card { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition); position: relative; }
+    .wishlist-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+    
+    .wishlist-image { aspect-ratio: 4/3; background: var(--bg); position: relative; }
+    .wishlist-image img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .wishlist-remove { position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .wishlist-remove:hover { background: #dc3545; color: white; }
+    .wishlist-remove svg { width: 18px; height: 18px; }
+    
+    .wishlist-info { padding: 1.5rem; }
+    .wishlist-category { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.5rem; }
+    .wishlist-name { font-family: var(--font-serif); font-size: 1.1rem; color: var(--navy); margin-bottom: 0.5rem; }
+    .wishlist-price { font-weight: 700; color: var(--navy); font-size: 1.1rem; margin-bottom: 1rem; }
+    
+    .wishlist-actions { display: flex; gap: 0.5rem; }
+    .wishlist-actions .btn { flex: 1; justify-content: center; font-size: 0.85rem; padding: 0.6rem 1rem; }
+    
+    .wishlist-empty { text-align: center; padding: 4rem 2rem; }
+    .wishlist-empty h2 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1rem; }
+    .wishlist-empty p { color: var(--text-light); margin-bottom: 2rem; }
+    
+    .wishlist-loading { text-align: center; padding: 4rem; color: var(--text-light); }
+    
+    .wishlist-count { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; }
+    
+    @media (max-width: 600px) {
+      .wishlist-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li data-auth style="display:none;">
+          <a href="cart.html" class="nav-cart" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--primary);color:white;font-size:11px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">0</span>
+          </a>
+        </li>
+        <li data-auth style="display:none;"><a href="account.html">Account</a></li>
+        <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wishlist-page">
+    <div class="wishlist-container">
+      <div class="wishlist-header">
+        <h1>My Wishlist</h1>
+        <p class="wishlist-count" id="wishlistCount"></p>
+      </div>
+
+      <div id="wishlistLoading" class="wishlist-loading">Loading wishlist...</div>
+      
+      <div id="wishlistEmpty" class="wishlist-empty" style="display:none;">
+        <h2>Your wishlist is empty</h2>
+        <p>Save products you love for later.</p>
+        <a href="products.html" class="btn btn-primary">Browse Products</a>
+      </div>
+
+      <div id="wishlistGrid" class="wishlist-grid" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const Wishlist = {
+      items: [],
+
+      async init() {
+        if (!Auth.isAuthenticated()) {
+          window.location.href = '/pages/login.html?redirect=/pages/wishlist.html';
+          return;
+        }
+        await this.load();
+      },
+
+      async load() {
+        const loading = document.getElementById('wishlistLoading');
+        const empty = document.getElementById('wishlistEmpty');
+        const grid = document.getElementById('wishlistGrid');
+
+        try {
+          const response = await Auth.authenticatedFetch('/api/wishlist/get');
+          if (!response || !response.ok) throw new Error('Failed to load');
+
+          const data = await response.json();
+          this.items = data.data || [];
+
+          loading.style.display = 'none';
+
+          if (this.items.length === 0) {
+            empty.style.display = 'block';
+            return;
+          }
+
+          document.getElementById('wishlistCount').textContent = `${this.items.length} ${this.items.length === 1 ? 'item' : 'items'}`;
+          this.render();
+          grid.style.display = 'grid';
+
+        } catch (error) {
+          loading.textContent = 'Failed to load wishlist';
+        }
+      },
+
+      render() {
+        const grid = document.getElementById('wishlistGrid');
+        grid.innerHTML = this.items.map(item => {
+          const product = item.products;
+          if (!product) return '';
+
+          return `
+            <div class="wishlist-card" id="wishlist-${product.id}">
+              <div class="wishlist-image">
+                <img src="../${product.image_url}" alt="${product.name}">
+                <button class="wishlist-remove" onclick="Wishlist.remove('${product.id}')" title="Remove from wishlist">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div class="wishlist-info">
+                <div class="wishlist-category">${product.category || 'Product'}</div>
+                <div class="wishlist-name">${product.name}</div>
+                <div class="wishlist-price">$${Number(product.price_usd).toFixed(2)}</div>
+                <div class="wishlist-actions">
+                  <button class="btn btn-primary" onclick="Wishlist.addToCart('${product.id}')">
+                    Add to Cart
+                  </button>
+                  <a href="product-detail.html?id=${product.id}" class="btn btn-outline">View</a>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      },
+
+      async remove(productId) {
+        if (!confirm('Remove this item from your wishlist?')) return;
+
+        try {
+          const response = await Auth.authenticatedFetch('/api/wishlist/remove', {
+            method: 'DELETE',
+            body: JSON.stringify({ product_id: productId })
+          });
+
+          if (!response || !response.ok) {
+            alert('Failed to remove item');
+            return;
+          }
+
+          // Remove from local array
+          this.items = this.items.filter(item => item.product_id !== productId);
+          
+          // Remove card from DOM
+          const card = document.getElementById(`wishlist-${productId}`);
+          if (card) card.remove();
+
+          // Update count
+          document.getElementById('wishlistCount').textContent = 
+            `${this.items.length} ${this.items.length === 1 ? 'item' : 'items'}`;
+
+          // Show empty if no items
+          if (this.items.length === 0) {
+            document.getElementById('wishlistGrid').style.display = 'none';
+            document.getElementById('wishlistEmpty').style.display = 'block';
+          }
+
+        } catch (error) {
+          alert('Failed to remove item');
+        }
+      },
+
+      async addToCart(productId) {
+        await Cart.addItem(productId, 1);
+        Cart.updateBadge();
+        alert('Added to cart!');
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => Wishlist.init());
+  </script>
+</body>
+</html>

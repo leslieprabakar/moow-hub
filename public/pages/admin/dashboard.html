@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Moow.Hub</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .admin-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+    
+    /* Sidebar */
+    .admin-sidebar { background: var(--navy); color: white; padding: 2rem 0; position: fixed; width: 250px; height: 100vh; overflow-y: auto; }
+    .admin-logo { padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .admin-logo h2 { color: white; font-family: var(--font-serif); font-size: 1.3rem; margin: 0; }
+    .admin-logo span { color: var(--primary); }
+    
+    .admin-nav { padding: 0 1rem; }
+    .admin-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; color: rgba(255,255,255,0.7); border-radius: var(--radius); margin-bottom: 0.25rem; cursor: pointer; transition: var(--transition); font-size: 0.9rem; }
+    .admin-nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .admin-nav-item.active { background: var(--primary); color: white; }
+    .admin-nav-item svg { width: 18px; height: 18px; }
+    
+    /* Main content */
+    .admin-main { margin-left: 250px; padding: 2rem; background: var(--bg); min-height: 100vh; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .admin-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; font-size: 1.8rem; }
+    
+    /* Stats cards */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); }
+    .stat-card-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .stat-card-value { font-family: var(--font-serif); font-size: 2rem; font-weight: 700; color: var(--navy); }
+    .stat-card-change { font-size: 0.8rem; color: #28a745; margin-top: 0.25rem; }
+    
+    /* Tables */
+    .admin-table { width: 100%; background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 2rem; }
+    .admin-table table { width: 100%; border-collapse: collapse; }
+    .admin-table th { background: var(--bg); padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+    .admin-table td { padding: 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: var(--bg); }
+    
+    .status-badge { padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 600; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d1ecf1; color: #0c5460; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    
+    .action-btn { padding: 0.4rem 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; transition: var(--transition); }
+    .action-btn-primary { background: var(--primary); color: white; }
+    .action-btn-primary:hover { background: var(--primary-hover); }
+    
+    /* Low stock alert */
+    .alert-card { background: #fff3cd; border: 1px solid #ffc107; border-radius: var(--radius); padding: 1rem 1.5rem; margin-bottom: 1rem; }
+    .alert-card h4 { color: #856404; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .alert-card p { color: #856404; font-size: 0.85rem; margin: 0; }
+    
+    @media (max-width: 1024px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    @media (max-width: 768px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { display: none; }
+      .admin-main { margin-left: 0; }
+      .stats-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <h2>Moow<span>.</span>Hub</h2>
+        <p style="font-size:0.8rem;opacity:0.7;margin:0.25rem 0 0;">Admin Panel</p>
+      </div>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="admin-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="orders.html" class="admin-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Orders
+        </a>
+        <a href="products.html" class="admin-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Products
+        </a>
+        <a href="customers.html" class="admin-nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Customers
+        </a>
+        <a href="../pages/products.html" class="admin-nav-item" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View Store
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-header">
+        <h1>Dashboard</h1>
+        <span style="color:var(--text-muted);font-size:0.9rem;" id="adminUser"></span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-label">Total Orders</div>
+          <div class="stat-card-value" id="statOrders">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Total Products</div>
+          <div class="stat-card-value" id="statProducts">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Total Customers</div>
+          <div class="stat-card-value" id="statUsers">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Revenue (30 days)</div>
+          <div class="stat-card-value" id="statRevenue">-</div>
+        </div>
+      </div>
+
+      <!-- Low Stock Alert -->
+      <div id="lowStockAlert" style="display:none;"></div>
+
+      <!-- Recent Orders -->
+      <div class="admin-table">
+        <div style="padding:1rem;border-bottom:1px solid var(--border-light);">
+          <h3 style="font-family:var(--font-serif);color:var(--navy);margin:0;">Recent Orders</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersTable">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check admin auth
+      if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
+        window.location.href = '/pages/login.html';
+        return;
+      }
+
+      const user = Auth.getUser();
+      document.getElementById('adminUser').textContent = user?.full_name || user?.email;
+
+      await loadDashboard();
+    });
+
+    async function loadDashboard() {
+      try {
+        const response = await Auth.authenticatedFetch('/api/admin/dashboard');
+        if (!response || !response.ok) throw new Error('Failed to load');
+
+        const data = await response.json();
+        const { stats, ordersByStatus, recentOrders, lowStockProducts } = data.data;
+
+        // Update stats
+        document.getElementById('statOrders').textContent = stats.totalOrders;
+        document.getElementById('statProducts').textContent = stats.totalProducts;
+        document.getElementById('statUsers').textContent = stats.totalUsers;
+        document.getElementById('statRevenue').textContent = '$' + stats.revenue30Days.toLocaleString();
+
+        // Low stock alert
+        if (lowStockProducts.length > 0) {
+          const alertDiv = document.getElementById('lowStockAlert');
+          alertDiv.style.display = 'block';
+          alertDiv.innerHTML = `
+            <div class="alert-card">
+              <h4>Low Stock Alert</h4>
+              <p>${lowStockProducts.length} product(s) have 5 or less items in stock</p>
+            </div>
+          `;
+        }
+
+        // Recent orders table
+        const tbody = document.getElementById('recentOrdersTable');
+        if (recentOrders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No orders yet</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = recentOrders.map(order => {
+          const date = new Date(order.created_at).toLocaleDateString();
+          const statusClass = 'status-' + order.status;
+          
+          return `
+            <tr>
+              <td><strong>${order.order_number}</strong></td>
+              <td>${order.customer || 'Unknown'}</td>
+              <td>$${Number(order.total).toFixed(2)}</td>
+              <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+              <td>${date}</td>
+              <td><a href="order-detail.html?id=${order.id}" class="action-btn action-btn-primary">View</a></td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Dashboard load error:', error);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details — Moow.Hub</title>
+  <meta name="description" content="View your order details and tracking information.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .detail-page { padding: 8rem 0 4rem; min-height: 100vh; }
+    .detail-container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .detail-back { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--text-light); font-size: 0.9rem; margin-bottom: 2rem; }
+    .detail-back:hover { color: var(--primary); }
+    
+    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .detail-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; font-size: 1.8rem; }
+    .detail-order-num { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem; }
+    .detail-date { font-size: 0.85rem; color: var(--text-muted); }
+    
+    .order-status { padding: 0.4rem 1rem; border-radius: var(--radius-pill); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d1ecf1; color: #0c5460; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    
+    .detail-grid { display: grid; grid-template-columns: 1fr 350px; gap: 2rem; }
+    
+    /* Sections */
+    .detail-section { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
+    .detail-section h3 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1rem; font-size: 1.1rem; }
+    .detail-address { line-height: 1.8; font-size: 0.95rem; }
+    
+    /* Items */
+    .detail-item { display: flex; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid var(--border-light); }
+    .detail-item:last-child { border-bottom: none; }
+    .detail-item-img { width: 80px; height: 80px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg); }
+    .detail-item-info { flex: 1; }
+    .detail-item-name { font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+    .detail-item-size { font-size: 0.85rem; color: var(--text-muted); }
+    .detail-item-qty { font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem; }
+    .detail-item-total { font-weight: 600; color: var(--navy); white-space: nowrap; }
+    
+    /* Totals */
+    .detail-totals { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .detail-total-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .detail-total-row.grand { font-weight: 700; font-size: 1.1rem; color: var(--navy); margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+    
+    /* Payment */
+    .detail-payment { font-size: 0.95rem; line-height: 1.8; }
+    
+    /* Tracking */
+    .tracking-timeline { position: relative; padding-left: 2rem; }
+    .tracking-timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+    .tracking-step { position: relative; margin-bottom: 1.5rem; }
+    .tracking-step:last-child { margin-bottom: 0; }
+    .tracking-dot { position: absolute; left: -2rem; top: 0; width: 18px; height: 18px; border-radius: 50%; background: var(--border); border: 3px solid var(--white); z-index: 1; }
+    .tracking-step.completed .tracking-dot { background: var(--primary); }
+    .tracking-step.active .tracking-dot { background: var(--primary); animation: pulse 2s infinite; }
+    .tracking-status { font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+    .tracking-date { font-size: 0.8rem; color: var(--text-muted); }
+    .tracking-desc { font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem; }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(212, 115, 94, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(212, 115, 94, 0); }
+    }
+    
+    /* Actions */
+    .detail-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-danger:hover { background: #c82333; }
+    
+    /* Loading */
+    .detail-loading { text-align: center; padding: 4rem; color: var(--text-light); }
+    
+    @media (max-width: 768px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li data-auth style="display:none;">
+          <a href="cart.html" class="nav-cart" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--primary);color:white;font-size:11px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">0</span>
+          </a>
+        </li>
+        <li data-auth style="display:none;"><a href="account.html">Account</a></li>
+        <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="detail-page">
+    <div class="detail-container">
+      <a href="orders.html" class="detail-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Orders
+      </a>
+
+      <div id="detailLoading" class="detail-loading">Loading order details...</div>
+
+      <div id="detailContent" style="display:none;">
+        <div class="detail-header">
+          <div>
+            <h1>Order <span id="detailOrderNumber"></span></h1>
+            <div class="detail-date" id="detailDate"></div>
+          </div>
+          <span class="order-status" id="detailStatus"></span>
+        </div>
+
+        <div class="detail-grid">
+          <div>
+            <!-- Items -->
+            <div class="detail-section">
+              <h3>Order Items</h3>
+              <div id="detailItems"></div>
+              <div class="detail-totals">
+                <div class="detail-total-row">
+                  <span>Subtotal</span>
+                  <span id="detailSubtotal"></span>
+                </div>
+                <div class="detail-total-row">
+                  <span>Shipping</span>
+                  <span id="detailShipping"></span>
+                </div>
+                <div class="detail-total-row">
+                  <span>Tax</span>
+                  <span id="detailTax"></span>
+                </div>
+                <div class="detail-total-row grand">
+                  <span>Total</span>
+                  <span id="detailTotal"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="detail-section">
+              <h3>Payment Information</h3>
+              <div class="detail-payment" id="detailPayment"></div>
+            </div>
+          </div>
+
+          <div>
+            <!-- Shipping Address -->
+            <div class="detail-section">
+              <h3>Shipping Address</h3>
+              <div class="detail-address" id="detailAddress"></div>
+            </div>
+
+            <!-- Tracking -->
+            <div class="detail-section">
+              <h3>Order Tracking</h3>
+              <div id="trackingTimeline">
+                <p style="color:var(--text-muted);font-size:0.9rem;">Tracking information will appear here once your order is shipped.</p>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="detail-actions">
+              <button id="detailCancelBtn" class="btn btn-danger" style="display:none;">
+                Cancel Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/orders.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/pages/login.html?redirect=/pages/order-detail.html';
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('id');
+      
+      if (!orderId) {
+        window.location.href = '/pages/orders.html';
+        return;
+      }
+
+      Orders.loadOrderDetail(orderId);
+    });
+  </script>
+</body>
+</html>

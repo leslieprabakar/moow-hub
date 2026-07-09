@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart — Moow.Hub</title>
+  <meta name="description" content="Review your cart and proceed to checkout.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .cart-page { padding: 8rem 0 4rem; min-height: 100vh; }
+    .cart-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .cart-header { margin-bottom: 2rem; }
+    .cart-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
+    .cart-grid { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; }
+    .cart-items { display: flex; flex-direction: column; gap: 1rem; }
+    .cart-item { background: var(--white); border-radius: var(--radius); padding: 1.5rem; display: grid; grid-template-columns: 100px 1fr auto; gap: 1.5rem; align-items: start; box-shadow: var(--shadow-sm); }
+    .cart-item-image { width: 100px; height: 100px; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg); }
+    .cart-item-image img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; font-size: 1.1rem; }
+    .cart-item-size { color: var(--text-light); font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .cart-item-price { color: var(--primary); font-weight: 600; font-size: 1.1rem; }
+    .cart-item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
+    .cart-qty { display: flex; align-items: center; gap: 0.5rem; }
+    .cart-qty button { width: 32px; height: 32px; border: 1px solid var(--border); background: var(--white); border-radius: var(--radius-sm); cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+    .cart-qty button:hover { background: var(--bg); }
+    .cart-qty span { width: 40px; text-align: center; font-weight: 600; }
+    .cart-remove { color: var(--text-light); background: none; border: none; cursor: pointer; font-size: 0.9rem; text-decoration: underline; }
+    .cart-remove:hover { color: #dc3545; }
+    .cart-summary { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); position: sticky; top: 100px; height: fit-content; }
+    .cart-summary h3 { font-family: var(--font-serif); color: var(--navy); margin: 0 0 1.5rem 0; }
+    .cart-summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; color: var(--text); }
+    .cart-summary-row.total { font-weight: 700; font-size: 1.1rem; color: var(--navy); border-top: 1px solid var(--border); padding-top: 0.75rem; margin-top: 0.75rem; }
+    .cart-empty { text-align: center; padding: 4rem 2rem; }
+    .cart-empty h2 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1rem; }
+    .cart-empty p { color: var(--text-light); margin-bottom: 2rem; }
+    .cart-empty .btn { display: inline-block; }
+    .btn-checkout { width: 100%; margin-top: 1rem; }
+    .cart-loading { text-align: center; padding: 4rem; color: var(--text-light); }
+    .suggestions-section { margin-top: 3rem; }
+    .suggestions-section h3 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1.5rem; }
+    .suggestions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .suggestion-card { background: var(--white); border-radius: var(--radius); padding: 1rem; text-align: center; box-shadow: var(--shadow-sm); }
+    .suggestion-card img { width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 0.75rem; }
+    .suggestion-card h5 { font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--navy); }
+    .suggestion-card .price { color: var(--primary); font-weight: 600; }
+    .suggestion-card .btn-add-small { margin-top: 0.5rem; padding: 0.4rem 1rem; font-size: 0.85rem; }
+    @media (max-width: 900px) {
+      .cart-grid { grid-template-columns: 1fr; }
+      .cart-item { grid-template-columns: 80px 1fr; }
+      .cart-item-actions { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; }
+      .suggestions-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li data-auth style="display:none;">
+          <a href="cart.html" class="nav-cart" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--primary);color:white;font-size:11px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">0</span>
+          </a>
+        </li>
+        <li data-auth style="display:none;"><a href="account.html">Account</a></li>
+        <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="cart-page">
+    <div class="cart-container">
+      <div class="cart-header">
+        <h1>Shopping Cart</h1>
+      </div>
+
+      <div id="cartLoading" class="cart-loading">Loading cart...</div>
+      <div id="cartEmpty" class="cart-empty" style="display:none;">
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added any products yet.</p>
+        <a href="products.html" class="btn btn-primary">Browse Products</a>
+      </div>
+
+      <div id="cartContent" class="cart-grid" style="display:none;">
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-summary">
+          <h3>Order Summary</h3>
+          <div class="cart-summary-row">
+            <span>Subtotal</span>
+            <span id="subtotal">$0.00</span>
+          </div>
+          <div class="cart-summary-row">
+            <span>Shipping</span>
+            <span id="shipping">$0.00</span>
+          </div>
+          <div class="cart-summary-row">
+            <span>Tax (estimated)</span>
+            <span id="tax">$0.00</span>
+          </div>
+          <div class="cart-summary-row total">
+            <span>Total</span>
+            <span id="total">$0.00</span>
+          </div>
+          <a href="checkout.html" class="btn btn-primary btn-checkout" id="checkoutBtn">Proceed to Checkout</a>
+          <a href="products.html" style="display:block;text-align:center;margin-top:1rem;color:var(--text-light);font-size:0.9rem;">Continue Shopping</a>
+        </div>
+      </div>
+
+      <div id="suggestionsSection" class="suggestions-section" style="display:none;">
+        <h3>You might also like</h3>
+        <div class="suggestions-grid" id="suggestionsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check auth
+      if (!Auth.isAuthenticated()) {
+        // Allow guest cart viewing
+      }
+
+      const loading = document.getElementById('cartLoading');
+      const empty = document.getElementById('cartEmpty');
+      const content = document.getElementById('cartContent');
+      const itemsContainer = document.getElementById('cartItems');
+
+      try {
+        const items = await Cart.getItems();
+        
+        loading.style.display = 'none';
+
+        if (items.length === 0) {
+          empty.style.display = 'block';
+          return;
+        }
+
+        content.style.display = 'grid';
+        renderCart(items);
+        await loadSuggestions(items[0]?.product_id);
+
+      } catch (error) {
+        loading.textContent = 'Failed to load cart';
+      }
+    });
+
+    function renderCart(items) {
+      const container = document.getElementById('cartItems');
+      container.innerHTML = items.map(item => `
+        <div class="cart-item" data-id="${item.id || item.product_id}">
+          <div class="cart-item-image">
+            <img src="../${item.product_image}" alt="${item.product_name}">
+          </div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.product_name}</div>
+            ${item.size ? `<div class="cart-item-size">Size: ${item.size}</div>` : ''}
+            <div class="cart-item-price">$${Number(item.price_usd).toFixed(2)}</div>
+          </div>
+          <div class="cart-item-actions">
+            <div class="cart-qty">
+              <button onclick="updateQty('${item.product_id}', ${item.quantity - 1})">-</button>
+              <span>${item.quantity}</span>
+              <button onclick="updateQty('${item.product_id}', ${item.quantity + 1})">+</button>
+            </div>
+            <button class="cart-remove" onclick="removeItem('${item.id || item.product_id}')">Remove</button>
+          </div>
+        </div>
+      `).join('');
+
+      updateSummary(items);
+    }
+
+    function updateSummary(items) {
+      const totals = Cart.calculateTotals(items);
+      document.getElementById('subtotal').textContent = '$' + totals.subtotal.toFixed(2);
+      document.getElementById('shipping').textContent = totals.shipping === 0 ? 'Free' : '$' + totals.shipping.toFixed(2);
+      document.getElementById('tax').textContent = '$' + totals.tax.toFixed(2);
+      document.getElementById('total').textContent = '$' + totals.total.toFixed(2);
+    }
+
+    async function updateQty(productId, newQty) {
+      if (newQty < 1) {
+        await removeItem(productId);
+        return;
+      }
+      await Cart.updateItem(productId, newQty);
+      location.reload();
+    }
+
+    async function removeItem(itemId) {
+      if (confirm('Remove this item from your cart?')) {
+        await Cart.removeItem(itemId);
+        location.reload();
+      }
+    }
+
+    async function loadSuggestions(productId) {
+      if (!productId) return;
+      try {
+        const res = await fetch(`/api/products/suggestions?id=${productId}&limit=4`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.data && data.data.length > 0) {
+          document.getElementById('suggestionsSection').style.display = 'block';
+          document.getElementById('suggestionsGrid').innerHTML = data.data.map(p => `
+            <div class="suggestion-card">
+              <img src="../${p.image_url}" alt="${p.name}">
+              <h5>${p.name}</h5>
+              <div class="price">$${Number(p.price_usd).toFixed(2)}</div>
+              <button class="btn btn-outline btn-add-small" onclick="addToCart('${p.id}')">Add to Cart</button>
+            </div>
+          `).join('');
+        }
+      } catch {}
+    }
+
+    async function addToCart(productId) {
+      await Cart.addItem(productId, 1);
+      Cart.updateBadge();
+      alert('Added to cart!');
+    }
+  </script>
+</body>
+</html>

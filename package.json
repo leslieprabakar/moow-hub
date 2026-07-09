@@ -1,0 +1,37 @@
+{
+  "name": "moow-hub-ecommerce",
+  "version": "1.0.0",
+  "description": "Moow.Hub E-Commerce Backend (Vercel Serverless)",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
+    "lint": "eslint api/",
+    "typecheck": "echo 'No typecheck configured'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "razorpay": "^2.8.0",
+    "stripe": "^14.0.0",
+    "resend": "^3.0.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  },
+  "keywords": [
+    "moow-hub",
+    "ecommerce",
+    "yoga",
+    "wellness",
+    "vercel",
+    "supabase"
+  ],
+  "author": "Moow.Hub",
+  "license": "ISC"
+}

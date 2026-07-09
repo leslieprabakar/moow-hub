@@ -100,26 +100,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // --- Cart Functionality ---
-  let cartCount = 0;
-  const cartBadge = document.querySelector('.cart-count');
-
+  // --- Cart Functionality (integrated with Cart module) ---
   document.querySelectorAll('.btn-add-cart').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      cartCount++;
-      if (cartBadge) {
-        cartBadge.textContent = cartCount;
-        cartBadge.style.display = 'inline-flex';
-      }
+      const productId = btn.getAttribute('data-product-id');
+      if (!productId) return;
 
       const originalText = btn.textContent;
-      btn.textContent = 'Added!';
-      btn.style.background = 'var(--primary)';
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.background = '';
-      }, 1500);
+      btn.textContent = 'Adding...';
+      btn.disabled = true;
+
+      try {
+        await Cart.addItem(productId, 1);
+        btn.textContent = 'Added!';
+        btn.style.background = 'var(--primary)';
+        
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 1500);
+      } catch (error) {
+        btn.textContent = 'Error';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 1500);
+      }
     });
   });
 
@@ -234,4 +242,51 @@ document.addEventListener('DOMContentLoaded', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  // --- Initialize Auth and Cart ---
+  if (typeof Auth !== 'undefined') {
+    Auth.init();
+  }
+  if (typeof Cart !== 'undefined') {
+    Cart.updateBadge();
+  }
 });
+
+// --- Utility Functions ---
+function formatCurrency(amount, currency = 'USD') {
+  const symbols = { USD: '$', INR: '₹', EUR: '€', GBP: '£', AED: 'د.إ', SGD: 'S$' };
+  return `${symbols[currency] || '$'}${Number(amount).toFixed(2)}`;
+}
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+function showNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
