@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Moow.Hub</title>
+  <meta name="description" content="Create your Moow.Hub account. Join the global wellness community.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      padding: 2rem 1rem;
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+    }
+    .auth-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+    }
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .auth-logo a {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-decoration: none;
+    }
+    .auth-logo .dot {
+      color: var(--primary);
+    }
+    .auth-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      color: var(--navy);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .auth-subtitle {
+      text-align: center;
+      color: var(--text-light);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--navy);
+      font-size: 0.9rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: var(--font-body);
+      color: var(--text);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(212, 115, 94, 0.1);
+    }
+    .form-group.error input {
+      border-color: #dc3545;
+    }
+    .error-message {
+      color: #dc3545;
+      font-size: 0.85rem;
+      margin-top: 0.35rem;
+      display: none;
+    }
+    .form-group.error .error-message {
+      display: block;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 0.875rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .btn-primary:hover {
+      background: #c0634e;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .auth-footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    .auth-footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .alert-error {
+      background: #fee;
+      color: #dc3545;
+      border: 1px solid #fcc;
+    }
+    .alert-success {
+      background: #efe;
+      color: #28a745;
+      border: 1px solid #cec;
+    }
+    .password-hints {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-light);
+    }
+    .password-hints li {
+      margin-bottom: 0.25rem;
+    }
+    .password-hints li.valid {
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <a href="../index.html">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+        </div>
+
+        <h1 class="auth-title">Join Moow.Hub</h1>
+        <p class="auth-subtitle">Create your account</p>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="registerForm" novalidate>
+          <div class="form-group">
+            <label for="fullName">Full name</label>
+            <input type="text" id="fullName" name="full_name" required autocomplete="name" placeholder="Your full name">
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone (optional)</label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
+            <div class="error-message"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Create a strong password">
+            <div class="error-message"></div>
+            <ul class="password-hints" id="passwordHints">
+              <li id="hint-length">At least 8 characters</li>
+              <li id="hint-upper">One uppercase letter</li>
+              <li id="hint-lower">One lowercase letter</li>
+              <li id="hint-number">One number</li>
+              <li id="hint-special">One special character</li>
+            </ul>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm password</label>
+            <input type="password" id="confirmPassword" name="confirm_password" required autocomplete="new-password" placeholder="Confirm your password">
+            <div class="error-message"></div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="submitBtn">Create Account</button>
+        </form>
+
+        <p class="auth-footer">
+          Already have an account? <a href="login.html">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Redirect if already logged in
+      if (Auth.isAuthenticated()) {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      const form = document.getElementById('registerForm');
+      const alert = document.getElementById('alert');
+      const submitBtn = document.getElementById('submitBtn');
+      const passwordInput = document.getElementById('password');
+
+      // Password strength hints
+      passwordInput.addEventListener('input', (e) => {
+        const pwd = e.target.value;
+        document.getElementById('hint-length').className = pwd.length >= 8 ? 'valid' : '';
+        document.getElementById('hint-upper').className = /[A-Z]/.test(pwd) ? 'valid' : '';
+        document.getElementById('hint-lower').className = /[a-z]/.test(pwd) ? 'valid' : '';
+        document.getElementById('hint-number').className = /[0-9]/.test(pwd) ? 'valid' : '';
+        document.getElementById('hint-special').className = /[^A-Za-z0-9]/.test(pwd) ? 'valid' : '';
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alert.style.display = 'none';
+
+        const fullName = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        // Validate
+        if (!fullName || fullName.length < 2) {
+          showAlert('Please enter your full name', 'error');
+          return;
+        }
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showAlert('Please enter a valid email address', 'error');
+          return;
+        }
+
+        if (password.length < 8) {
+          showAlert('Password must be at least 8 characters', 'error');
+          return;
+        }
+
+        if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+          showAlert('Password must include uppercase, lowercase, number, and special character', 'error');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showAlert('Passwords do not match', 'error');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating account...';
+
+        try {
+          await Auth.register(email, password, fullName, phone || undefined);
+          showAlert('Account created! Please check your email to verify your account.', 'success');
+          form.reset();
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 3000);
+        } catch (error) {
+          showAlert(error.message, 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Account';
+        }
+      });
+
+      function showAlert(message, type) {
+        alert.textContent = message;
+        alert.className = 'alert alert-' + type;
+        alert.style.display = 'block';
+        alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  </script>
+</body>
+</html>

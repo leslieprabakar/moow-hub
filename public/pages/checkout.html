@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Moow.Hub</title>
+  <meta name="description" content="Complete your purchase securely.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .checkout-page { padding: 8rem 0 4rem; min-height: 100vh; }
+    .checkout-container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    
+    /* Steps indicator */
+    .checkout-steps { display: flex; justify-content: center; margin-bottom: 3rem; gap: 2rem; }
+    .step { display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
+    .step.active { color: var(--primary); font-weight: 600; }
+    .step.completed { color: var(--navy); }
+    .step-number { width: 28px; height: 28px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; }
+    .step.active .step-number { background: var(--primary); color: white; border-color: var(--primary); }
+    .step.completed .step-number { background: var(--navy); color: white; border-color: var(--navy); }
+    .step-connector { width: 60px; height: 2px; background: var(--border); align-self: center; }
+    .step-connector.completed { background: var(--navy); }
+    
+    /* Main grid */
+    .checkout-grid { display: grid; grid-template-columns: 1fr 400px; gap: 2rem; }
+    .checkout-form { background: var(--white); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow-sm); }
+    .checkout-sidebar { position: sticky; top: 100px; height: fit-content; }
+    
+    /* Form styles */
+    .form-section { margin-bottom: 2rem; }
+    .form-section h3 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1.5rem; font-size: 1.2rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text); margin-bottom: 0.5rem; }
+    .form-group input, .form-group select { width: 100%; padding: 0.85rem 1rem; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--font-body); font-size: 0.95rem; color: var(--text); transition: var(--transition); }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); background: var(--white); }
+    .form-group input.error { border-color: #dc3545; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    
+    /* Saved addresses */
+    .saved-addresses { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+    .saved-address { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+    .saved-address:hover, .saved-address.selected { border-color: var(--primary); background: rgba(212, 115, 94, 0.05); }
+    .saved-address input { margin-top: 0.25rem; }
+    .saved-address label { flex: 1; font-size: 0.9rem; line-height: 1.6; cursor: pointer; }
+    
+    /* Payment methods */
+    .payment-methods { display: flex; flex-direction: column; gap: 0.75rem; }
+    .payment-method { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+    .payment-method:hover { border-color: var(--primary); }
+    .payment-method.selected { border-color: var(--primary); background: rgba(212, 115, 94, 0.05); }
+    .payment-method input { margin: 0; }
+    .payment-icon { font-size: 1.5rem; }
+    .payment-name { font-weight: 600; color: var(--navy); }
+    .payment-desc { font-size: 0.8rem; color: var(--text-muted); }
+    
+    /* Order summary */
+    .order-summary { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); }
+    .order-summary h3 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1.5rem; }
+    .summary-item { display: flex; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light); }
+    .summary-item:last-child { border-bottom: none; }
+    .summary-item-img { width: 60px; height: 60px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg); }
+    .summary-item-info { flex: 1; }
+    .summary-item-name { font-weight: 500; font-size: 0.9rem; color: var(--navy); }
+    .summary-item-size { font-size: 0.8rem; color: var(--text-muted); }
+    .summary-item-qty { font-size: 0.8rem; color: var(--text-muted); }
+    .summary-item-price { font-weight: 600; color: var(--navy); }
+    
+    .summary-totals { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    .summary-row.total { font-weight: 700; font-size: 1.1rem; color: var(--navy); margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
+    
+    /* Currency selector */
+    .currency-select { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; background: var(--white); margin-bottom: 1rem; width: 100%; }
+    
+    /* Buttons */
+    .checkout-btn { width: 100%; margin-top: 1.5rem; padding: 1rem; font-size: 1rem; }
+    .btn-back { background: transparent; color: var(--text-light); margin-top: 1rem; }
+    .btn-back:hover { color: var(--navy); background: transparent; transform: none; box-shadow: none; }
+    
+    /* Review section */
+    .review-section { margin-bottom: 1.5rem; }
+    .review-section h4 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .review-box { background: var(--bg); padding: 1rem; border-radius: var(--radius); font-size: 0.95rem; line-height: 1.6; }
+    .review-edit { font-size: 0.8rem; color: var(--primary); cursor: pointer; float: right; }
+    
+    /* Success */
+    .checkout-success { text-align: center; padding: 3rem; }
+    .checkout-success h2 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1rem; }
+    .success-icon { font-size: 4rem; margin-bottom: 1.5rem; }
+    .success-order { font-size: 1.2rem; color: var(--text-light); margin-bottom: 0.5rem; }
+    .success-total { font-family: var(--font-serif); font-size: 1.5rem; color: var(--navy); margin-bottom: 2rem; }
+    .success-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    
+    /* OTP Modal */
+    .otp-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+    .otp-modal-content { background: var(--white); padding: 2rem; border-radius: var(--radius-lg); max-width: 400px; width: 90%; text-align: center; }
+    .otp-modal h3 { margin-bottom: 1rem; }
+    .otp-modal input { width: 100%; padding: 1rem; font-size: 1.5rem; text-align: center; letter-spacing: 0.5em; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: var(--radius); }
+    
+    @media (max-width: 900px) {
+      .checkout-grid { grid-template-columns: 1fr; }
+      .checkout-sidebar { position: static; order: -1; }
+      .checkout-steps { gap: 0.5rem; }
+      .step span { display: none; }
+      .step-connector { width: 30px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li data-auth style="display:none;">
+          <a href="cart.html" class="nav-cart" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--primary);color:white;font-size:11px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">0</span>
+          </a>
+        </li>
+        <li data-auth style="display:none;"><a href="account.html">Account</a></li>
+        <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="checkout-page">
+    <div class="checkout-container">
+      <!-- Step indicators -->
+      <div class="checkout-steps">
+        <div class="step active">
+          <span class="step-number">1</span>
+          <span>Shipping</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span>Payment</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span>Review</span>
+        </div>
+      </div>
+
+      <div id="checkoutSteps" class="checkout-grid">
+        <!-- Main form area -->
+        <div class="checkout-form">
+          <!-- Step 1: Shipping -->
+          <div id="step1" class="checkout-step">
+            <div class="form-section">
+              <h3>Shipping Address</h3>
+              
+              <div id="savedAddressesSection"></div>
+              
+              <div id="newAddressForm">
+                <div class="form-group">
+                  <label for="fullName">Full Name *</label>
+                  <input type="text" id="fullName" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="address">Address Line 1 *</label>
+                  <input type="text" id="address" placeholder="123 Main Street" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="address2">Address Line 2</label>
+                  <input type="text" id="address2" placeholder="Apartment, suite, etc.">
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" id="city" placeholder="Mumbai" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="state">State *</label>
+                    <input type="text" id="state" placeholder="Maharashtra" required>
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="postalCode">Postal Code *</label>
+                    <input type="text" id="postalCode" placeholder="400001" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="country">Country *</label>
+                    <select id="country" required>
+                      <option value="IN">India</option>
+                      <option value="US">United States</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="AE">UAE</option>
+                      <option value="SG">Singapore</option>
+                      <option value="DE">Germany</option>
+                      <option value="FR">France</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="phone">Phone Number *</label>
+                  <input type="tel" id="phone" placeholder="+91 98765 43210" required>
+                </div>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary checkout-btn" onclick="Checkout.goToStep2()">
+              Continue to Payment
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+
+          <!-- Step 2: Payment -->
+          <div id="step2" class="checkout-step" style="display:none;">
+            <div class="form-section">
+              <h3>Payment Method</h3>
+              <div id="paymentMethods" class="payment-methods"></div>
+              
+              <div id="upiIdField" class="form-group" style="display:none; margin-top: 1rem;">
+                <label for="upiId">UPI ID</label>
+                <input type="text" id="upiId" placeholder="yourname@upi">
+              </div>
+            </div>
+            
+            <button class="btn btn-primary checkout-btn" onclick="Checkout.goToStep3()">
+              Review Order
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn btn-back" onclick="Checkout.currentStep = 1; Checkout.updateSteps();">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Back to Shipping
+            </button>
+          </div>
+
+          <!-- Step 3: Review -->
+          <div id="step3" class="checkout-step" style="display:none;">
+            <div class="form-section">
+              <h3>Review Order</h3>
+              
+              <div class="review-section">
+                <h4>Shipping Address</h4>
+                <div class="review-box" id="reviewAddress"></div>
+                <span class="review-edit" onclick="Checkout.currentStep = 1; Checkout.updateSteps();">Edit</span>
+              </div>
+              
+              <div class="review-section">
+                <h4>Payment Method</h4>
+                <div class="review-box" id="reviewPayment"></div>
+                <span class="review-edit" onclick="Checkout.currentStep = 2; Checkout.updateSteps();">Edit</span>
+              </div>
+              
+              <div class="review-section">
+                <h4>Order Total</h4>
+                <div class="review-box" style="font-weight:700;font-size:1.2rem;" id="reviewTotal"></div>
+              </div>
+            </div>
+            
+            <button id="placeOrderBtn" class="btn btn-primary checkout-btn" onclick="Checkout.placeOrder()">
+              Place Order
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn btn-back" onclick="Checkout.currentStep = 2; Checkout.updateSteps();">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Back to Payment
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="checkout-sidebar">
+          <div class="order-summary">
+            <h3>Order Summary</h3>
+            
+            <select id="currencySelect" class="currency-select">
+              <option value="USD">USD ($)</option>
+              <option value="INR">INR (₹)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option>
+              <option value="AED">AED (د.إ)</option>
+              <option value="SGD">SGD (S$)</option>
+            </select>
+            
+            <div id="summaryItems"></div>
+            
+            <div class="summary-totals">
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="summarySubtotal">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Shipping</span>
+                <span id="summaryShipping">$0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Tax</span>
+                <span id="summaryTax">$0.00</span>
+              </div>
+              <div class="summary-row total">
+                <span>Total</span>
+                <span id="summaryTotal">$0.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success state -->
+      <div id="checkoutSuccess" class="checkout-success" style="display:none;">
+        <div class="success-icon">✓</div>
+        <h2>Order Placed Successfully!</h2>
+        <p class="success-order">Order Number: <strong id="successOrderNumber"></strong></p>
+        <p class="success-total">Total: <strong id="successTotal"></strong></p>
+        <p style="color:var(--text-light);margin-bottom:2rem;">
+          Thank you for your purchase! You will receive an email confirmation shortly.
+        </p>
+        <div class="success-actions">
+          <a href="orders.html" class="btn btn-primary">View My Orders</a>
+          <a href="products.html" class="btn btn-outline">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTP Modal for COD -->
+  <div id="otpModal" class="otp-modal">
+    <div class="otp-modal-content">
+      <h3>Verify OTP</h3>
+      <p style="color:var(--text-light);margin-bottom:1rem;">Enter the 6-digit code sent to your phone</p>
+      <input type="text" id="otpInput" maxlength="6" placeholder="000000">
+      <button id="verifyOtpBtn" class="btn btn-primary" style="width:100%;">Verify & Place Order</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/checkout.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1279,6 +1279,8 @@ p {
 .form-group textarea {
   resize: vertical;
   min-height: 100px;
+  color: var(--text);
+  background: var(--white);
 }
 
 .contact-form-dark .form-group select option {
