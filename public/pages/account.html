@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — Moow.Hub</title>
+  <meta name="description" content="Manage your Moow.Hub account settings and profile.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .account-page { padding: 8rem 0 4rem; min-height: 100vh; background: var(--bg); }
+    .account-container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
+    .account-header { margin-bottom: 2rem; }
+    .account-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
+
+    .account-grid { display: grid; grid-template-columns: 260px 1fr; gap: 2rem; }
+    @media (max-width: 768px) { .account-grid { grid-template-columns: 1fr; } }
+
+    /* Sidebar */
+    .account-sidebar { background: var(--white); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); height: fit-content; }
+    .account-avatar { text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); margin-bottom: 1.5rem; }
+    .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem; font-size: 2rem; font-weight: 600; font-family: var(--font-serif); }
+    .account-name { font-weight: 600; color: var(--navy); font-size: 1.1rem; }
+    .account-email { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+
+    .sidebar-nav { list-style: none; padding: 0; margin: 0; }
+    .sidebar-nav li { margin-bottom: 0.25rem; }
+    .sidebar-nav a { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--radius); color: var(--text); text-decoration: none; font-size: 0.95rem; transition: var(--transition); }
+    .sidebar-nav a:hover, .sidebar-nav a.active { background: var(--bg); color: var(--primary); }
+    .sidebar-nav a svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Main content */
+    .account-main { min-height: 400px; }
+
+    .account-card { background: var(--white); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); }
+    .account-card h2 { font-family: var(--font-serif); color: var(--navy); margin: 0 0 1.5rem; font-size: 1.3rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; color: var(--navy); font-size: 0.9rem; }
+    .form-group input, .form-group select { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 1rem; font-family: var(--font-body); transition: border-color 0.2s, box-shadow 0.2s; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(212, 115, 94, 0.1); }
+    .form-group input:disabled { background: var(--bg); color: var(--text-muted); }
+
+    .btn-row { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+    .btn-primary { padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+    .btn-primary:hover { background: #c0634e; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-outline { padding: 0.75rem 1.5rem; background: var(--white); color: var(--navy); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: var(--transition); text-decoration: none; }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+    .alert { padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.9rem; display: none; }
+    .alert-error { background: #fee; color: #dc3545; border: 1px solid #fcc; }
+    .alert-success { background: #efe; color: #28a745; border: 1px solid #cec; }
+
+    /* Quick links */
+    .quick-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    @media (max-width: 600px) { .quick-links { grid-template-columns: 1fr; } }
+    .quick-link { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1.5rem; background: var(--bg); border-radius: var(--radius); text-decoration: none; color: var(--navy); transition: var(--transition); }
+    .quick-link:hover { background: var(--primary); color: white; }
+    .quick-link svg { width: 24px; height: 24px; }
+    .quick-link span { font-weight: 500; font-size: 0.9rem; }
+
+    /* Password section */
+    .password-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-light); }
+    .password-section h3 { font-family: var(--font-serif); color: var(--navy); margin: 0 0 1rem; font-size: 1.1rem; }
+
+    /* Danger zone */
+    .danger-zone { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-light); }
+    .danger-zone h3 { color: #dc3545; margin: 0 0 0.5rem; font-size: 1rem; }
+    .danger-zone p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+    .btn-danger { padding: 0.75rem 1.5rem; background: #dc3545; color: white; border: none; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .btn-danger:hover { background: #c82333; }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+      <ul class="nav-links">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="partners.html">Partners</a></li>
+        <li data-auth style="display:none;">
+          <a href="cart.html" class="nav-cart" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span class="cart-count" style="display:none;position:absolute;top:-8px;right:-8px;background:var(--primary);color:white;font-size:11px;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">0</span>
+          </a>
+        </li>
+        <li data-auth style="display:none;"><a href="account.html">Account</a></li>
+        <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
+      </ul>
+      <div class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="account-page">
+    <div class="account-container">
+      <div class="account-header">
+        <h1>My Account</h1>
+      </div>
+
+      <div class="account-grid">
+        <!-- Sidebar -->
+        <aside class="account-sidebar">
+          <div class="account-avatar">
+            <div class="avatar-circle" id="avatarLetter">?</div>
+            <div class="account-name" id="sidebarName">Loading...</div>
+            <div class="account-email" id="sidebarEmail"></div>
+          </div>
+          <ul class="sidebar-nav">
+            <li><a href="#profile" class="active" onclick="Account.showSection('profile');return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile
+            </a></li>
+            <li><a href="orders.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              My Orders
+            </a></li>
+            <li><a href="wishlist.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              Wishlist
+            </a></li>
+          </ul>
+        </aside>
+
+        <!-- Main content -->
+        <main class="account-main">
+          <!-- Profile Section -->
+          <div id="section-profile" class="account-section">
+            <div class="account-card">
+              <h2>Profile Information</h2>
+              <div id="profileAlert" class="alert"></div>
+              <form id="profileForm" novalidate>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="full_name" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" disabled>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="+1 234 567 890">
+                  </div>
+                  <div class="form-group">
+                    <label for="currency">Default Currency</label>
+                    <select id="currency" name="default_currency">
+                      <option value="USD">USD — US Dollar</option>
+                      <option value="INR">INR — Indian Rupee</option>
+                      <option value="EUR">EUR — Euro</option>
+                      <option value="GBP">GBP — British Pound</option>
+                      <option value="AED">AED — UAE Dirham</option>
+                      <option value="SGD">SGD — Singapore Dollar</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="btn-row">
+                  <button type="submit" class="btn-primary" id="saveProfileBtn">Save Changes</button>
+                </div>
+              </form>
+
+              <div class="password-section">
+                <h3>Change Password</h3>
+                <div id="passwordAlert" class="alert"></div>
+                <form id="passwordForm" novalidate>
+                  <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" name="password" placeholder="Min 8 chars, uppercase, lowercase, number, special" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirm_password" required>
+                  </div>
+                  <div class="btn-row">
+                    <button type="submit" class="btn-primary" id="changePasswordBtn">Update Password</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 Moow.Hub<sup>&reg;</sup>. All rights reserved.</p>
+        <p>Wear a pose. Awaken an ecosystem.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/auth.js"></script>
+  <script src="../js/cart.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    const Account = {
+      user: null,
+
+      async init() {
+        if (!Auth.isAuthenticated()) {
+          window.location.href = '/pages/login.html?redirect=/pages/account.html';
+          return;
+        }
+        await this.loadProfile();
+        this.bindEvents();
+      },
+
+      async loadProfile() {
+        try {
+          const response = await Auth.authenticatedFetch('/api/auth/user');
+          if (!response || !response.ok) throw new Error('Failed to load profile');
+
+          const data = await response.json();
+          this.user = data.data;
+          this.populateForm();
+        } catch (error) {
+          console.error('Failed to load profile:', error);
+        }
+      },
+
+      populateForm() {
+        const u = this.user;
+        document.getElementById('fullName').value = u.full_name || '';
+        document.getElementById('email').value = u.email || '';
+        document.getElementById('phone').value = u.phone || '';
+        document.getElementById('currency').value = u.default_currency || 'USD';
+
+        const letter = (u.full_name || u.email || '?')[0].toUpperCase();
+        document.getElementById('avatarLetter').textContent = letter;
+        document.getElementById('sidebarName').textContent = u.full_name || 'User';
+        document.getElementById('sidebarEmail').textContent = u.email || '';
+      },
+
+      bindEvents() {
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          await this.saveProfile();
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          await this.changePassword();
+        });
+      },
+
+      async saveProfile() {
+        const btn = document.getElementById('saveProfileBtn');
+        const alert = document.getElementById('profileAlert');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        alert.style.display = 'none';
+
+        try {
+          const body = {
+            full_name: document.getElementById('fullName').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            default_currency: document.getElementById('currency').value
+          };
+
+          const response = await Auth.authenticatedFetch('/api/auth/user', {
+            method: 'PUT',
+            body: JSON.stringify(body)
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) throw new Error(data.error || 'Failed to update profile');
+
+          this.user = { ...this.user, ...body };
+          localStorage.setItem('moow_user', JSON.stringify(this.user));
+          this.populateForm();
+
+          alert.textContent = 'Profile updated successfully!';
+          alert.className = 'alert alert-success';
+          alert.style.display = 'block';
+        } catch (error) {
+          alert.textContent = error.message;
+          alert.className = 'alert alert-error';
+          alert.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Save Changes';
+        }
+      },
+
+      async changePassword() {
+        const btn = document.getElementById('changePasswordBtn');
+        const alert = document.getElementById('passwordAlert');
+        btn.disabled = true;
+        btn.textContent = 'Updating...';
+        alert.style.display = 'none';
+
+        const password = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+
+        if (password !== confirm) {
+          alert.textContent = 'Passwords do not match';
+          alert.className = 'alert alert-error';
+          alert.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Update Password';
+          return;
+        }
+
+        try {
+          const response = await Auth.authenticatedFetch('/api/auth/password-change', {
+            method: 'POST',
+            body: JSON.stringify({ password })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) throw new Error(data.error || 'Failed to update password');
+
+          alert.textContent = 'Password updated successfully!';
+          alert.className = 'alert alert-success';
+          alert.style.display = 'block';
+          document.getElementById('passwordForm').reset();
+        } catch (error) {
+          alert.textContent = error.message;
+          alert.className = 'alert alert-error';
+          alert.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Update Password';
+        }
+      },
+
+      showSection(name) {
+        document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+        document.querySelector(`.sidebar-nav a[href="#${name}"]`)?.classList.add('active');
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => Account.init());
+  </script>
+</body>
+</html>
