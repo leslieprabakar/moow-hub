@@ -25,6 +25,57 @@
   <link rel="stylesheet" href="css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <link rel="sitemap" type="application/xml" href="sitemap.xml">
+  <!-- Google Analytics 4 — replace G-XXXXXXXXXX with your Measurement ID -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script> -->
+  <!-- Google Tag Manager — replace GTM-XXXXXXX with your Container ID -->
+  <!-- <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script> -->
+  <!-- Bing Webmaster Tools — replace with your verification code -->
+  <!-- <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" /> -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Moow.Hub",
+    "url": "https://moow.hub",
+    "logo": "https://moow.hub/images/vrksasana-hero.jpg",
+    "description": "Moow.Hub begins with a single t-shirt — a beautifully illustrated yoga pose with a QR code that opens an ocean of practices, personalized programs, global centers, and a worldwide partnership network.",
+    "sameAs": [
+      "https://www.facebook.com/",
+      "https://www.instagram.com/",
+      "https://twitter.com/",
+      "https://www.linkedin.com/"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "url": "https://moow.hub/pages/contact.html"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Moow.Hub",
+    "url": "https://moow.hub",
+    "description": "Wear a pose. Awaken an ecosystem.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://moow.hub/pages/products.html?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -123,7 +174,7 @@
   <section class="section">
     <div class="container">
       <div class="walking-billboard reveal">
-        <img src="images/qr-walking-billboard.jpeg" alt="Moow.Hub QR code t-shirt - every shirt a gateway to wellness" class="walking-billboard-image">
+        <img src="images/qr-walking-billboard.jpeg" alt="Moow.Hub QR code t-shirt - every shirt a gateway to wellness" class="walking-billboard-image" loading="lazy">
         <div class="walking-billboard-card">
           <div class="label">Walking Billboard</div>
           <h3>Every shirt, a gateway.</h3>
@@ -160,7 +211,7 @@
           </div>
         </div>
         <div class="ecosystem-visual reveal reveal-delay-2">
-          <img src="images/TShirt with QR scanner.png" alt="Moow.Hub yoga t-shirt with QR code - scan to explore ecosystem" style="width: 100%; max-width: 400px; height: auto; border-radius: var(--radius); margin-bottom: 1.5rem;">
+          <img src="images/TShirt with QR scanner.png" alt="Moow.Hub yoga t-shirt with QR code - scan to explore ecosystem" style="width: 100%; max-width: 400px; height: auto; border-radius: var(--radius); margin-bottom: 1.5rem;" loading="lazy">
           <p>Scan to explore the ecosystem</p>
         </div>
       </div>
@@ -177,12 +228,12 @@
       </div>
 
       <div class="asana-preview reveal" style="margin-bottom: 2rem;">
-        <img src="images/yoga-wellness-lifestyle.jpg" alt="Woman practicing Vrksasana (Tree Pose) yoga on mat" class="asana-image">
+        <img src="images/yoga-wellness-lifestyle.jpg" alt="Woman practicing Vrksasana (Tree Pose) yoga on mat" class="asana-image" loading="lazy">
         <div class="asana-tag">Standing / Balance</div>
       </div>
 
       <div class="asana-detail">
-        <img src="images/Vrksasana scanner.png" alt="Vrksasana Tree Pose detail - yoga balance and focus" class="asana-detail-image">
+        <img src="images/Vrksasana scanner.png" alt="Vrksasana Tree Pose detail - yoga balance and focus" class="asana-detail-image" loading="lazy">
         <div class="asana-detail-content">
           <div class="label">Asana</div>
           <h3>Vrksasana</h3>
@@ -274,6 +325,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script defer src="js/main.js"></script>
 </body>
 </html>
