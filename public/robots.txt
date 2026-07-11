@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /pages/admin/
+Disallow: /pages/cart
+Disallow: /pages/checkout
+Disallow: /pages/account
+Disallow: /pages/orders
+Disallow: /pages/order-detail
+Disallow: /pages/wishlist
+
+Sitemap: https://moow.hub/sitemap.xml
