@@ -24,7 +24,7 @@ const config = {
   RESEND_API_KEY: process.env.RESEND_API_KEY,
   EMAIL_FROM: process.env.EMAIL_FROM || 'orders@moow.hub',
   OER_APP_ID: process.env.OER_APP_ID,
-  SITE_URL: process.env.SITE_URL || 'https://moow.hub',
+  SITE_URL: process.env.SITE_URL || 'https://moow-hub.vercel.app',
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@moow.hub',
   ORDER_PREFIX: 'MOOW',
   CANCELLATION_WINDOW_HOURS: 24,

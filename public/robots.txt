@@ -8,4 +8,4 @@ Disallow: /pages/orders
 Disallow: /pages/order-detail
 Disallow: /pages/wishlist
 
-Sitemap: https://moow.hub/sitemap.xml
+Sitemap: https://moow-hub.vercel.app/sitemap.xml
