@@ -414,10 +414,14 @@ p {
 .cube-slider {
   width: 100%;
   aspect-ratio: 4/5;
+  height: 0;
+  padding-bottom: 125%;
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
   background: linear-gradient(135deg, var(--bg-warm), var(--border-light));
+  perspective: 800px;
+  -webkit-perspective: 800px;
 }
 
 .cube-face {
@@ -427,6 +431,9 @@ p {
   transform: rotateY(90deg);
   transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s ease;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity;
+  z-index: 0;
 }
 
 .cube-face img {
@@ -439,16 +446,19 @@ p {
 .cube-face.cube-active {
   opacity: 1;
   transform: rotateY(0deg);
+  z-index: 1;
 }
 
 .cube-face.cube-exit-left {
   opacity: 0;
   transform: rotateY(-90deg);
+  z-index: 0;
 }
 
 .cube-face.cube-exit-right {
   opacity: 0;
   transform: rotateY(90deg);
+  z-index: 0;
 }
 
 .hero-image-placeholder {

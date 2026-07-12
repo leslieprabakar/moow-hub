@@ -22,7 +22,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css?v=2">
+  <link rel="preload" as="image" href="images/Vrikshasana (Tree).webp" type="image/webp" fetchpriority="high">
+  <link rel="stylesheet" href="css/styles.css?v=3">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <link rel="sitemap" type="application/xml" href="sitemap.xml">
   <!-- Google Analytics 4 — replace G-XXXXXXXXXX with your Measurement ID -->
@@ -137,16 +138,28 @@
       <div class="hero-visual">
         <div class="cube-slider">
           <div class="cube-face cube-active">
-            <img src="images/Vrikshasana (Tree).png" alt="Vrikshasana (Tree Pose) yoga">
+            <picture>
+              <source srcset="images/Vrikshasana (Tree).webp" type="image/webp">
+              <img src="images/Vrikshasana (Tree).png" alt="Vrikshasana (Tree Pose) yoga" fetchpriority="high" decoding="sync">
+            </picture>
           </div>
           <div class="cube-face">
-            <img src="images/Garudasana (Eagle).png" alt="Garudasana (Eagle Pose) yoga">
+            <picture>
+              <source srcset="images/Garudasana (Eagle).webp" type="image/webp">
+              <img src="images/Garudasana (Eagle).png" alt="Garudasana (Eagle Pose) yoga" loading="lazy" decoding="async">
+            </picture>
           </div>
           <div class="cube-face">
-            <img src="images/Halasana (Plough).png" alt="Halasana (Plough Pose) yoga">
+            <picture>
+              <source srcset="images/Halasana (Plough).webp" type="image/webp">
+              <img src="images/Halasana (Plough).png" alt="Halasana (Plough Pose) yoga" loading="lazy" decoding="async">
+            </picture>
           </div>
           <div class="cube-face">
-            <img src="images/Matsyendrasana.png" alt="Matsyendrasana (Seated Spinal Twist) yoga">
+            <picture>
+              <source srcset="images/Matsyendrasana.webp" type="image/webp">
+              <img src="images/Matsyendrasana.png" alt="Matsyendrasana (Seated Spinal Twist) yoga" loading="lazy" decoding="async">
+            </picture>
           </div>
         </div>
         <div class="hero-float">
@@ -222,7 +235,10 @@
           </div>
         </div>
         <div class="ecosystem-visual reveal reveal-delay-2">
-          <img src="images/TShirt with QR scanner.png" alt="Moow.Hub yoga t-shirt with QR code - scan to explore ecosystem" style="width: 100%; max-width: 400px; height: auto; border-radius: var(--radius); margin-bottom: 1.5rem;" loading="lazy">
+          <picture>
+          <source srcset="images/TShirt with QR scanner.webp" type="image/webp">
+          <img src="images/TShirt with QR scanner.png" alt="Moow.Hub yoga t-shirt with QR code - scan to explore ecosystem" style="width: 100%; max-width: 400px; height: auto; border-radius: var(--radius); margin-bottom: 1.5rem;" loading="lazy" decoding="async">
+        </picture>
           <p>Scan to explore the ecosystem</p>
         </div>
       </div>
@@ -244,7 +260,10 @@
       </div>
 
       <div class="asana-detail">
-        <img src="images/Vrikshasana scanner.png" alt="Vrikshasana Tree Pose detail - yoga balance and focus" class="asana-detail-image" loading="lazy">
+        <picture>
+          <source srcset="images/Vrikshasana scanner.webp" type="image/webp">
+          <img src="images/Vrikshasana scanner.png" alt="Vrikshasana Tree Pose detail - yoga balance and focus" class="asana-detail-image" loading="lazy" decoding="async">
+        </picture>
         <div class="asana-detail-content">
           <div class="label">Asana</div>
           <h3>Vrikshasana</h3>
