@@ -40,15 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (faces.length > 1) {
       let current = 0;
       setInterval(() => {
-        const prev = current;
+        faces[current].classList.remove('cube-active');
         current = (current + 1) % faces.length;
-        faces[prev].classList.remove('cube-active');
-        faces[prev].classList.add('cube-exit-left');
         faces[current].classList.add('cube-active');
-        setTimeout(() => {
-          faces[prev].classList.remove('cube-exit-left');
-        }, 1500);
-      }, 5000);
+      }, 4000);
     }
   }
 

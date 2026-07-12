@@ -331,7 +331,6 @@ p {
   align-items: center;
   padding-top: 6rem;
   position: relative;
-  overflow: hidden;
 }
 
 .hero-container {
@@ -414,25 +413,17 @@ p {
 .cube-slider {
   width: 100%;
   aspect-ratio: 4/5;
-  height: 0;
-  padding-bottom: 125%;
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
   background: linear-gradient(135deg, var(--bg-warm), var(--border-light));
-  perspective: 800px;
-  -webkit-perspective: 800px;
 }
 
 .cube-face {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transform: rotateY(90deg);
-  transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s ease;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: transform, opacity;
+  transition: opacity 1.2s ease;
   z-index: 0;
 }
 
@@ -445,14 +436,7 @@ p {
 
 .cube-face.cube-active {
   opacity: 1;
-  transform: rotateY(0deg);
   z-index: 1;
-}
-
-.cube-face.cube-exit-left {
-  opacity: 0;
-  transform: rotateY(-90deg);
-  z-index: 0;
 }
 
 .cube-face.cube-exit-right {
@@ -492,6 +476,7 @@ p {
   box-shadow: var(--shadow-lg);
   animation: floatBounce 3s ease-in-out infinite;
   max-width: 240px;
+  z-index: 10;
 }
 
 .hero-float-brand {
