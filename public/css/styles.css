@@ -412,11 +412,20 @@ p {
 /* Hero Cube Transition */
 .cube-slider {
   width: 100%;
-  aspect-ratio: 4/5;
+  height: 0;
+  padding-bottom: 125%;
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
   background: linear-gradient(135deg, var(--bg-warm), var(--border-light));
+}
+
+@supports (aspect-ratio: 4/5) {
+  .cube-slider {
+    height: auto;
+    padding-bottom: 0;
+    aspect-ratio: 4/5;
+  }
 }
 
 .cube-face {
