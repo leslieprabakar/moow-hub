@@ -2060,6 +2060,7 @@ p {
   }
 
   .hero-visual {
+    order: -1;
     max-width: 280px;
   }
 
