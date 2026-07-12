@@ -33,6 +33,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Hero Cube Transition ---
+  const cubeSlider = document.querySelector('.cube-slider');
+  if (cubeSlider) {
+    const faces = cubeSlider.querySelectorAll('.cube-face');
+    if (faces.length > 1) {
+      let current = 0;
+      setInterval(() => {
+        const prev = current;
+        current = (current + 1) % faces.length;
+        faces[prev].classList.remove('cube-active');
+        faces[prev].classList.add('cube-exit-left');
+        faces[current].classList.add('cube-active');
+        setTimeout(() => {
+          faces[prev].classList.remove('cube-exit-left');
+        }, 1500);
+      }, 5000);
+    }
+  }
+
   // --- Scroll Reveal Animation ---
   const revealElements = document.querySelectorAll('.reveal');
 
