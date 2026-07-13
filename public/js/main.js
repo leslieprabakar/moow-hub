@@ -55,10 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
       let current = 0;
       setInterval(() => {
         faces[current].classList.remove('eco-active');
-        faces[current].style.opacity = '0';
         current = (current + 1) % faces.length;
         faces[current].classList.add('eco-active');
-        faces[current].style.opacity = '1';
       }, 2500);
     }
   }
