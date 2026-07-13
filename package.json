@@ -20,6 +20,7 @@
     "jsonwebtoken": "^9.0.0",
     "razorpay": "^2.8.0",
     "resend": "^3.0.0",
+    "sharp": "^0.35.3",
     "stripe": "^14.0.0"
   },
   "devDependencies": {
