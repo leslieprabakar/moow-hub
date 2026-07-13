@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Moow.Hub E-Commerce Backend (Vercel Serverless)",
   "private": true,
+  "packageManager": "npm@10.0.0",
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "node server.js",
     "build": "echo 'Static site - no build needed'",
     "deploy": "vercel --prod",
     "deploy:preview": "vercel",
@@ -16,12 +17,15 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
+    "jsonwebtoken": "^9.0.0",
     "razorpay": "^2.8.0",
-    "stripe": "^14.0.0",
     "resend": "^3.0.0",
-    "jsonwebtoken": "^9.0.0"
+    "stripe": "^14.0.0"
   },
   "devDependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "vercel": "^37.0.0"
   },
   "keywords": [
