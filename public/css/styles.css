@@ -482,6 +482,44 @@ p {
   z-index: 0;
 }
 
+.eco-slider {
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-warm);
+}
+
+@supports (aspect-ratio: 1/1) {
+  .eco-slider {
+    height: auto;
+    padding-bottom: 0;
+    aspect-ratio: 1/1;
+  }
+}
+
+.eco-face {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  z-index: 0;
+}
+
+.eco-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.eco-face.eco-active {
+  opacity: 1;
+  z-index: 1;
+}
+
 .hero-image-placeholder {
   text-align: center;
   padding: 3rem;
