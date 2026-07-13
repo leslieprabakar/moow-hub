@@ -187,7 +187,7 @@
   </section>
 
   <!-- Walking Billboard Section -->
-  <section class="section">
+  <section class="section" style="display: none;">
     <div class="container">
       <div class="walking-billboard reveal">
         <img src="images/qr-walking-billboard.jpeg" alt="Moow.Hub QR code t-shirt - every shirt a gateway to wellness" class="walking-billboard-image" loading="lazy">
@@ -227,10 +227,19 @@
           </div>
         </div>
         <div class="ecosystem-visual reveal reveal-delay-2">
-          <picture>
-          <source srcset="images/TShirt with QR scanner.webp" type="image/webp">
-          <img src="images/TShirt with QR scanner.png" alt="Moow.Hub yoga t-shirt with QR code - scan to explore ecosystem" style="width: 100%; max-width: 400px; height: auto; border-radius: var(--radius); margin-bottom: 1.5rem;" loading="lazy" decoding="async">
-        </picture>
+          <div class="eco-slider" style="position: relative; max-width: 400px; margin: 0 auto 1.5rem;">
+            <div class="eco-face eco-active" style="opacity: 1; transition: opacity 1.2s ease;">
+              <picture>
+                <source srcset="images/TShirt with QR scanner.webp" type="image/webp">
+                <img src="images/TShirt with QR scanner.png" alt="Moow.Hub yoga t-shirt with QR code" style="width: 100%; height: auto; border-radius: var(--radius); display: block;" loading="lazy" decoding="async">
+              </picture>
+            </div>
+            <div class="eco-face" style="position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease;">
+              <picture>
+                <img src="images/TShirt with QR - Set of 8 images.png" alt="Moow.Hub t-shirt set of 8 yoga poses" style="width: 100%; height: auto; border-radius: var(--radius); display: block;" loading="lazy" decoding="async">
+              </picture>
+            </div>
+          </div>
           <p>Scan to explore the ecosystem</p>
         </div>
       </div>

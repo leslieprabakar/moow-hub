@@ -43,7 +43,23 @@ document.addEventListener('DOMContentLoaded', () => {
         faces[current].classList.remove('cube-active');
         current = (current + 1) % faces.length;
         faces[current].classList.add('cube-active');
-      }, 4000);
+      }, 2500);
+    }
+  }
+
+  // --- Ecosystem QR Transition ---
+  const ecoSlider = document.querySelector('.eco-slider');
+  if (ecoSlider) {
+    const faces = ecoSlider.querySelectorAll('.eco-face');
+    if (faces.length > 1) {
+      let current = 0;
+      setInterval(() => {
+        faces[current].classList.remove('eco-active');
+        faces[current].style.opacity = '0';
+        current = (current + 1) % faces.length;
+        faces[current].classList.add('eco-active');
+        faces[current].style.opacity = '1';
+      }, 2500);
     }
   }
 
