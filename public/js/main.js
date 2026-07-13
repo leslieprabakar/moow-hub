@@ -50,13 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Ecosystem QR Transition ---
   const ecoSlider = document.querySelector('.eco-slider');
   if (ecoSlider) {
-    const faces = ecoSlider.querySelectorAll('.eco-face');
+    const faces = ecoSlider.querySelectorAll('.cube-face');
     if (faces.length > 1) {
       let current = 0;
       setInterval(() => {
-        faces[current].classList.remove('eco-active');
+        faces[current].classList.remove('cube-active');
         current = (current + 1) % faces.length;
-        faces[current].classList.add('eco-active');
+        faces[current].classList.add('cube-active');
       }, 2500);
     }
   }
