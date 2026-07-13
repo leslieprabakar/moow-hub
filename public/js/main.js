@@ -280,6 +280,186 @@ function formatDate(dateString) {
   });
 }
 
+// --- Pose Library Filters ---
+const poseGrid = document.getElementById('poseGrid');
+const poseFilters = document.getElementById('poseFilters');
+
+if (poseFilters && poseGrid) {
+  poseFilters.querySelectorAll('.pose-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      poseFilters.querySelectorAll('.pose-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-filter');
+
+      poseGrid.querySelectorAll('.pose-card').forEach(card => {
+        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+}
+
+// --- Centers Region Filters ---
+const centersGrid = document.getElementById('centersGrid');
+const regionFilters = document.getElementById('regionFilters');
+
+if (regionFilters && centersGrid) {
+  regionFilters.querySelectorAll('.region-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      regionFilters.querySelectorAll('.region-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const region = btn.getAttribute('data-region');
+
+      centersGrid.querySelectorAll('.center-card').forEach(card => {
+        if (region === 'all' || card.getAttribute('data-region') === region) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+}
+
+// --- Wellness AI Form ---
+const aiForm = document.getElementById('aiForm');
+
+if (aiForm) {
+  const poseDB = {
+    beginner: {
+      stress: [
+        { name: 'Balasana', english: "Child's Pose", duration: '3 min' },
+        { name: 'Sukhasana', english: 'Easy Seated Pose', duration: '5 min' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '1 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+      ],
+      diabetes: [
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '30 sec' },
+        { name: 'Bhujangasana', english: 'Cobra Pose', duration: '30 sec' },
+        { name: 'Adho Mukha Svanasana', english: 'Downward-Facing Dog', duration: '1 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '5 min' },
+      ],
+      hypertension: [
+        { name: 'Vrksasana', english: 'Tree Pose', duration: '1 min' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '1 min' },
+        { name: 'Sukhasana', english: 'Easy Seated Pose', duration: '5 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+      ],
+      'lower back': [
+        { name: 'Balasana', english: "Child's Pose", duration: '2 min' },
+        { name: 'Bhujangasana', english: 'Cobra Pose', duration: '30 sec' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '1 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '5 min' },
+      ],
+    },
+    intermediate: {
+      stress: [
+        { name: 'Adho Mukha Svanasana', english: 'Downward-Facing Dog', duration: '2 min' },
+        { name: 'Vrksasana', english: 'Tree Pose', duration: '2 min' },
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '1 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+      ],
+      diabetes: [
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '1 min' },
+        { name: 'Bhujangasana', english: 'Cobra Pose', duration: '1 min' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '1 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '8 min' },
+      ],
+      hypertension: [
+        { name: 'Vrksasana', english: 'Tree Pose', duration: '2 min' },
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '1 min' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '2 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+      ],
+      'lower back': [
+        { name: 'Balasana', english: "Child's Pose", duration: '2 min' },
+        { name: 'Bhujangasana', english: 'Cobra Pose', duration: '1 min' },
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '1 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '8 min' },
+      ],
+    },
+    advanced: {
+      stress: [
+        { name: 'Adho Mukha Vrksasana', english: 'Downward-Facing Dog', duration: '2 min' },
+        { name: 'Vrksasana', english: 'Tree Pose', duration: '3 min' },
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '2 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+      ],
+      diabetes: [
+        { name: 'Adho Mukha Svanasana', english: 'Downward-Facing Dog', duration: '2 min' },
+        { name: 'Bhujangasana', english: 'Cobra Pose', duration: '1 min' },
+        { name: 'Trikonasana', english: 'Triangle Pose', duration: '2 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '5 min' },
+      ],
+      hypertension: [
+        { name: 'Vrksasana', english: 'Tree Pose', duration: '3 min' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '2 min' },
+        { name: 'Sukhasana', english: 'Easy Seated Pose', duration: '5 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+      ],
+      'lower back': [
+        { name: 'Adho Mukha Svanasana', english: 'Downward-Facing Dog', duration: '2 min' },
+        { name: 'Bhujangasana', english: 'Cobra Pose', duration: '1 min' },
+        { name: 'Setu Bandhasana', english: 'Bridge Pose', duration: '2 min' },
+        { name: 'Savasana', english: 'Corpse Pose', duration: '8 min' },
+      ],
+    },
+  };
+
+  const defaultSequence = [
+    { name: 'Vrksasana', english: 'Tree Pose', duration: '2 min' },
+    { name: 'Trikonasana', english: 'Triangle Pose', duration: '1 min' },
+    { name: 'Bhujangasana', english: 'Cobra Pose', duration: '1 min' },
+    { name: 'Balasana', english: "Child's Pose", duration: '2 min' },
+    { name: 'Savasana', english: 'Corpse Pose', duration: '10 min' },
+  ];
+
+  function findSequence(condition, experience) {
+    const c = condition.toLowerCase();
+    const e = experience || 'beginner';
+
+    for (const [key, sequences] of Object.entries(poseDB[e] || poseDB.beginner)) {
+      if (c.includes(key)) {
+        return sequences;
+      }
+    }
+    return null;
+  }
+
+  function renderSequence(sequence) {
+    const container = document.getElementById('aiSequence');
+    container.innerHTML = '';
+    sequence.forEach((pose, i) => {
+      const item = document.createElement('div');
+      item.className = 'ai-sequence-item';
+      item.innerHTML = `
+        <div class="ai-sequence-num">${i + 1}</div>
+        <div class="pose-name"><em>${pose.name}</em> &mdash; ${pose.english}</div>
+        <div class="pose-duration">${pose.duration}</div>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  aiForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const condition = document.getElementById('condition').value.trim();
+    const experience = document.getElementById('experience').value;
+    const duration = parseInt(document.getElementById('duration').value) || 20;
+
+    const result = document.getElementById('aiResult');
+    const seq = findSequence(condition, experience) || defaultSequence;
+
+    renderSequence(seq);
+
+    result.classList.add('show');
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
 function showNotification(message, type = 'success') {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
