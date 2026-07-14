@@ -21,7 +21,7 @@
   --border: #e0d8d0;
   --border-light: #ebe5de;
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --radius: 12px;
   --radius-lg: 20px;
   --radius-pill: 50px;
@@ -305,7 +305,7 @@ p {
 
 .btn-gold {
   background: var(--gold);
-  color: var(--white);
+  color: var(--navy);
 }
 
 .btn-gold:hover {
@@ -400,6 +400,7 @@ p {
 }
 
 .hero-description {
+  font-family: var(--font-serif);
   font-size: 1.1rem;
   line-height: 1.8;
   color: var(--text-light);
@@ -1309,6 +1310,13 @@ p {
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
   padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.agreement-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 .agreement-section h3 {
@@ -1329,8 +1337,11 @@ p {
 }
 
 .agreement-section p {
-  font-size: 0.95rem;
-  line-height: 1.8;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 2.0;
+  letter-spacing: 0.01em;
+  color: rgba(26, 36, 68, 0.88);
 }
 
 .agreement-section ul {
@@ -1342,8 +1353,10 @@ p {
   padding: 0.4rem 0;
   padding-left: 1.25rem;
   position: relative;
-  font-size: 0.95rem;
-  color: var(--text-light);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.9;
+  color: rgba(26, 36, 68, 0.88);
 }
 
 .agreement-section li::before {
@@ -1351,11 +1364,11 @@ p {
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translateY(-50%);
-  width: 5px;
-  height: 5px;
-  background: var(--primary);
-  border-radius: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 1px;
 }
 
 /* Execution Block */
@@ -1403,11 +1416,11 @@ p {
 
 .execution-field label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 0.5rem;
 }
 
