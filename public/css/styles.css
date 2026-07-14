@@ -2732,11 +2732,12 @@ p {
 
   .cta-buttons {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .cta-buttons .btn {
-    width: 100%;
+    width: auto;
     justify-content: center;
+    padding: 0.65rem 1.5rem;
   }
 }
