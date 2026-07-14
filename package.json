@@ -27,7 +27,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "vercel": "^37.0.0"
+    "vercel": "^50.0.0"
   },
   "keywords": [
     "moow-hub",
