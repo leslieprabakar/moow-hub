@@ -2053,9 +2053,19 @@ p {
     display: flex;
   }
 
-  .hero {
+  .hero,
+  .library-hero,
+  .ai-hero,
+  .centers-hero {
     min-height: auto;
     padding: 2.5rem 0 3rem;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .stats-grid {
@@ -2673,6 +2683,13 @@ p {
   .marquee-label {
     font-size: 0.7rem;
     margin-bottom: 1rem;
+  }
+
+  .hero-eyebrow {
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
   }
 
   html {
