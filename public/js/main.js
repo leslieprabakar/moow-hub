@@ -25,10 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
+      link.addEventListener('click', (e) => {
         menuToggle.classList.remove('active');
         navLinks.classList.remove('active');
         document.body.style.overflow = '';
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('#') && !link.getAttribute('target') && !e.metaKey && !e.ctrlKey && e.button === 0) {
+          e.preventDefault();
+          window.location.href = href;
+        }
       });
     });
   }
