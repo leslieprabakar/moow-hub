@@ -2066,6 +2066,8 @@ p {
     justify-content: center;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
+    gap: 0;
   }
 
   .hero-eyebrow::before {
@@ -2694,6 +2696,7 @@ p {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+    gap: 0;
   }
 
   .hero-eyebrow::before {
