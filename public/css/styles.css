@@ -638,28 +638,37 @@ p {
 /* --- Partner Marquee --- */
 .marquee-section {
   padding: 4rem 0 0;
-  background: var(--navy);
   overflow: hidden;
   position: relative;
 }
 
-.marquee-section::before,
-.marquee-section::after {
+.marquee-ribbon {
+  width: 60%;
+  margin: 0 auto;
+  background: var(--navy);
+  overflow: hidden;
+  position: relative;
+  border-radius: 999px;
+  padding: 0 1.5rem;
+}
+
+.marquee-ribbon::before,
+.marquee-ribbon::after {
   content: '';
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 120px;
+  width: 80px;
   z-index: 2;
   pointer-events: none;
 }
 
-.marquee-section::before {
+.marquee-ribbon::before {
   left: 0;
   background: linear-gradient(to right, var(--navy), transparent);
 }
 
-.marquee-section::after {
+.marquee-ribbon::after {
   right: 0;
   background: linear-gradient(to left, var(--navy), transparent);
 }
