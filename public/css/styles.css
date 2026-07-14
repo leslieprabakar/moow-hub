@@ -148,10 +148,33 @@ p {
   font-weight: 700;
   color: var(--navy);
   letter-spacing: -0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .nav-logo .dot {
   color: var(--primary);
+}
+
+.nav-logo .badge {
+  font-family: var(--font-ui);
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: linear-gradient(135deg, rgba(201,169,110,0.12), rgba(201,169,110,0.04));
+  padding: 0.1rem 0.45rem;
+  border-radius: 50px;
+  border: 1px solid rgba(201,169,110,0.15);
+  line-height: 1.4;
+  animation: badgeGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes badgeGlow {
+  0%, 100% { opacity: 0.55; box-shadow: 0 0 0 0 rgba(201,169,110,0); }
+  50% { opacity: 1; box-shadow: 0 0 6px 0 rgba(201,169,110,0.3); }
 }
 
 .nav-links {
