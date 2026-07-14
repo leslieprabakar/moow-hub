@@ -2068,6 +2068,10 @@ p {
     margin-right: auto;
   }
 
+  .hero-eyebrow::before {
+    display: none;
+  }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2690,6 +2694,10 @@ p {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+  }
+
+  .hero-eyebrow::before {
+    display: none;
   }
 
   html {
