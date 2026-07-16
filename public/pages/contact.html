@@ -2,35 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Contact — Moow.Hub</title>
   <meta name="description" content="Get in touch with Moow.Hub — become a partner, place an order, or learn about our wellness programmes.">
   <meta name="keywords" content="contact Moow Hub, wellness partnership, place order, wellness programmes, get in touch, Moow Hub contact">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="Contact — Moow.Hub">
   <meta property="og:description" content="Get in touch with Moow.Hub — become a partner, place an order, or learn about our wellness programmes.">
-  <meta property="og:image" content="images/corporate-wellness.jpg">
+  <meta property="og:image" content="https://moow-hub.vercel.app/images/corporate-wellness.jpg">
+  <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://moow-hub.vercel.app/pages/contact.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Moow.Hub">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Contact — Moow.Hub">
   <meta name="twitter:description" content="Get in touch with Moow.Hub — become a partner, place an order, or learn about our wellness programmes.">
-  <meta name="twitter:image" content="images/corporate-wellness.jpg">
+  <meta name="twitter:site" content="@moowhub">
+  <meta name="twitter:image" content="https://moow-hub.vercel.app/images/corporate-wellness.jpg">
   <link rel="canonical" href="https://moow-hub.vercel.app/pages/contact.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I become a partner?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Fill out the contact form above or email us directly. We'll schedule a call to discuss your wellness goals and partnership options."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What are the payment terms?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Default terms: 50% advance and balance before dispatch. Custom terms can be arranged for large orders through purchase orders."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you ship internationally?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! We serve partners across 25+ countries. Shipping, duties, and customs are defined in the applicable purchase order."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can we co-brand products?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, co-branding is available for Impact Programme partners. All co-branding requires prior written approval per the Brand Guidelines."
+        }
+      }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://moow-hub.vercel.app/"},
+      {"@type": "ListItem", "position": 2, "name": "Contact", "item": "https://moow-hub.vercel.app/pages/contact.html"}
+    ]
+  }
+  </script>
 </head>
 <body class="page-transition">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Navigation -->
-  <nav class="navbar">
+  <header>
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-container">
       <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
-      <ul class="nav-links">
+      <ul class="nav-links" role="menubar">
         <li><a href="../index.html">Home</a></li>
         <li><a href="pose-library.html">Pose Library</a></li>
         <li><a href="wellness-ai.html">Wellness AI</a></li>
@@ -39,13 +93,16 @@
         <li><a href="products.html">Products</a></li>
         <li><a href="contact.html" class="nav-cta active">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
       </ul>
-      <div class="menu-toggle">
+      <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
   </nav>
+  </header>
+
+  <main id="main-content">
 
   <!-- Partner Marquee -->
   <section class="marquee-section">
@@ -187,7 +244,7 @@
             </div>
 
             <div class="info-card reveal reveal-delay-1">
-              <div class="info-card-icon"><img src="../images/digital-ecosystem.webp" alt="Digital wellness ecosystem - email us at hello@moow.hub" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div class="info-card-icon"><img src="../images/digital-ecosystem.webp" alt="Digital wellness ecosystem - email us at hello@moow.hub" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
               <div>
                 <h4>Email Us</h4>
                 <p>hello@moow.hub</p>
@@ -195,7 +252,7 @@
             </div>
 
             <div class="info-card reveal reveal-delay-2">
-              <div class="info-card-icon"><img src="../images/corporate-wellness.webp" alt="Corporate wellness programme - call us at +1 (555) 000-MOOO" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div class="info-card-icon"><img src="../images/corporate-wellness.webp" alt="Corporate wellness programme - call us at +1 (555) 000-MOOO" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
               <div>
                 <h4>Call Us</h4>
                 <p>+1 (555) 000-MOOO</p>
@@ -203,7 +260,7 @@
             </div>
 
             <div class="info-card reveal reveal-delay-3">
-              <div class="info-card-icon"><img src="../images/yoga-group-park.webp" alt="Global Reach" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div class="info-card-icon"><img src="../images/yoga-group-park.webp" alt="Global Reach" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
               <div>
                 <h4>Global Reach</h4>
                 <p>23+ Countries</p>
@@ -211,7 +268,7 @@
             </div>
 
             <div class="info-card reveal reveal-delay-4">
-              <div class="info-card-icon"><img src="../images/Vrikshasana-hero.webp" alt="Response Time" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
+              <div class="info-card-icon"><img src="../images/Vrikshasana-hero.webp" alt="Response Time" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;"></div>
               <div>
                 <h4>Response Time</h4>
                 <p>Within 24 Hours</p>
@@ -251,6 +308,8 @@
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer class="footer">

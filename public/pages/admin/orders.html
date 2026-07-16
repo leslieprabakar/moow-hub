@@ -31,7 +31,8 @@
     .filter-bar input { flex: 1; min-width: 200px; }
     
     .admin-table { background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
-    .admin-table table { width: 100%; border-collapse: collapse; }
+    .admin-table > div { overflow-x: auto; }
+    .admin-table table { width: 100%; border-collapse: collapse; min-width: 700px; }
     .admin-table th { background: var(--bg); padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
     .admin-table td { padding: 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
     .admin-table tr:hover td { background: var(--bg); }

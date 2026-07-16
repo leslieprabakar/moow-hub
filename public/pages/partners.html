@@ -2,35 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Partners — Moow.Hub</title>
   <meta name="description" content="Partner with Moow.Hub — schools, hospitals, NGOs, corporates, Rotary, Lions Clubs, and community organisations.">
   <meta name="keywords" content="wellness partners, school partnerships, hospital partnerships, corporate wellness, NGO partnerships, Rotary clubs, community organisations">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="Partners — Moow.Hub">
   <meta property="og:description" content="Partner with Moow.Hub — schools, hospitals, NGOs, corporates, Rotary, Lions Clubs, and community organisations.">
-  <meta property="og:image" content="images/school-wellness.jpg">
+  <meta property="og:image" content="https://moow-hub.vercel.app/images/school-wellness.jpg">
+  <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://moow-hub.vercel.app/pages/partners.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Moow.Hub">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Partners — Moow.Hub">
   <meta name="twitter:description" content="Partner with Moow.Hub — schools, hospitals, NGOs, corporates, Rotary, Lions Clubs, and community organisations.">
-  <meta name="twitter:image" content="images/school-wellness.jpg">
+  <meta name="twitter:site" content="@moowhub">
+  <meta name="twitter:image" content="https://moow-hub.vercel.app/images/school-wellness.jpg">
   <link rel="canonical" href="https://moow-hub.vercel.app/pages/partners.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://moow-hub.vercel.app/"},
+      {"@type": "ListItem", "position": 2, "name": "Partners", "item": "https://moow-hub.vercel.app/pages/partners.html"}
+    ]
+  }
+  </script>
 </head>
 <body class="page-transition">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Navigation -->
-  <nav class="navbar">
+  <header>
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-container">
       <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
-      <ul class="nav-links">
+      <ul class="nav-links" role="menubar">
         <li><a href="../index.html">Home</a></li>
         <li><a href="pose-library.html">Pose Library</a></li>
         <li><a href="wellness-ai.html">Wellness AI</a></li>
@@ -40,13 +54,16 @@
         <li><a href="about.html">About Us</a></li>
         <li><a href="contact.html" class="nav-cta">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
       </ul>
-      <div class="menu-toggle">
+      <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
   </nav>
+  </header>
+
+  <main id="main-content">
 
   <!-- Partner Marquee -->
   <section class="marquee-section">
@@ -92,42 +109,42 @@
       </div>
       <div class="partners-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
         <div class="partner-card reveal">
-          <div class="partner-icon"><img src="../images/school-wellness.webp" alt="Schools and Universities" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/school-wellness.webp" alt="Schools and Universities" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Schools & Universities</h4>
           <p>Integrate wellness into education. Access curriculum materials and student programmes.</p>
         </div>
         <div class="partner-card reveal reveal-delay-1">
-          <div class="partner-icon"><img src="../images/healthcare-wellness.webp" alt="Hospitals and Clinics" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/healthcare-wellness.webp" alt="Hospitals and Clinics" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Hospitals & Clinics</h4>
           <p>Preventive healthcare programmes for patients, staff, and communities.</p>
         </div>
         <div class="partner-card reveal reveal-delay-2">
-          <div class="partner-icon"><img src="../images/corporate-wellness.webp" alt="Corporates" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/corporate-wellness.webp" alt="Corporates" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Corporates</h4>
           <p>Employee wellness programmes, CSR initiatives, and branded merchandise.</p>
         </div>
         <div class="partner-card reveal reveal-delay-3">
-          <div class="partner-icon"><img src="../images/Vrikshasana scanner.png" alt="NGOs and Charities" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/Vrikshasana scanner.png" alt="NGOs and Charities" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>NGOs & Charities</h4>
           <p>Fundraising merchandise, campaign support, and digital tools.</p>
         </div>
         <div class="partner-card reveal">
-          <div class="partner-icon"><img src="../images/yoga-group-park.webp" alt="Rotary and Lions Clubs" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/yoga-group-park.webp" alt="Rotary and Lions Clubs" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Rotary & Lions Clubs</h4>
           <p>Community wellness projects and fundraising solutions.</p>
         </div>
         <div class="partner-card reveal reveal-delay-1">
-          <div class="partner-icon"><img src="../images/digital-ecosystem.webp" alt="Government Bodies" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/digital-ecosystem.webp" alt="Government Bodies" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Government Bodies</h4>
           <p>Public health initiatives and preventive healthcare awareness.</p>
         </div>
         <div class="partner-card reveal reveal-delay-2">
-          <div class="partner-icon"><img src="../images/wellness-kit.webp" alt="Distributors and Retailers" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/wellness-kit.webp" alt="Distributors and Retailers" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Distributors & Retailers</h4>
           <p>Distribution partnerships with wholesale pricing and marketing support.</p>
         </div>
         <div class="partner-card reveal reveal-delay-3">
-          <div class="partner-icon"><img src="../images/yoga-wellness-lifestyle.webp" alt="Community Organisations" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="partner-icon"><img src="../images/yoga-wellness-lifestyle.webp" alt="Community Organisations" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Community Organisations</h4>
           <p>Local wellness initiatives and neighbourhood health campaigns.</p>
         </div>
@@ -144,22 +161,22 @@
       </div>
       <div class="features-grid">
         <div class="feature-card reveal">
-          <div class="feature-icon"><img src="../images/digital-ecosystem.webp" alt="Digital Platform Access" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
+          <div class="feature-icon"><img src="../images/digital-ecosystem.webp" alt="Digital Platform Access" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
           <h4>Digital Platform Access</h4>
           <p>QR-code ecosystem, mobile app, and digital content platform to track impact and engage your community.</p>
         </div>
         <div class="feature-card reveal reveal-delay-1">
-          <div class="feature-icon"><img src="../images/Vrikshasana-hero.webp" alt="Brand Assets" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
+          <div class="feature-icon"><img src="../images/Vrikshasana-hero.webp" alt="Brand Assets" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
           <h4>Brand Assets & Guidelines</h4>
           <p>Approved logos, marketing materials, co-branding options, and comprehensive brand guidelines.</p>
         </div>
         <div class="feature-card reveal reveal-delay-2">
-          <div class="feature-icon"><img src="../images/education-materials.webp" alt="Training and Education" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
+          <div class="feature-icon"><img src="../images/education-materials.webp" alt="Training and Education" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
           <h4>Training & Education</h4>
           <p>Wellness programme training, instructor certification support, and educational content library.</p>
         </div>
         <div class="feature-card reveal reveal-delay-3">
-          <div class="feature-icon"><img src="../images/corporate-bundle.webp" alt="Dedicated Support" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
+          <div class="feature-icon"><img src="../images/corporate-bundle.webp" alt="Dedicated Support" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; border-radius: 14px;"></div>
           <h4>Dedicated Support</h4>
           <p>Partner success team, marketing guidance, campaign metrics, and ongoing programme support.</p>
         </div>
@@ -208,6 +225,8 @@
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer class="footer">

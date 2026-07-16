@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Moow.Hub — Wear a pose. Awaken an ecosystem.</title>
   <meta name="description" content="Moow.Hub begins with a single T-Shirt — a beautifully illustrated yoga pose with a QR code that opens an ocean of practices, personalized programs, global centers, and a worldwide partnership network.">
   <meta name="keywords" content="yoga, wellness, QR code, T-Shirt, preventive healthcare, yoga poses, wellness ecosystem, community health, Moow Hub">
@@ -10,14 +10,16 @@
   <meta name="google-site-verification" content="Fhg4zXSIGMb5yT9gMIyTqxjYhxh-HRLBpZ5mXNVXMAc" />
   <meta property="og:title" content="Moow.Hub — Wear a pose. Awaken an ecosystem.">
   <meta property="og:description" content="Moow.Hub begins with a single T-Shirt — a beautifully illustrated yoga pose with a QR code that opens an ocean of practices, personalized programs, global centers, and a worldwide partnership network.">
-  <meta property="og:image" content="images/Vrikshasana-hero.jpg">
+  <meta property="og:image" content="https://moow-hub.vercel.app/images/Vrikshasana-hero.jpg">
   <meta property="og:url" content="https://moow-hub.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Moow.Hub">
+  <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Moow.Hub — Wear a pose. Awaken an ecosystem.">
   <meta name="twitter:description" content="Moow.Hub begins with a single T-Shirt — a beautifully illustrated yoga pose with a QR code that opens an ocean of practices, personalized programs, global centers, and a worldwide partnership network.">
-  <meta name="twitter:image" content="images/Vrikshasana-hero.jpg">
+  <meta name="twitter:image" content="https://moow-hub.vercel.app/images/Vrikshasana-hero.jpg">
+  <meta name="twitter:site" content="@moowhub">
   <link rel="canonical" href="https://moow-hub.vercel.app/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,14 +79,25 @@
     }
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://moow-hub.vercel.app/"}
+    ]
+  }
+  </script>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Navigation -->
-  <nav class="navbar">
+  <header>
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-container">
       <a href="index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
-      <ul class="nav-links">
+      <ul class="nav-links" role="menubar">
         <li><a href="index.html" class="active">Home</a></li>
         <li><a href="pages/pose-library.html">Pose Library</a></li>
         <li><a href="pages/wellness-ai.html">Wellness AI</a></li>
@@ -94,13 +107,16 @@
         <li><a href="pages/about.html">About Us</a></li>
         <li><a href="pages/contact.html" class="nav-cta">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
       </ul>
-      <div class="menu-toggle">
+      <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
   </nav>
+  </header>
+
+  <main id="main-content">
 
   <!-- Partner Marquee -->
   <section class="marquee-section">
@@ -193,7 +209,7 @@
   <section class="section" style="display: none;">
     <div class="container">
       <div class="walking-billboard reveal">
-        <img src="images/qr-walking-billboard.webp" alt="Moow.Hub QR code T-Shirt - every shirt a gateway to wellness" class="walking-billboard-image" loading="lazy">
+        <img src="images/qr-walking-billboard.webp" alt="Moow.Hub QR code T-Shirt - every shirt a gateway to wellness" class="walking-billboard-image" loading="lazy" width="800" height="600">
         <div class="walking-billboard-card">
           <div class="label">Walking Billboard</div>
           <h3>Every shirt, a gateway.</h3>
@@ -214,13 +230,13 @@
         <div class="ecosystem-visual">
           <div class="eco-slider">
             <div class="eco-face eco-active">
-              <img src="images/TShirt with QR scanner.webp" alt="Moow.Hub yoga T-Shirt with QR code" loading="lazy" decoding="async">
+              <img src="images/TShirt with QR scanner.webp" alt="Moow.Hub yoga T-Shirt with QR code" loading="lazy" decoding="async" width="400" height="400">
             </div>
             <div class="eco-face">
-              <img src="images/TShirt with QR - Set of 8 images.webp" alt="Moow.Hub T-Shirt set of 8 yoga poses" loading="lazy" decoding="async">
+              <img src="images/TShirt with QR - Set of 8 images.webp" alt="Moow.Hub T-Shirt set of 8 yoga poses" loading="lazy" decoding="async" width="400" height="400">
             </div>
             <div class="eco-face">
-              <img src="images/Vrikshasana scanner.webp" alt="Vrikshasana Tree Pose detail" loading="lazy" decoding="async">
+              <img src="images/Vrikshasana scanner.webp" alt="Vrikshasana Tree Pose detail" loading="lazy" decoding="async" width="400" height="400">
             </div>
           </div>
           <p>Scan to explore the ecosystem</p>
@@ -242,6 +258,8 @@
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer class="footer">

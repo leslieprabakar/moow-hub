@@ -2,35 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Services — Moow.Hub</title>
   <meta name="description" content="Moow.Hub services — yoga programmes, corporate wellness, school initiatives, fundraising, and digital wellness ecosystem.">
   <meta name="keywords" content="yoga programmes, corporate wellness, school wellness, fundraising support, digital wellness ecosystem, preventive healthcare services">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="Services — Moow.Hub">
   <meta property="og:description" content="Moow.Hub services — yoga programmes, corporate wellness, school initiatives, fundraising, and digital wellness ecosystem.">
-  <meta property="og:image" content="images/digital-ecosystem.jpg">
+  <meta property="og:image" content="https://moow-hub.vercel.app/images/digital-ecosystem.jpg">
+  <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://moow-hub.vercel.app/pages/services.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Moow.Hub">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Services — Moow.Hub">
   <meta name="twitter:description" content="Moow.Hub services — yoga programmes, corporate wellness, school initiatives, fundraising, and digital wellness ecosystem.">
-  <meta name="twitter:image" content="images/digital-ecosystem.jpg">
+  <meta name="twitter:site" content="@moowhub">
+  <meta name="twitter:image" content="https://moow-hub.vercel.app/images/digital-ecosystem.jpg">
   <link rel="canonical" href="https://moow-hub.vercel.app/pages/services.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Wellness Ecosystem Services",
+    "provider": {
+      "@type": "Organization",
+      "name": "Moow.Hub",
+      "url": "https://moow-hub.vercel.app"
+    },
+    "name": "Moow.Hub Wellness Services",
+    "description": "From yoga programmes to corporate wellness, school initiatives to fundraising support — Moow.Hub provides end-to-end wellness solutions.",
+    "url": "https://moow-hub.vercel.app/pages/services.html",
+    "areaServed": "Worldwide",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Moow.Hub Services",
+      "itemListElement": [
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Yoga Programmes", "description": "Structured yoga and meditation programmes for schools, corporates, hospitals, and community groups."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Corporate Wellness", "description": "Employee wellness initiatives including yoga sessions, health screenings, and wellness challenges."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "School Wellness", "description": "Wellness-integrated education for schools — yoga classes, health education, and student programmes."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Fundraising Support", "description": "Complete fundraising solutions for NGOs, charities, Rotary, Lions Clubs — branded merchandise."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Digital Ecosystem", "description": "QR-code ecosystem, mobile app, and digital content platform connecting products to resources."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Preventive Healthcare", "description": "Health awareness programmes partnering with hospitals and healthcare organisations."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Educational Content", "description": "Comprehensive wellness education materials — printed guides, digital content, and QR-linked resources."}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Brand & Marketing", "description": "Co-branding opportunities, approved brand assets, and marketing support for partners."}}
+      ]
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://moow-hub.vercel.app/"},
+      {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://moow-hub.vercel.app/pages/services.html"}
+    ]
+  }
+  </script>
 </head>
 <body class="page-transition">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Navigation -->
-  <nav class="navbar">
+  <header>
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-container">
       <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
-      <ul class="nav-links">
+      <ul class="nav-links" role="menubar">
         <li><a href="../index.html">Home</a></li>
         <li><a href="pose-library.html">Pose Library</a></li>
         <li><a href="wellness-ai.html">Wellness AI</a></li>
@@ -40,13 +84,16 @@
         <li><a href="about.html">About Us</a></li>
         <li><a href="contact.html" class="nav-cta">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
       </ul>
-      <div class="menu-toggle">
+      <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
   </nav>
+  </header>
+
+  <main id="main-content">
 
   <!-- Partner Marquee -->
   <section class="marquee-section">
@@ -92,42 +139,42 @@
       </div>
       <div class="services-grid">
         <div class="service-card reveal">
-          <div class="service-icon"><img src="../images/yoga-wellness-lifestyle.webp" alt="Yoga Programmes" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/yoga-wellness-lifestyle.webp" alt="Yoga Programmes" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Yoga Programmes</h4>
           <p>Structured yoga and meditation programmes for schools, corporates, hospitals, and community groups.</p>
         </div>
         <div class="service-card reveal reveal-delay-1">
-          <div class="service-icon"><img src="../images/corporate-wellness.webp" alt="Corporate Wellness" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/corporate-wellness.webp" alt="Corporate Wellness" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Corporate Wellness</h4>
           <p>Employee wellness initiatives including yoga sessions, health screenings, and wellness challenges.</p>
         </div>
         <div class="service-card reveal reveal-delay-2">
-          <div class="service-icon"><img src="../images/school-wellness.webp" alt="School Wellness" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/school-wellness.webp" alt="School Wellness" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>School Wellness</h4>
           <p>Wellness-integrated education for schools — yoga classes, health education, and student programmes.</p>
         </div>
         <div class="service-card reveal reveal-delay-3">
-          <div class="service-icon"><img src="../images/corporate-bundle.webp" alt="Fundraising Support" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/corporate-bundle.webp" alt="Fundraising Support" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Fundraising Support</h4>
           <p>Complete fundraising solutions for NGOs, charities, Rotary, Lions Clubs — branded merchandise.</p>
         </div>
         <div class="service-card reveal">
-          <div class="service-icon"><img src="../images/digital-ecosystem.webp" alt="Digital Ecosystem" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/digital-ecosystem.webp" alt="Digital Ecosystem" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Digital Ecosystem</h4>
           <p>QR-code ecosystem, mobile app, and digital content platform connecting products to resources.</p>
         </div>
         <div class="service-card reveal reveal-delay-1">
-          <div class="service-icon"><img src="../images/healthcare-wellness.webp" alt="Preventive Healthcare" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/healthcare-wellness.webp" alt="Preventive Healthcare" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Preventive Healthcare</h4>
           <p>Health awareness programmes partnering with hospitals and healthcare organisations.</p>
         </div>
         <div class="service-card reveal reveal-delay-2">
-          <div class="service-icon"><img src="../images/education-materials.webp" alt="Educational Content" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/education-materials.webp" alt="Educational Content" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Educational Content</h4>
           <p>Comprehensive wellness education materials — printed guides, digital content, and QR-linked resources.</p>
         </div>
         <div class="service-card reveal reveal-delay-3">
-          <div class="service-icon"><img src="../images/Vrikshasana-hero.webp" alt="Brand and Marketing" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+          <div class="service-icon"><img src="../images/Vrikshasana-hero.webp" alt="Brand and Marketing" width="100" height="100" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
           <h4>Brand & Marketing</h4>
           <p>Co-branding opportunities, approved brand assets, and marketing support for partners.</p>
         </div>
@@ -144,7 +191,7 @@
       </div>
       <div class="pricing-grid" style="max-width: 1000px; margin: 0 auto;">
         <div class="pricing-card reveal">
-          <div class="pricing-icon"><img src="../images/Vrikshasana-hero.webp" alt="Starter Programme" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;"></div>
+          <div class="pricing-icon"><img src="../images/Vrikshasana-hero.webp" alt="Starter Programme" width="60" height="60" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;"></div>
           <h3>Starter Programme</h3>
           <div class="pricing-amount">$500</div>
           <div class="pricing-period">per quarter</div>
@@ -158,7 +205,7 @@
         </div>
         <div class="pricing-card featured reveal reveal-delay-1">
           <div class="badge">Most Popular</div>
-          <div class="pricing-icon"><img src="../images/yoga-group-park.webp" alt="Growth Programme" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;"></div>
+          <div class="pricing-icon"><img src="../images/yoga-group-park.webp" alt="Growth Programme" width="60" height="60" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;"></div>
           <h3>Growth Programme</h3>
           <div class="pricing-amount">$1,500</div>
           <div class="pricing-period">per quarter</div>
@@ -172,7 +219,7 @@
           <a href="contact.html" class="btn btn-primary" style="width: 100%; justify-content: center;">Get Started</a>
         </div>
         <div class="pricing-card reveal reveal-delay-2">
-          <div class="pricing-icon"><img src="../images/digital-ecosystem.webp" alt="Impact Programme" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;"></div>
+          <div class="pricing-icon"><img src="../images/digital-ecosystem.webp" alt="Impact Programme" width="60" height="60" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;"></div>
           <h3>Impact Programme</h3>
           <div class="pricing-amount">Custom</div>
           <div class="pricing-period">tailored pricing</div>
@@ -202,6 +249,8 @@
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer class="footer">

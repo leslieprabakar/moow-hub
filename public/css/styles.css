@@ -65,6 +65,25 @@ img {
   display: block;
 }
 
+/* --- Skip Link (Accessibility) --- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: var(--navy);
+  color: var(--white);
+  padding: 0.75rem 1.5rem;
+  z-index: 10000;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 /* --- Typography --- */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
@@ -120,7 +139,7 @@ p {
   left: 0;
   width: 100%;
   z-index: 1000;
-  padding: 1.25rem 0;
+  padding: 1.25rem env(safe-area-inset-right) 1.25rem env(safe-area-inset-left);
   background: rgba(245, 240, 235, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -260,16 +279,19 @@ p {
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.85rem 2rem;
   border-radius: var(--radius-pill);
+  font-family: var(--font-ui);
   font-weight: 600;
   font-size: 0.95rem;
-  font-family: var(--font-ui);
-  transition: var(--transition);
   cursor: pointer;
+  transition: var(--transition);
   border: none;
-  white-space: nowrap;
+  text-decoration: none;
+  min-height: 48px;
+  min-width: 48px;
 }
 
 .btn svg {

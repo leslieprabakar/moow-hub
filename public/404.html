@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Page Not Found — Moow.Hub</title>
+  <meta name="description" content="The page you're looking for doesn't exist. Return to Moow.Hub homepage.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <style>
+    .error-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+    .error-code {
+      font-family: var(--font-serif);
+      font-size: clamp(6rem, 15vw, 12rem);
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      opacity: 0.2;
+    }
+    .error-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      color: var(--navy);
+      margin: 1rem 0;
+    }
+    .error-message {
+      color: var(--text-light);
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin-bottom: 2rem;
+    }
+    .error-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="page-transition">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header>
+    <nav class="navbar" aria-label="Main navigation">
+      <div class="nav-container">
+        <a href="index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
+        <ul class="nav-links" role="menubar">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pages/pose-library.html">Pose Library</a></li>
+          <li><a href="pages/wellness-ai.html">Wellness AI</a></li>
+          <li><a href="pages/centers.html">Centers</a></li>
+          <li><a href="pages/partners.html">Partners</a></li>
+          <li><a href="pages/products.html">Products</a></li>
+          <li><a href="pages/about.html">About Us</a></li>
+          <li><a href="pages/contact.html" class="nav-cta">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
+        </ul>
+        <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <div class="error-page">
+      <div class="error-code">404</div>
+      <h1 class="error-title">Page Not Found</h1>
+      <p class="error-message">The page you're looking for doesn't exist or has been moved. Let's get you back on track.</p>
+      <div class="error-actions">
+        <a href="index.html" class="btn btn-primary">Go Home</a>
+        <a href="pages/products.html" class="btn btn-outline">Browse Products</a>
+      </div>
+    </div>
+  </main>
+
+  <script defer src="js/main.js"></script>
+</body>
+</html>

@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     menuToggle.addEventListener('click', () => {
       menuToggle.classList.toggle('active');
       navLinks.classList.toggle('active');
-      document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+      const isOpen = navLinks.classList.contains('active');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+      menuToggle.setAttribute('aria-expanded', isOpen);
     });
 
     navLinks.querySelectorAll('a').forEach(link => {

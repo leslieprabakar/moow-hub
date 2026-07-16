@@ -2,35 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Wellness AI — Moow.Hub</title>
   <meta name="description" content="Tell Moow.Hub Wellness AI what you're working with — stress, diabetes, hypertension, or lower back tension — and get a condition-aware yoga sequence.">
   <meta name="keywords" content="AI yoga, personalized yoga sequence, wellness AI, condition-aware yoga, yoga therapy, Gemini yoga">
   <meta name="robots" content="index, follow">
-  <meta property="og:title" content="Wellness AI — Moow.Hub</title>
+  <meta property="og:title" content="Wellness AI — Moow.Hub">
+  <meta property="og:locale" content="en_US">
   <meta property="og:description" content="Tell Moow.Hub Wellness AI what you're working with — stress, diabetes, hypertension, or lower back tension — and get a condition-aware yoga sequence.">
-  <meta property="og:image" content="../images/Vrikshasana-hero.jpg">
+  <meta property="og:image" content="https://moow-hub.vercel.app/images/Vrikshasana-hero.jpg">
   <meta property="og:url" content="https://moow-hub.vercel.app/pages/wellness-ai.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Moow.Hub">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Wellness AI — Moow.Hub">
   <meta name="twitter:description" content="Get a personalized, condition-aware yoga sequence powered by AI.">
-  <meta name="twitter:image" content="../images/Vrikshasana-hero.jpg">
+  <meta name="twitter:site" content="@moowhub">
+  <meta name="twitter:image" content="https://moow-hub.vercel.app/images/Vrikshasana-hero.jpg">
   <link rel="canonical" href="https://moow-hub.vercel.app/pages/wellness-ai.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://moow-hub.vercel.app/"},
+      {"@type": "ListItem", "position": 2, "name": "Wellness AI", "item": "https://moow-hub.vercel.app/pages/wellness-ai.html"}
+    ]
+  }
+  </script>
 </head>
 <body class="page-transition">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Navigation -->
-  <nav class="navbar">
+  <header>
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-container">
       <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
-      <ul class="nav-links">
+      <ul class="nav-links" role="menubar">
         <li><a href="../index.html">Home</a></li>
         <li><a href="pose-library.html">Pose Library</a></li>
         <li><a href="wellness-ai.html" class="active">Wellness AI</a></li>
@@ -40,13 +54,16 @@
         <li><a href="about.html">About Us</a></li>
         <li><a href="contact.html" class="nav-cta">Join the Movement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a></li>
       </ul>
-      <div class="menu-toggle">
+      <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
   </nav>
+  </header>
+
+  <main id="main-content">
 
   <!-- Partner Marquee -->
   <section class="marquee-section">
@@ -90,6 +107,7 @@
   <!-- AI Form -->
   <section class="section">
     <div class="container">
+      <h2>Generate Your Sequence</h2>
       <div class="ai-form-section">
         <div class="ai-form-card">
           <form id="aiForm">
@@ -151,6 +169,8 @@
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- Footer -->
   <footer class="footer">

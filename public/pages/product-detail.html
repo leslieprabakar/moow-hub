@@ -2,21 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Product — Moow.Hub</title>
   <meta name="description" content="Product details for Moow.Hub wellness products.">
+  <meta name="keywords" content="wellness products, yoga T-Shirts, educational materials, wellness kits, QR code merchandise">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="Product — Moow.Hub">
   <meta property="og:description" content="Product details for Moow.Hub wellness products.">
-  <meta property="og:image" content="images/wellness-tshirt.jpg">
-  <meta property="og:url" content="https://moow-hub.vercel.app/product-detail">
+  <meta property="og:image" content="https://moow-hub.vercel.app/images/wellness-tshirt.webp">
+  <meta property="og:url" content="https://moow-hub.vercel.app/pages/product-detail.html">
   <meta property="og:type" content="product">
   <meta property="og:site_name" content="Moow.Hub">
+  <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Product — Moow.Hub">
   <meta name="twitter:description" content="Product details for Moow.Hub wellness products.">
-  <meta name="twitter:image" content="images/wellness-tshirt.jpg">
-  <link rel="canonical" href="https://moow-hub.vercel.app/product-detail">
+  <meta name="twitter:site" content="@moowhub">
+  <meta name="twitter:image" content="https://moow-hub.vercel.app/images/wellness-tshirt.webp">
+  <link rel="canonical" href="https://moow-hub.vercel.app/pages/product-detail.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -32,15 +35,26 @@
       "@type": "Brand",
       "name": "Moow.Hub"
     },
-    "image": "images/wellness-tshirt.jpg",
-    "url": "https://moow-hub.vercel.app/product-detail",
+    "image": "https://moow-hub.vercel.app/images/wellness-tshirt.webp",
+    "url": "https://moow-hub.vercel.app/pages/product-detail.html",
     "offers": {
       "@type": "Offer",
       "priceCurrency": "USD",
       "price": "0.00",
       "availability": "https://schema.org/InStock",
-      "url": "https://moow-hub.vercel.app/product-detail"
+      "url": "https://moow-hub.vercel.app/pages/product-detail.html"
     }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://moow-hub.vercel.app/"},
+      {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://moow-hub.vercel.app/pages/products.html"},
+      {"@type": "ListItem", "position": 3, "name": "Product Detail", "item": "https://moow-hub.vercel.app/pages/product-detail.html"}
+    ]
   }
   </script>
   <style>
@@ -95,12 +109,14 @@
     }
   </style>
 </head>
-<body>
+<body class="page-transition">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
   <!-- Navigation -->
-  <nav class="navbar">
+  <header>
+  <nav class="navbar" aria-label="Main navigation">
     <div class="nav-container">
       <a href="../index.html" class="nav-logo">Moow<span class="dot">.</span>Hub<sup>&reg;</sup></a>
-      <ul class="nav-links">
+      <ul class="nav-links" role="menubar">
         <li><a href="../index.html">Home</a></li>
         <li><a href="pose-library.html">Pose Library</a></li>
         <li><a href="wellness-ai.html">Wellness AI</a></li>
@@ -116,13 +132,16 @@
         <li data-auth style="display:none;"><a href="account.html">Account</a></li>
         <li data-auth style="display:none;"><a href="#" onclick="Auth.logout();return false;">Logout</a></li>
       </ul>
-      <div class="menu-toggle">
+      <div class="menu-toggle" role="button" aria-label="Toggle navigation menu" aria-expanded="false" tabindex="0">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
   </nav>
+  </header>
+
+  <main id="main-content">
 
   <!-- Partner Marquee -->
   <section class="marquee-section">
@@ -217,6 +236,8 @@
       </div>
     </div>
   </div>
+
+  </main>
 
   <!-- Footer -->
   <footer class="footer">
