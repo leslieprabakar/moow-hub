@@ -2369,14 +2369,14 @@ p {
 }
 
 .pose-filter {
-  padding: 0.5rem 1.25rem;
+  padding: 0.6rem 1.5rem;
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  border: 1.5px solid var(--border);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 2px solid var(--border);
   background: var(--white);
-  color: var(--text-light);
+  color: var(--text);
   cursor: pointer;
   transition: var(--transition);
   font-family: var(--font-ui);
