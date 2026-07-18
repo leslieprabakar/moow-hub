@@ -154,9 +154,10 @@ function getStripe() { if (!stripeClient && config.STRIPE_SECRET_KEY) stripeClie
 
 // ─── CORS SETUP ───────────────────────────────────────────────────────────────
 function setCORS(res, methods = 'GET, POST, PUT, DELETE, OPTIONS') {
-  res.setHeader('Access-Control-Allow-Origin', config.SITE_URL || '*');
+  res.setHeader('Access-Control-Allow-Origin', config.SITE_URL || 'https://moow-hub.vercel.app');
   res.setHeader('Access-Control-Allow-Methods', methods);
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Razorpay-Signature, Stripe-Signature');
+  res.setHeader('Access-Control-Max-Age', '86400');
 }
 
 // ─── ROUTE HANDLERS ───────────────────────────────────────────────────────────
@@ -186,6 +187,9 @@ async function handleAuth(req, res, path) {
   }
 
   if (req.method === 'POST' && path === 'login') {
+    const ip = getClientIP(req);
+    const rateLimit = await checkRateLimit(ip, 'login');
+    if (!rateLimit.allowed) return res.status(429).json({ error: 'Too many login attempts. Please try again later.' });
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
     const { data, error } = await db.auth.signInWithPassword({ email, password });

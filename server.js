@@ -33,6 +33,15 @@ function parseBody(req) {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
+  // Security headers for all responses
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+
   if (url.pathname.startsWith('/api/')) {
     try {
       const body = await parseBody(req);
@@ -66,6 +75,9 @@ const server = http.createServer(async (req, res) => {
     '/contact': '/pages/contact.html',
     '/agreement': '/pages/agreement.html',
     '/product-detail': '/pages/product-detail.html',
+    '/privacy-policy': '/pages/privacy-policy.html',
+    '/terms-of-service': '/pages/terms-of-service.html',
+    '/brand-guidelines': '/pages/brand-guidelines.html',
   };
 
   const rewrittenPath = cleanUrlMap[pathname] || pathname;
