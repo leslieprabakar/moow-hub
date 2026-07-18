@@ -175,6 +175,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     phone VARCHAR(20),
     default_currency VARCHAR(3) DEFAULT 'USD',
     is_admin BOOLEAN DEFAULT FALSE,
+    is_partner BOOLEAN DEFAULT FALSE,
     email_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
     reset_token VARCHAR(255),

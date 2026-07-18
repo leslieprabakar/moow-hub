@@ -499,6 +499,29 @@ async function handleWishlist(req, res, path) {
   return false;
 }
 
+// ─── PARTNER HANDLER ─────────────────────────────────────────────────────────
+async function handlePartner(req, res, path) {
+  const user = await requireAuth(req, res);
+  if (!user) return true;
+  const db = getAdminDB();
+
+  if (req.method === 'GET' && path === 'status') {
+    return res.status(200).json({ success: true, data: { is_partner: user.is_partner === true } });
+  }
+
+  if (req.method === 'POST' && path === 'apply') {
+    if (user.is_partner) return res.status(200).json({ success: true, message: 'Already a partner' });
+    const updates = { is_partner: true, updated_at: new Date().toISOString() };
+    const { error } = await db.from('profiles').update(updates).eq('id', user.id);
+    if (error) return res.status(500).json({ error: 'Failed to apply as partner' });
+    const { data: updated } = await db.from('profiles').select('*').eq('id', user.id).single();
+    sendEmail(user.email, 'Welcome to Moow.Hub Partner Network', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">You're Now a Moow.Hub Partner!</h1><p>Hi ${user.full_name || 'Partner'},</p><p>Congratulations! Your partner application has been approved. You now have full access to partnership schedules, pricing, and resources.</p><p><strong>What's next:</strong></p><ul style="color:#666;"><li>Review the <a href="${config.SITE_URL}/pages/agreement.html">Partnership Agreement</a></li><li>Access exclusive partner pricing</li><li>Download brand assets and marketing materials</li></ul><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'welcome' }).catch(() => {});
+    return res.status(200).json({ success: true, data: { is_partner: true, user: updated } });
+  }
+
+  return false;
+}
+
 async function handleAdmin(req, res, path, url) {
   const user = await requireAuth(req, res);
   if (!user) return true;
@@ -652,6 +675,9 @@ module.exports = async function handler(req, res) {
         break;
       case 'wishlist':
         handled = await handleWishlist(req, res, subPath);
+        break;
+      case 'partner':
+        handled = await handlePartner(req, res, subPath);
         break;
       case 'admin':
         handled = await handleAdmin(req, res, subPath, url);

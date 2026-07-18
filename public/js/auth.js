@@ -128,6 +128,14 @@ const Auth = {
   },
 
   /**
+   * Check if user is a partner
+   */
+  isPartner() {
+    const user = this.getUser();
+    return user?.is_partner === true;
+  },
+
+  /**
    * Make authenticated API call
    */
   async authenticatedFetch(url, options = {}) {
