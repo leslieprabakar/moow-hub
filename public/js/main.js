@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', (e) => {
+        if (link.closest('.nav-dropdown')) return;
         menuToggle.classList.remove('active');
         navLinks.classList.remove('active');
         document.body.style.overflow = '';
@@ -39,6 +40,33 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // --- Nav Dropdown ---
+  document.querySelectorAll('.nav-dropdown-trigger').forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropdown = trigger.closest('.nav-dropdown');
+      const isOpen = dropdown.classList.contains('open');
+
+      document.querySelectorAll('.nav-dropdown.open').forEach(d => {
+        if (d !== dropdown) d.classList.remove('open');
+      });
+
+      dropdown.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', !isOpen);
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown.open').forEach(d => {
+        d.classList.remove('open');
+        const t = d.querySelector('.nav-dropdown-trigger');
+        if (t) t.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
 
   // --- Hero Cube Transition ---
   const cubeSlider = document.querySelector('.cube-slider');
