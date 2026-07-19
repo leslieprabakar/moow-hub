@@ -246,10 +246,21 @@ const Auth = {
     }
 
     try {
-      const response = await this.authenticatedFetch('/api/cart/get');
-      if (response && response.ok) {
+      const response = await fetch('/api/cart/get', {
+        headers: {
+          'Authorization': `Bearer ${this.getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
         const data = await response.json();
         const count = data.data?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      } else {
+        // API error or 401 — show guest cart count instead of redirecting
+        const guestCart = JSON.parse(localStorage.getItem('moow_guest_cart') || '[]');
+        const count = guestCart.reduce((sum, item) => sum + item.quantity, 0);
         badge.textContent = count;
         badge.style.display = count > 0 ? 'inline-flex' : 'none';
       }
