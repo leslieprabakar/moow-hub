@@ -475,6 +475,13 @@ const Checkout = {
   async processRazorpayPayment(orderData) {
     const { payment } = orderData;
 
+    if (!payment.razorpay_key || !payment.razorpay_order_id) {
+      alert('Payment is not configured yet. Please try Cash on Delivery or contact support.');
+      document.getElementById('placeOrderBtn').disabled = false;
+      document.getElementById('placeOrderBtn').textContent = 'Place Order';
+      return;
+    }
+
     const options = {
       key: payment.razorpay_key,
       amount: Math.round(orderData.total * 100),
@@ -516,6 +523,13 @@ const Checkout = {
    */
   async processStripePayment(orderData) {
     const { payment } = orderData;
+
+    if (!payment.stripe_publishable_key || !payment.stripe_client_secret) {
+      alert('Payment is not configured yet. Please try Cash on Delivery or contact support.');
+      document.getElementById('placeOrderBtn').disabled = false;
+      document.getElementById('placeOrderBtn').textContent = 'Place Order';
+      return;
+    }
 
     const stripe = Stripe(payment.stripe_publishable_key);
     const { error } = await stripe.confirmCardPayment(payment.stripe_client_secret, {

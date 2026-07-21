@@ -167,7 +167,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-add-cart').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
-      const productId = btn.getAttribute('data-product-id');
+      let productId = btn.getAttribute('data-product-id');
+      const slug = btn.getAttribute('data-product-slug');
+
+      if (!productId && slug) {
+        try {
+          const res = await fetch(`/api/products/list?search=${encodeURIComponent(slug)}&limit=1`);
+          const data = await res.json();
+          const match = (data.data || []).find(p => p.slug === slug);
+          if (match) productId = match.id;
+        } catch {}
+      }
       if (!productId) return;
 
       const originalText = btn.textContent;

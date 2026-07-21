@@ -254,8 +254,21 @@ const Cart = {
    */
   async getCount() {
     if (Auth.isAuthenticated()) {
-      const items = await this.getServerItems();
-      return items.reduce((sum, item) => sum + item.quantity, 0);
+      try {
+        const token = Auth.getToken();
+        if (!token) return this.getGuestCart().reduce((sum, item) => sum + item.quantity, 0);
+        const response = await fetch('/api/cart/get', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) return this.getGuestCart().reduce((sum, item) => sum + item.quantity, 0);
+        const data = await response.json();
+        const items = (data.data || []).map(item => ({
+          quantity: item.quantity
+        }));
+        return items.reduce((sum, item) => sum + item.quantity, 0);
+      } catch {
+        return this.getGuestCart().reduce((sum, item) => sum + item.quantity, 0);
+      }
     } else {
       const cart = this.getGuestCart();
       return cart.reduce((sum, item) => sum + item.quantity, 0);

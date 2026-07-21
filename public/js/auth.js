@@ -46,6 +46,11 @@ const Auth = {
     localStorage.setItem('moow_user', JSON.stringify(data.user));
 
     this.updateUI(data.user);
+
+    if (typeof Cart !== 'undefined') {
+      await Cart.mergeGuestCart();
+    }
+
     return data.user;
   },
 
