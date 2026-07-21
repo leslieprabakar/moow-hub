@@ -261,6 +261,31 @@ p {
   display: none !important;
 }
 
+/* Icon-only account dropdown */
+.nav-dropdown-icon .nav-dropdown-trigger {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.nav-dropdown-icon .nav-dropdown-trigger:hover {
+  background: var(--bg);
+}
+
+.nav-dropdown-icon .nav-dropdown-trigger svg {
+  width: 24px;
+  height: 24px;
+}
+
+.nav-dropdown-icon .nav-dropdown-menu {
+  min-width: 200px;
+}
+
 .nav-dropdown-trigger svg:last-child {
   transition: transform 0.3s ease;
   width: 12px;
