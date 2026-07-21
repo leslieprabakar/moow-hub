@@ -195,7 +195,7 @@ async function handleAuth(req, res, path) {
     const { data, error } = await db.auth.signInWithPassword({ email, password });
     if (error) return res.status(401).json({ error: 'Invalid credentials' });
     const { data: profile } = await db.from('profiles').select('*').eq('id', data.user.id).single();
-    return res.status(200).json({ success: true, session: data.session, user: profile || { id: data.user.id, email: data.user.email } });
+    return res.status(200).json({ success: true, session: data.session, user: { ...profile, email: data.user.email } });
   }
 
   if (req.method === 'POST' && path === 'logout') {
@@ -205,7 +205,13 @@ async function handleAuth(req, res, path) {
   if (req.method === 'GET' && path === 'user') {
     const user = await verifyAuth(req);
     if (!user) return res.status(401).json({ error: 'Not authenticated' });
-    return res.status(200).json({ success: true, data: user });
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(' ')[1];
+    const authRes = await fetch(`${config.SUPABASE_URL}/auth/v1/user`, {
+      headers: { Authorization: `Bearer ${token}`, apikey: config.SUPABASE_ANON_KEY }
+    });
+    const authUser = authRes.ok ? await authRes.json() : null;
+    return res.status(200).json({ success: true, data: { ...user, email: authUser?.email || user.email } });
   }
 
   if (req.method === 'PUT' && path === 'user') {

@@ -33,9 +33,28 @@ const Checkout = {
     
     this.renderSummary();
     this.initCurrencySelector();
+    this.prefillForm();
     this.loadSavedAddresses();
     
     return true;
+  },
+
+  /**
+   * Pre-fill form fields from user profile
+   */
+  prefillForm() {
+    const user = Auth.getUser();
+    if (!user) return;
+
+    const fields = {
+      fullName: user.full_name || '',
+      phone: user.phone || ''
+    };
+
+    for (const [id, value] of Object.entries(fields)) {
+      const el = document.getElementById(id);
+      if (el && value) el.value = value;
+    }
   },
 
   /**
@@ -140,7 +159,7 @@ const Checkout = {
    * Render saved addresses
    */
   renderSavedAddresses(addresses) {
-    const container = document.getElementById('savedAddresses');
+    const container = document.getElementById('savedAddressesSection');
     if (!container || addresses.length === 0) return;
 
     container.innerHTML = `

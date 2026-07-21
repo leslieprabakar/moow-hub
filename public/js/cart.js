@@ -100,7 +100,17 @@ const Cart = {
       if (!response || !response.ok) return [];
       
       const data = await response.json();
-      return data.data || [];
+      const items = data.data || [];
+      return items.map(item => ({
+        id: item.id,
+        product_id: item.product_id,
+        product_name: item.products?.name || '',
+        product_image: item.products?.image_url || '',
+        price_usd: item.products?.price_usd || 0,
+        quantity: item.quantity,
+        size: item.size,
+        slug: item.products?.slug || ''
+      }));
     } catch {
       return [];
     }
