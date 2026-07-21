@@ -29,7 +29,8 @@ const Checkout = {
     }
 
     this.currency = localStorage.getItem('moow_currency') || 'USD';
-    this.totals = Cart.calculateTotals(this.cartItems, this.currency);
+    this.usdTotals = Cart.calculateTotals(this.cartItems, 'USD');
+    this.totals = { ...this.usdTotals };
     
     this.renderSummary();
     this.initCurrencySelector();
@@ -77,17 +78,22 @@ const Checkout = {
    */
   async updateTotals() {
     const rates = await this.getExchangeRates();
-    const convertedTotals = { ...this.totals };
+    this._lastRates = rates;
+    const base = this.usdTotals;
     
     if (this.currency !== 'USD' && rates[this.currency]) {
       const rate = rates[this.currency];
-      convertedTotals.subtotal = Math.round(this.totals.subtotal * rate * 100) / 100;
-      convertedTotals.shipping = Math.round(this.totals.shipping * rate * 100) / 100;
-      convertedTotals.tax = Math.round(this.totals.tax * rate * 100) / 100;
-      convertedTotals.total = Math.round(this.totals.total * rate * 100) / 100;
+      this.totals = {
+        subtotal: Math.round(base.subtotal * rate * 100) / 100,
+        shipping: Math.round(base.shipping * rate * 100) / 100,
+        tax: Math.round(base.tax * rate * 100) / 100,
+        total: Math.round(base.total * rate * 100) / 100,
+        currency: this.currency
+      };
+    } else {
+      this.totals = { ...base };
     }
 
-    this.totals = convertedTotals;
     this.renderSummary();
   },
 
@@ -118,8 +124,12 @@ const Checkout = {
    */
   renderSummary() {
     const symbol = this.getCurrencySymbol();
+    const rate = (this.currency !== 'USD' && this._lastRates && this._lastRates[this.currency])
+      ? this._lastRates[this.currency] : 1;
     
-    document.getElementById('summaryItems').innerHTML = this.cartItems.map(item => `
+    document.getElementById('summaryItems').innerHTML = this.cartItems.map(item => {
+      const itemTotal = item.price_usd * item.quantity * rate;
+      return `
       <div class="summary-item">
         <img src="../${item.product_image}" alt="${item.product_name}" class="summary-item-img">
         <div class="summary-item-info">
@@ -127,9 +137,9 @@ const Checkout = {
           ${item.size ? `<div class="summary-item-size">${item.size}</div>` : ''}
           <div class="summary-item-qty">Qty: ${item.quantity}</div>
         </div>
-        <div class="summary-item-price">${symbol}${(item.price_usd * item.quantity).toFixed(2)}</div>
-      </div>
-    `).join('');
+        <div class="summary-item-price">${symbol}${itemTotal.toFixed(2)}</div>
+      </div>`;
+    }).join('');
 
     document.getElementById('summarySubtotal').textContent = `${symbol}${this.totals.subtotal.toFixed(2)}`;
     document.getElementById('summaryShipping').textContent = this.totals.shipping === 0 ? 'Free' : `${symbol}${this.totals.shipping.toFixed(2)}`;
@@ -223,9 +233,6 @@ const Checkout = {
    * Validate step 1 (shipping address)
    */
   validateStep1() {
-    const form = document.getElementById('shippingForm');
-    if (!form) return true;
-
     const required = ['fullName', 'address', 'city', 'state', 'postalCode', 'phone'];
     let valid = true;
 
@@ -244,7 +251,6 @@ const Checkout = {
       return false;
     }
 
-    // Store shipping data
     this.shippingData = {
       full_name: document.getElementById('fullName').value,
       line1: document.getElementById('address').value,
@@ -311,6 +317,22 @@ const Checkout = {
             <span class="payment-desc">Visa, Mastercard, AMEX</span>
           </label>
         </div>
+        <div class="payment-method" onclick="Checkout.selectPayment('paypal')">
+          <input type="radio" name="payment" id="paypal">
+          <label for="paypal">
+            <span class="payment-icon">🅿️</span>
+            <span class="payment-name">PayPal</span>
+            <span class="payment-desc">Pay with your PayPal account</span>
+          </label>
+        </div>
+        <div class="payment-method" onclick="Checkout.selectPayment('cod')">
+          <input type="radio" name="payment" id="cod">
+          <label for="cod">
+            <span class="payment-icon">💵</span>
+            <span class="payment-name">Cash on Delivery</span>
+            <span class="payment-desc">Pay when you receive</span>
+          </label>
+        </div>
       `;
     }
 
@@ -369,7 +391,8 @@ const Checkout = {
       upi: 'UPI',
       card: 'Credit/Debit Card',
       netbanking: 'Net Banking',
-      cod: 'Cash on Delivery'
+      cod: 'Cash on Delivery',
+      paypal: 'PayPal'
     };
     document.getElementById('reviewPayment').textContent = paymentNames[this.paymentMethod] || this.paymentMethod;
 
