@@ -18,6 +18,7 @@ const Auth = {
     if (token && user) {
       const parsed = JSON.parse(user);
       this.updateUI(parsed);
+      console.log('[SM-debug] typeof SessionManager =', typeof SessionManager);
       if (typeof SessionManager !== 'undefined') SessionManager.init();
       return parsed;
     }
@@ -291,7 +292,7 @@ const Auth = {
 };
 
 /**
- * Session Manager — 30-minute inactivity timeout with countdown warning
+ * Session Manager — 3-minute inactivity timeout with countdown warning
  * Tracks user activity, shows a non-intrusive countdown before expiry,
  * and saves pending data before logging out.
  */
@@ -318,10 +319,12 @@ const SessionManager = {
   },
 
   init() {
+    console.log('[SM-debug] init() called, initialized=', this.initialized, 'isAuth=', Auth.isAuthenticated(), 'isAuthPage=', this.isAuthPage());
     if (this.initialized) return;
     if (!Auth.isAuthenticated()) return;
     if (this.isAuthPage()) return;
 
+    console.log('[SM-debug] initializing session manager');
     this.initialized = true;
     this.lastActivity = this.loadActivity();
     if (Date.now() - this.lastActivity > this.TIMEOUT) {
@@ -346,6 +349,7 @@ const SessionManager = {
   },
 
   buildUI() {
+    console.log('[SM-debug] buildUI() called');
     if (this.countdownEl) return;
     const el = document.createElement('div');
     el.id = 'session-countdown';
@@ -355,7 +359,7 @@ const SessionManager = {
     el.innerHTML =
       '<div class="scd-inner">' +
         '<svg class="scd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
-        '<span class="scd-msg">Session expires in <strong id="scd-time">5:00</strong></span>' +
+        '<span class="scd-msg">Session expires in <strong id="scd-time">3:00</strong></span>' +
         '<button class="scd-btn" id="scd-extend" type="button">Keep Active</button>' +
         '<button class="scd-x" id="scd-dismiss" type="button" aria-label="Dismiss">&times;</button>' +
       '</div>';
@@ -387,23 +391,27 @@ const SessionManager = {
   },
 
   markActive() {
+    console.log('[SM-debug] markActive() - resetting timer');
     this.lastActivity = Date.now();
     this.persist();
     if (this.warningVisible) this.hideCountdown();
   },
 
   startCheck() {
+    console.log('[SM-debug] startCheck() - interval every', this.CHECK_MS, 'ms');
     this.checkTimer = setInterval(() => this.check(), this.CHECK_MS);
   },
 
   check() {
-    if (!Auth.isAuthenticated()) { this.stop(); return; }
+    if (!Auth.isAuthenticated()) { console.log('[SM-debug] check() not authenticated, stopping'); this.stop(); return; }
     const remaining = this.TIMEOUT - (Date.now() - this.lastActivity);
+    console.log('[SM-debug] check() remaining=', Math.round(remaining/1000), 's, WARNING_AT=', this.WARNING_AT/1000, 's');
     if (remaining <= 0) { this.expire(); return; }
     if (remaining <= this.WARNING_AT) this.showCountdown(remaining);
   },
 
   showCountdown(ms) {
+    console.log('[SM-debug] showCountdown() ms=', Math.round(ms/1000), 's, countdownEl exists=', !!this.countdownEl);
     if (!this.countdownEl) return;
     this.warningVisible = true;
     this.countdownEl.classList.add('visible');
