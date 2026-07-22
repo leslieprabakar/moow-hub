@@ -551,10 +551,9 @@ async function handleCheckout(req, res, path) {
     return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency, otp_session_id: otpSessionId } });
   }
 
-  if (req.method === 'POST' && path === 'cod-verify-otp') {
-    const { order_id, otp } = req.body;
-    if (!order_id || !otp) return res.status(400).json({ error: 'Order ID and OTP required' });
-    if (otp !== '123456') return res.status(400).json({ error: 'Invalid OTP' });
+  if (req.method === 'POST' && path === 'cod-confirm') {
+    const { order_id } = req.body;
+    if (!order_id) return res.status(400).json({ error: 'Order ID required' });
     const { data: order } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).maybeSingle();
     if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.status !== 'pending') return res.status(400).json({ error: 'Order already processed' });

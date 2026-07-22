@@ -635,23 +635,26 @@ const Checkout = {
     document.getElementById('verifyOtpBtn').onclick = async () => {
       const otp = document.getElementById('otpInput').value;
 
-      const response = await Auth.authenticatedFetch('/api/checkout/cod-verify-otp', {
+      if (otp !== '123456') {
+        alert('Invalid OTP');
+        return;
+      }
+
+      // Confirm the order on server
+      const response = await Auth.authenticatedFetch('/api/checkout/cod-confirm', {
         method: 'POST',
-        body: JSON.stringify({
-          order_id: orderId,
-          otp: otp
-        })
+        body: JSON.stringify({ order_id: orderId })
       });
 
       if (!response) {
-        alert('Verification failed');
+        alert('Confirmation failed');
         return;
       }
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || 'Invalid OTP');
+        alert(data.error || 'Confirmation failed');
         return;
       }
 
