@@ -211,7 +211,8 @@ async function handleAuth(req, res, path) {
       headers: { Authorization: `Bearer ${token}`, apikey: config.SUPABASE_ANON_KEY }
     });
     const authUser = authRes.ok ? await authRes.json() : null;
-    return res.status(200).json({ success: true, data: { ...user, email: authUser?.email || user.email } });
+    const { data: addresses } = await db.from('user_addresses').select('*').eq('user_id', user.id).order('is_default', { ascending: false }).order('created_at', { ascending: false });
+    return res.status(200).json({ success: true, data: { ...user, email: authUser?.email || user.email, addresses: addresses || [] } });
   }
 
   if (req.method === 'PUT' && path === 'user') {
@@ -240,6 +241,58 @@ async function handleAuth(req, res, path) {
     const { error: updateError } = await db.auth.admin.updateUserById(user.id, { password });
     if (updateError) return res.status(500).json({ error: 'Failed to update password' });
     return res.status(200).json({ success: true, message: 'Password updated successfully' });
+  }
+
+  // ─── ADDRESS MANAGEMENT ───────────────────────────────────────────────────
+  if (req.method === 'POST' && path === 'addresses') {
+    const user = await requireAuth(req, res);
+    if (!user) return true;
+    const { label, full_name, phone, address_line1, address_line2, city, state, postal_code, country, is_default } = req.body;
+    if (!full_name || !address_line1 || !city || !postal_code || !country) {
+      return res.status(400).json({ error: 'Missing required address fields' });
+    }
+    const addrData = { user_id: user.id, label: label || null, full_name: sanitizeString(full_name), phone: phone || null, address_line1: sanitizeString(address_line1), address_line2: address_line2 ? sanitizeString(address_line2) : null, city: sanitizeString(city), state: state ? sanitizeString(state) : null, postal_code: postal_code, country: country, is_default: is_default || false };
+    if (is_default) {
+      await db.from('user_addresses').update({ is_default: false }).eq('user_id', user.id);
+    }
+    const { data: addr, error } = await db.from('user_addresses').insert(addrData).select().single();
+    if (error) return res.status(500).json({ error: 'Failed to save address' });
+    return res.status(201).json({ success: true, data: addr });
+  }
+
+  if (req.method === 'PUT' && path === 'addresses') {
+    const user = await requireAuth(req, res);
+    if (!user) return true;
+    const { id, label, full_name, phone, address_line1, address_line2, city, state, postal_code, country, is_default } = req.body;
+    if (!id) return res.status(400).json({ error: 'Address ID required' });
+    const updates = {};
+    if (label !== undefined) updates.label = label || null;
+    if (full_name !== undefined) updates.full_name = sanitizeString(full_name);
+    if (phone !== undefined) updates.phone = phone || null;
+    if (address_line1 !== undefined) updates.address_line1 = sanitizeString(address_line1);
+    if (address_line2 !== undefined) updates.address_line2 = address_line2 ? sanitizeString(address_line2) : null;
+    if (city !== undefined) updates.city = sanitizeString(city);
+    if (state !== undefined) updates.state = state ? sanitizeString(state) : null;
+    if (postal_code !== undefined) updates.postal_code = postal_code;
+    if (country !== undefined) updates.country = country;
+    if (is_default) {
+      await db.from('user_addresses').update({ is_default: false }).eq('user_id', user.id);
+      updates.is_default = true;
+    }
+    const { error } = await db.from('user_addresses').update(updates).eq('id', id).eq('user_id', user.id);
+    if (error) return res.status(500).json({ error: 'Failed to update address' });
+    const { data: updated } = await db.from('user_addresses').select('*').eq('id', id).single();
+    return res.status(200).json({ success: true, data: updated });
+  }
+
+  if (req.method === 'DELETE' && path === 'addresses') {
+    const user = await requireAuth(req, res);
+    if (!user) return true;
+    const addrId = req.body?.id || req.query?.id;
+    if (!addrId) return res.status(400).json({ error: 'Address ID required' });
+    const { error } = await db.from('user_addresses').delete().eq('id', addrId).eq('user_id', user.id);
+    if (error) return res.status(500).json({ error: 'Failed to delete address' });
+    return res.status(200).json({ success: true, message: 'Address deleted' });
   }
 
   if (req.method === 'POST' && path === 'password-reset') {

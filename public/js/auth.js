@@ -311,6 +311,8 @@ const SessionManager = {
   warningVisible: false,
   reShowTimer: null,
   initialized: false,
+  _trackFn: null,
+  _tracked: false,
 
   isAuthPage() {
     const p = window.location.pathname.toLowerCase();
@@ -377,17 +379,19 @@ const SessionManager = {
   },
 
   track() {
+    if (this._tracked) return;
     let last = 0;
-    const fn = () => {
+    this._trackFn = () => {
       const now = Date.now();
       if (now - last < this.THROTTLE_MS) return;
       last = now;
       this.markActive();
     };
     ['mousedown','mousemove','keydown','scroll','touchstart','touchmove','click'].forEach(e => {
-      document.addEventListener(e, fn, { passive: true });
+      document.addEventListener(e, this._trackFn, { passive: true });
     });
-    window.addEventListener('focus', fn);
+    window.addEventListener('focus', this._trackFn);
+    this._tracked = true;
   },
 
   markActive() {
@@ -497,7 +501,11 @@ const SessionManager = {
     clearTimeout(this.reShowTimer);
     if (this.checkTimer) { clearInterval(this.checkTimer); this.checkTimer = null; }
     if (this.countdownTimer) { clearInterval(this.countdownTimer); this.countdownTimer = null; }
-    this.hideCountdown();
+    this.warningVisible = false;
+    if (this.countdownEl) {
+      this.countdownEl.remove();
+      this.countdownEl = null;
+    }
     this.initialized = false;
   },
 
@@ -505,6 +513,7 @@ const SessionManager = {
     this.stop();
     this.lastActivity = Date.now();
     this.persist();
+    this.initialized = false;
     this.init();
   }
 };

@@ -41,7 +41,7 @@ const Checkout = {
   },
 
   /**
-   * Pre-fill form fields from user profile
+   * Pre-fill form fields from user profile and default address
    */
   prefillForm() {
     const user = Auth.getUser();
@@ -56,6 +56,28 @@ const Checkout = {
       const el = document.getElementById(id);
       if (el && value) el.value = value;
     }
+  },
+
+  /**
+   * Pre-fill shipping form from a saved address
+   */
+  fillAddressFields(addr) {
+    if (!addr) return;
+    const map = {
+      fullName: addr.full_name,
+      address: addr.address_line1 || addr.line1,
+      address2: addr.address_line2 || addr.line2 || '',
+      city: addr.city,
+      state: addr.state || '',
+      postalCode: addr.postal_code,
+      phone: addr.phone || ''
+    };
+    for (const [id, value] of Object.entries(map)) {
+      const el = document.getElementById(id);
+      if (el) el.value = value || '';
+    }
+    const countryEl = document.getElementById('country');
+    if (countryEl && addr.country) countryEl.value = addr.country;
   },
 
   /**
@@ -159,8 +181,9 @@ const Checkout = {
       if (!response || !response.ok) return;
       
       const data = await response.json();
-      if (data.data?.addresses?.length > 0) {
-        this.renderSavedAddresses(data.data.addresses);
+      this._savedAddresses = data.data?.addresses || [];
+      if (this._savedAddresses.length > 0) {
+        this.renderSavedAddresses(this._savedAddresses);
       }
     } catch {}
   },
@@ -176,14 +199,15 @@ const Checkout = {
       <h4>Saved Addresses</h4>
       <div class="saved-addresses">
         ${addresses.map((addr, i) => `
-          <div class="saved-address" onclick="Checkout.selectAddress(${i})">
+          <div class="saved-address ${i === 0 ? 'selected' : ''}" onclick="Checkout.selectAddress(${i})">
             <input type="radio" name="saved_address" id="addr_${i}" ${i === 0 ? 'checked' : ''}>
             <label for="addr_${i}">
               <strong>${addr.full_name}</strong><br>
-              ${addr.line1}<br>
-              ${addr.line2 ? addr.line2 + '<br>' : ''}
-              ${addr.city}, ${addr.state} ${addr.postal_code}<br>
+              ${addr.address_line1 || addr.line1 || ''}<br>
+              ${(addr.address_line2 || addr.line2) ? (addr.address_line2 || addr.line2) + '<br>' : ''}
+              ${addr.city}, ${addr.state || ''} ${addr.postal_code}<br>
               ${addr.country}
+              ${addr.phone ? '<br>Phone: ' + addr.phone : ''}
             </label>
           </div>
         `).join('')}
@@ -193,10 +217,27 @@ const Checkout = {
       </button>
     `;
 
-    // Auto-select first address
+    // Auto-fill from first (default) address
     if (addresses.length > 0) {
-      this.shippingData = addresses[0];
+      this.shippingData = this.normalizeAddress(addresses[0]);
+      this.fillAddressFields(addresses[0]);
     }
+  },
+
+  /**
+   * Normalize address object from different formats
+   */
+  normalizeAddress(addr) {
+    return {
+      full_name: addr.full_name || '',
+      line1: addr.address_line1 || addr.line1 || '',
+      line2: addr.address_line2 || addr.line2 || '',
+      city: addr.city || '',
+      state: addr.state || '',
+      postal_code: addr.postal_code || '',
+      country: addr.country || '',
+      phone: addr.phone || ''
+    };
   },
 
   /**
@@ -204,10 +245,14 @@ const Checkout = {
    */
   selectAddress(index) {
     const user = Auth.getUser();
-    // This would need to store addresses - simplified for now
     document.querySelectorAll('.saved-address').forEach((el, i) => {
       el.classList.toggle('selected', i === index);
     });
+    // Fill form fields from selected address
+    if (this._savedAddresses && this._savedAddresses[index]) {
+      this.shippingData = this.normalizeAddress(this._savedAddresses[index]);
+      this.fillAddressFields(this._savedAddresses[index]);
+    }
   },
 
   /**

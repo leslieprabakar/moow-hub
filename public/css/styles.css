@@ -3467,6 +3467,7 @@ p {
     bottom: 12px;
     right: 12px;
     left: 12px;
+    z-index: 99999;
   }
   .scd-inner {
     flex-wrap: wrap;
@@ -3474,10 +3475,21 @@ p {
     text-align: center;
     padding: 10px 14px;
     gap: 8px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .scd-msg {
+    white-space: normal;
+    text-align: center;
+  }
+  .scd-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
   }
   .session-toast {
     bottom: 70px;
     right: 12px;
     left: 12px;
+    z-index: 99999;
   }
 }

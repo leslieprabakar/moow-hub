@@ -68,6 +68,35 @@
     .quick-link svg { width: 24px; height: 24px; }
     .quick-link span { font-weight: 500; font-size: 0.9rem; }
 
+    /* Profile detail rows */
+    .profile-details { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light); }
+    .profile-detail-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+    .profile-detail-row:last-child { border-bottom: none; }
+    .profile-detail-label { color: var(--text-muted); font-weight: 500; }
+    .profile-detail-value { color: var(--navy); font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
+
+    /* Address cards */
+    .addresses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .address-card { background: var(--bg); border-radius: var(--radius); padding: 1.25rem; border: 1px solid var(--border-light); position: relative; transition: var(--transition); }
+    .address-card:hover { border-color: var(--primary); }
+    .address-card.default { border-color: var(--primary); border-width: 2px; }
+    .address-card-label { display: inline-block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); background: rgba(212,115,94,0.1); padding: 2px 8px; border-radius: 4px; margin-bottom: 0.75rem; }
+    .address-card-name { font-weight: 600; color: var(--navy); margin-bottom: 0.5rem; }
+    .address-card-details { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+    .address-card-phone { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .address-card-actions { display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light); }
+    .address-card-actions button { font-size: 0.8rem; padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--text); transition: var(--transition); }
+    .address-card-actions button:hover { border-color: var(--primary); color: var(--primary); }
+    .address-card-actions .btn-delete { color: #dc3545; border-color: #dc3545; }
+    .address-card-actions .btn-delete:hover { background: #dc3545; color: white; }
+    .btn-set-default { font-size: 0.8rem; padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid var(--primary); background: transparent; color: var(--primary); transition: var(--transition); }
+    .btn-set-default:hover { background: var(--primary); color: white; }
+
+    /* Add address form */
+    .add-address-form { background: var(--bg); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1rem; border: 1px dashed var(--border); }
+    .add-address-form h3 { font-family: var(--font-serif); color: var(--navy); margin: 0 0 1rem; font-size: 1.1rem; }
+    .no-addresses { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.95rem; }
+
     /* Password section */
     .password-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-light); }
     .password-section h3 { font-family: var(--font-serif); color: var(--navy); margin: 0 0 1rem; font-size: 1.1rem; }
@@ -172,6 +201,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               Profile
             </a></li>
+            <li><a href="#addresses" onclick="Account.showSection('addresses');return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Addresses
+            </a></li>
             <li><a href="orders.html">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
               My Orders
@@ -223,6 +256,21 @@
                 </div>
               </form>
 
+              <div class="profile-details" id="profileDetails">
+                <div class="profile-detail-row">
+                  <span class="profile-detail-label">Account Status</span>
+                  <span class="profile-detail-value" id="detailStatus">—</span>
+                </div>
+                <div class="profile-detail-row">
+                  <span class="profile-detail-label">Member Since</span>
+                  <span class="profile-detail-value" id="detailJoined">—</span>
+                </div>
+                <div class="profile-detail-row">
+                  <span class="profile-detail-label">Saved Addresses</span>
+                  <span class="profile-detail-value" id="detailAddressCount">0</span>
+                </div>
+              </div>
+
               <div class="password-section">
                 <h3>Change Password</h3>
                 <div id="passwordAlert" class="alert"></div>
@@ -237,6 +285,92 @@
                   </div>
                   <div class="btn-row">
                     <button type="submit" class="btn-primary" id="changePasswordBtn">Update Password</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Addresses Section -->
+          <div id="section-addresses" class="account-section" style="display:none;">
+            <div class="account-card">
+              <h2>Saved Addresses</h2>
+              <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:1rem;">Manage your shipping addresses for faster checkout.</p>
+              <div id="addressesAlert" class="alert"></div>
+              <div id="addressesContainer">
+                <div class="no-addresses" id="noAddressesMsg">No saved addresses yet. Add one below.</div>
+                <div class="addresses-grid" id="addressesGrid"></div>
+              </div>
+
+              <div class="add-address-form" id="addAddressForm">
+                <h3 id="addressFormTitle">Add New Address</h3>
+                <form id="addressForm" novalidate>
+                  <input type="hidden" id="addrId" value="">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addrLabel">Label (e.g., Home, Office)</label>
+                      <input type="text" id="addrLabel" placeholder="Home">
+                    </div>
+                    <div class="form-group">
+                      <label for="addrFullName">Full Name *</label>
+                      <input type="text" id="addrFullName" placeholder="John Doe" required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="addrLine1">Address Line 1 *</label>
+                    <input type="text" id="addrLine1" placeholder="123 Main Street" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="addrLine2">Address Line 2</label>
+                    <input type="text" id="addrLine2" placeholder="Apartment, suite, etc.">
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addrCity">City *</label>
+                      <input type="text" id="addrCity" placeholder="Mumbai" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="addrState">State / Province</label>
+                      <input type="text" id="addrState" placeholder="Maharashtra">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addrPostal">Postal Code *</label>
+                      <input type="text" id="addrPostal" placeholder="400001" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="addrCountry">Country *</label>
+                      <select id="addrCountry" required>
+                        <option value="">Select Country</option>
+                        <option value="IN">India</option>
+                        <option value="US">United States</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="AE">UAE</option>
+                        <option value="SG">Singapore</option>
+                        <option value="DE">Germany</option>
+                        <option value="FR">France</option>
+                        <option value="AU">Australia</option>
+                        <option value="CA">Canada</option>
+                        <option value="JP">Japan</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="addrPhone">Phone</label>
+                      <input type="tel" id="addrPhone" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;">
+                      <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;padding-bottom:0.75rem;">
+                        <input type="checkbox" id="addrDefault" style="width:auto;">
+                        Set as default address
+                      </label>
+                    </div>
+                  </div>
+                  <div class="btn-row">
+                    <button type="submit" class="btn-primary" id="saveAddrBtn">Save Address</button>
+                    <button type="button" class="btn-outline" id="cancelAddrBtn" onclick="Account.cancelAddressForm()" style="display:none;">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -263,6 +397,7 @@
   <script>
     const Account = {
       user: null,
+      addresses: [],
 
       async init() {
         if (!Auth.isAuthenticated()) {
@@ -280,7 +415,12 @@
 
           const data = await response.json();
           this.user = data.data;
+          this.addresses = data.data.addresses || [];
           this.populateForm();
+          this.populateDetails();
+          this.renderAddresses();
+
+          localStorage.setItem('moow_user', JSON.stringify(this.user));
         } catch (error) {
           console.error('Failed to load profile:', error);
         }
@@ -299,6 +439,50 @@
         document.getElementById('sidebarEmail').textContent = u.email || '';
       },
 
+      populateDetails() {
+        const u = this.user;
+        const status = u.is_admin ? 'Admin' : u.is_partner ? 'Partner' : 'Active';
+        document.getElementById('detailStatus').textContent = status;
+        document.getElementById('detailJoined').textContent = u.created_at ? new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
+        document.getElementById('detailAddressCount').textContent = this.addresses.length;
+      },
+
+      renderAddresses() {
+        const grid = document.getElementById('addressesGrid');
+        const noMsg = document.getElementById('noAddressesMsg');
+
+        if (this.addresses.length === 0) {
+          noMsg.style.display = 'block';
+          grid.innerHTML = '';
+          return;
+        }
+
+        noMsg.style.display = 'none';
+        const countryNames = { IN:'India', US:'United States', GB:'United Kingdom', AE:'UAE', SG:'Singapore', DE:'Germany', FR:'France', AU:'Australia', CA:'Canada', JP:'Japan' };
+
+        grid.innerHTML = this.addresses.map((addr, i) => `
+          <div class="address-card ${addr.is_default ? 'default' : ''}">
+            ${addr.label ? `<div class="address-card-label">${addr.label}</div>` : ''}
+            ${addr.is_default ? '<div class="address-card-label" style="background:rgba(40,167,69,0.1);color:#28a745;">Default</div>' : ''}
+            <div class="address-card-name">${addr.full_name}</div>
+            <div class="address-card-details">
+              ${addr.address_line1}<br>
+              ${addr.address_line2 ? addr.address_line2 + '<br>' : ''}
+              ${addr.city}${addr.state ? ', ' + addr.state : ''} ${addr.postal_code}<br>
+              ${countryNames[addr.country] || addr.country}
+            </div>
+            ${addr.phone ? `<div class="address-card-phone">Phone: ${addr.phone}</div>` : ''}
+            <div class="address-card-actions">
+              <button onclick="Account.editAddress(${i})">Edit</button>
+              <button class="btn-delete" onclick="Account.deleteAddress('${addr.id}', ${i})">Delete</button>
+              ${!addr.is_default ? `<button class="btn-set-default" onclick="Account.setDefault('${addr.id}')">Set Default</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        document.getElementById('detailAddressCount').textContent = this.addresses.length;
+      },
+
       bindEvents() {
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -308,6 +492,11 @@
         document.getElementById('passwordForm').addEventListener('submit', async (e) => {
           e.preventDefault();
           await this.changePassword();
+        });
+
+        document.getElementById('addressForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          await this.saveAddress();
         });
       },
 
@@ -337,6 +526,7 @@
           this.user = { ...this.user, ...body };
           localStorage.setItem('moow_user', JSON.stringify(this.user));
           this.populateForm();
+          this.populateDetails();
 
           alert.textContent = 'Profile updated successfully!';
           alert.className = 'alert alert-success';
@@ -394,7 +584,145 @@
         }
       },
 
+      async saveAddress() {
+        const btn = document.getElementById('saveAddrBtn');
+        const alert = document.getElementById('addressesAlert');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        alert.style.display = 'none';
+
+        const id = document.getElementById('addrId').value;
+        const body = {
+          id: id || undefined,
+          label: document.getElementById('addrLabel').value.trim() || null,
+          full_name: document.getElementById('addrFullName').value.trim(),
+          address_line1: document.getElementById('addrLine1').value.trim(),
+          address_line2: document.getElementById('addrLine2').value.trim() || null,
+          city: document.getElementById('addrCity').value.trim(),
+          state: document.getElementById('addrState').value.trim() || null,
+          postal_code: document.getElementById('addrPostal').value.trim(),
+          country: document.getElementById('addrCountry').value,
+          phone: document.getElementById('addrPhone').value.trim() || null,
+          is_default: document.getElementById('addrDefault').checked
+        };
+
+        try {
+          const method = id ? 'PUT' : 'POST';
+          const response = await Auth.authenticatedFetch('/api/auth/addresses', {
+            method,
+            body: JSON.stringify(body)
+          });
+
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Failed to save address');
+
+          if (id) {
+            const idx = this.addresses.findIndex(a => a.id === id);
+            if (idx !== -1) this.addresses[idx] = data.data;
+          } else {
+            this.addresses.push(data.data);
+          }
+
+          if (body.is_default) {
+            this.addresses.forEach(a => { if (a.id !== data.data.id) a.is_default = false; });
+          }
+
+          this.renderAddresses();
+          this.cancelAddressForm();
+          this.populateDetails();
+
+          alert.textContent = id ? 'Address updated successfully!' : 'Address added successfully!';
+          alert.className = 'alert alert-success';
+          alert.style.display = 'block';
+        } catch (error) {
+          alert.textContent = error.message;
+          alert.className = 'alert alert-error';
+          alert.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Save Address';
+        }
+      },
+
+      editAddress(index) {
+        const addr = this.addresses[index];
+        if (!addr) return;
+
+        document.getElementById('addrId').value = addr.id;
+        document.getElementById('addrLabel').value = addr.label || '';
+        document.getElementById('addrFullName').value = addr.full_name || '';
+        document.getElementById('addrLine1').value = addr.address_line1 || '';
+        document.getElementById('addrLine2').value = addr.address_line2 || '';
+        document.getElementById('addrCity').value = addr.city || '';
+        document.getElementById('addrState').value = addr.state || '';
+        document.getElementById('addrPostal').value = addr.postal_code || '';
+        document.getElementById('addrCountry').value = addr.country || '';
+        document.getElementById('addrPhone').value = addr.phone || '';
+        document.getElementById('addrDefault').checked = addr.is_default || false;
+        document.getElementById('addressFormTitle').textContent = 'Edit Address';
+        document.getElementById('cancelAddrBtn').style.display = 'inline-block';
+        document.getElementById('addAddressForm').scrollIntoView({ behavior: 'smooth' });
+      },
+
+      async deleteAddress(id, index) {
+        if (!confirm('Are you sure you want to delete this address?')) return;
+
+        try {
+          const response = await Auth.authenticatedFetch('/api/auth/addresses', {
+            method: 'DELETE',
+            body: JSON.stringify({ id })
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to delete address');
+          }
+
+          this.addresses.splice(index, 1);
+          this.renderAddresses();
+          this.populateDetails();
+
+          const alert = document.getElementById('addressesAlert');
+          alert.textContent = 'Address deleted successfully!';
+          alert.className = 'alert alert-success';
+          alert.style.display = 'block';
+        } catch (error) {
+          const alert = document.getElementById('addressesAlert');
+          alert.textContent = error.message;
+          alert.className = 'alert alert-error';
+          alert.style.display = 'block';
+        }
+      },
+
+      async setDefault(id) {
+        try {
+          const response = await Auth.authenticatedFetch('/api/auth/addresses', {
+            method: 'PUT',
+            body: JSON.stringify({ id, is_default: true })
+          });
+
+          if (!response.ok) throw new Error('Failed to set default');
+
+          this.addresses.forEach(a => { a.is_default = (a.id === id); });
+          this.renderAddresses();
+        } catch (error) {
+          const alert = document.getElementById('addressesAlert');
+          alert.textContent = error.message;
+          alert.className = 'alert alert-error';
+          alert.style.display = 'block';
+        }
+      },
+
+      cancelAddressForm() {
+        document.getElementById('addressForm').reset();
+        document.getElementById('addrId').value = '';
+        document.getElementById('addressFormTitle').textContent = 'Add New Address';
+        document.getElementById('cancelAddrBtn').style.display = 'none';
+      },
+
       showSection(name) {
+        document.querySelectorAll('.account-section').forEach(s => s.style.display = 'none');
+        document.getElementById('section-' + name).style.display = 'block';
         document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
         document.querySelector(`.sidebar-nav a[href="#${name}"]`)?.classList.add('active');
       }

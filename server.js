@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -50,6 +50,18 @@ const server = http.createServer(async (req, res) => {
 
     req.headers = Object.fromEntries(Object.entries(req.headers));
     req.socket = { remoteAddress: req.socket?.remoteAddress || '127.0.0.1' };
+
+    // Provide Express-compatible res methods for the API handler
+    res.status = function(code) {
+      res.statusCode = code;
+      return res;
+    };
+    res.json = function(data) {
+      if (!res.headersSent) res.writeHead(res.statusCode || 200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
+      return res;
+    };
+    res.end = res.end.bind(res);
 
     try {
       await apiHandler(req, res);
