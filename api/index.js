@@ -882,148 +882,171 @@ async function handleAgreement(req, res, path) {
     res.setHeader('Content-Disposition', 'attachment; filename="Moow.Hub-Partnership-Agreement.pdf"');
     doc.pipe(res);
 
-    const pageW = 495;
-    const leftX = 72;
-    let pageNum = 0;
-    let decorating = false;
+    const pw = 495, lx = 72;
+    let pg = 0, decorating = false;
 
-    const decoratePage = () => {
+    const decorate = () => {
       if (decorating) return;
       decorating = true;
-      pageNum++;
+      pg++;
       doc.save();
-      doc.opacity(0.08);
-      doc.font('Helvetica-Bold').fontSize(48);
+      doc.opacity(0.08).font('Helvetica-Bold').fontSize(48);
       doc.rotate(-35, { origin: [297, 420] });
       doc.text('MOOW.HUB — CONFIDENTIAL', 50, 380, { align: 'center', width: 500 });
       doc.restore();
       doc.save();
       doc.font('Helvetica', 8).fillColor('#999');
-      doc.text(`Page ${pageNum}`, leftX, doc.page.height - 40, { align: 'center', width: pageW });
+      doc.text(`Page ${pg}`, lx, doc.page.height - 40, { align: 'center', width: pw });
       doc.restore();
       decorating = false;
     };
+    decorate();
+    doc.on('pageAdded', decorate);
 
-    decoratePage();
-    doc.on('pageAdded', decoratePage);
+    const hdr = () => { doc.font('Helvetica', 8).fillColor('#999').text('Moow.Hub® Partnership Agreement', lx, 40, { align: 'right', width: pw }); };
+    hdr();
 
-    const addHeader = () => {
-      doc.font('Helvetica', 8).fillColor('#999');
-      doc.text('Moow.Hub® Partnership Agreement', leftX, 40, { align: 'right', width: pageW });
-      doc.fillColor('#000');
-    };
-    addHeader();
-
-    const addSection = (title, body, opts = {}) => {
-      const { marginTop = 20, fontSize = 11, bold = false, bullet = false } = opts;
-      doc.moveDown(marginTop / doc.currentLineHeight() || 1);
+    const st = (title, body) => {
+      doc.moveDown(0.3);
       if (title) {
-        doc.font('Helvetica-Bold', 13).fillColor('#1a2744').text(title, { continued: false });
-        doc.moveDown(0.3);
+        doc.font('Helvetica-Bold', 12).fillColor('#1a2744').text(title);
+        doc.moveDown(0.2);
       }
-      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica', fontSize).fillColor('#222');
-      if (bullet) {
-        const lines = Array.isArray(body) ? body : [body];
-        lines.forEach(line => doc.text(`  •  ${line}`, { indent: 10 }));
-      } else {
-        doc.text(body, { align: 'justify' });
+      if (Array.isArray(body)) {
+        doc.font('Helvetica', 10).fillColor('#222');
+        body.forEach((line, i) => {
+          if (i > 0) doc.moveDown(0.1);
+          doc.text(`  \u2022  ${line}`, { indent: 12, align: 'justify' });
+        });
+      } else if (body) {
+        doc.font('Helvetica', 10).fillColor('#222').text(body, { align: 'justify' });
       }
     };
 
-    // Title
-    doc.font('Helvetica-Bold', 26).fillColor('#1a2744').text('PARTNERSHIP AGREEMENT', { align: 'center' });
-    doc.moveDown(0.5);
-    doc.font('Helvetica', 14).fillColor('#666').text('Moow.Hub®', { align: 'center' });
-    doc.moveDown(0.3);
+    // ── Title Page ──
+    doc.font('Helvetica-Bold', 24).fillColor('#1a2744').text('PARTNERSHIP AGREEMENT', { align: 'center' });
+    doc.moveDown(0.6);
+    doc.font('Helvetica', 13).fillColor('#666').text('Moow.Hub\u00AE', { align: 'center' });
+    doc.moveDown(0.4);
     doc.font('Helvetica', 10).fillColor('#888').text('Effective Date: ______________', { align: 'center' });
-    doc.moveDown(2);
+    doc.moveDown(1.5);
 
-    // Sections
-    addSection('1. Purpose', 'This website and mobile responsive design will promote yoga, wellness, preventive healthcare, educational initiatives, fundraising, corporate wellness, schools, NGOs, charities, hospitals, Rotary, Lions Clubs, distributors, retailers, government bodies, and community organisations.');
+    // ── Main Agreement Sections ──
+    st('1. Purpose', 'This website and mobile responsive design will promote yoga, wellness, preventive healthcare, educational initiatives, fundraising, corporate wellness, schools, NGOs, charities, hospitals, Rotary, Lions Clubs, distributors, retailers, government bodies, and community organisations.');
 
-    addSection('2. Definitions', '', { marginTop: 16 });
-    doc.font('Helvetica', 11).fillColor('#222');
-    doc.text("'Moow.Hub®' includes the website, mobile application, QR-code ecosystem, educational content, digital services and future enhancements.", { align: 'justify' });
+    st('2. Definitions');
+    doc.font('Helvetica', 10).fillColor('#222').text('\u201CMoow.Hub\u00AE\u201D includes the website, mobile application, QR-code ecosystem, educational content, digital services and future enhancements.', { align: 'justify' });
+    doc.moveDown(0.2);
+    doc.font('Helvetica', 10).fillColor('#222').text('\u201CProducts\u201D include T-Shirts, printed materials and associated merchandise.', { align: 'justify' });
+
+    st('3. Scope', 'Partner may market, distribute, promote and conduct wellness programmes using approved Moow.Hub\u00AE products and branding.');
+
+    st('4. Company Obligations', ['Supply products', 'Maintain digital platform', 'Provide approved branding assets', 'Provide training material', 'Provide reasonable partner support']);
+
+    st('5. Partner Obligations', ['Promote ethically', 'Comply with laws', 'Protect brand reputation', 'Avoid misleading claims', 'Maintain records', 'Pay invoices', 'Provide campaign metrics upon request']);
+
+    st('6. Intellectual Property', 'All copyrights, trademarks, patents, software, artwork, illustrations, QR codes, databases, educational content, logos and know-how remain exclusively owned by Moow.Hub\u00AE. No ownership transfers under this Agreement.');
+
+    st('7. Brand Usage', 'Brand assets may only be used according to the Brand Guidelines. Any co-branding requires prior written approval.');
+
+    st('8. Orders & Payments', 'Commercial terms shall be defined in purchase orders. Default terms: 50% advance and balance before dispatch unless otherwise agreed.');
+
+    st('9. Shipping', 'Shipping, insurance, import duties, customs clearance and local taxes are allocated in the applicable purchase order or Incoterms.');
+
+    st('10. Confidentiality', 'Each Party shall keep confidential all business, pricing, customer, technical and strategic information. This obligation survives five years after termination or longer where required by law.');
+
+    st('11. Data Protection', 'Each Party shall independently comply with applicable privacy legislation, including where applicable India\u2019s Digital Personal Data Protection Act, UK GDPR, EU GDPR or equivalent local laws.');
+
+    st('12. Compliance', 'Each Party shall comply with anti-bribery, anti-corruption, sanctions, export control and applicable regulatory requirements.');
+
+    st('13. Warranty', 'Products will substantially conform to agreed specifications. Except where prohibited by law, all other warranties are excluded.');
+
+    st('14. Limitation of Liability', 'Neither Party shall be liable for indirect or consequential damages. Aggregate liability shall not exceed the value of the affected order except where local law prohibits such limitation.');
+
+    st('15. Force Majeure', 'Neither Party is liable for delays caused by events beyond reasonable control.');
+
+    st('16. Term', 'Initial term of three years with automatic one-year renewals unless notice is given.');
+
+    st('17. Termination', ['30 days written notice without cause', 'Immediate termination for material breach', 'Immediate termination for insolvency', 'Immediate termination for illegal conduct', 'Immediate termination for misuse of intellectual property']);
+
+    st('18. Post-Termination', 'Partner shall cease using Moow.Hub\u00AE IP, return confidential information and settle outstanding payments.');
+
+    st('19. Governing Law', 'The Parties shall select the applicable governing law by completing the appropriate Schedule (Schedule A) before execution. Suggested options include India, England & Wales, an EU member state, or another mutually agreed jurisdiction.');
+
+    st('20. Dispute Resolution', 'Negotiation followed by mediation where practical and then arbitration or competent courts as selected in Schedule A.');
+
+    st('21. Entire Agreement', 'This Agreement together with its schedules constitutes the entire agreement between the Parties.');
+
+    // ── Schedules ──
+    doc.addPage(); hdr();
+    doc.font('Helvetica-Bold', 16).fillColor('#1a2744').text('SCHEDULES', { align: 'center' });
+    doc.moveDown(0.8);
+    doc.font('Helvetica', 10).fillColor('#444').text('The following Schedules form an integral part of this Agreement and are incorporated by reference.', { align: 'center' });
+    doc.moveDown(1);
+
+    st('Schedule A \u2014 Country Legal Addendum');
+    doc.font('Helvetica', 10).fillColor('#222').text('This Schedule sets out the governing law, jurisdiction, and regulatory compliance provisions applicable to this Agreement based on the Partner\u2019s country of operation.', { align: 'justify' });
     doc.moveDown(0.3);
-    doc.text("'Products' include T-Shirts, printed materials and associated merchandise.", { align: 'justify' });
+    st('', ['Governing Law: The Parties shall select one of the following jurisdictions \u2014 India, England & Wales, an EU member state (to be specified), or another mutually agreed jurisdiction.', 'Jurisdiction: Courts in the selected jurisdiction shall have exclusive jurisdiction over any disputes.', 'Regulatory Compliance: Each Party shall comply with all applicable local laws, regulations, and industry standards in its jurisdiction.', 'Language: This Agreement may be translated into local languages; the English version shall prevail in case of inconsistency.']);
 
-    addSection('3. Scope', 'Partner may market, distribute, promote and conduct wellness programmes using approved Moow.Hub® products and branding.', { marginTop: 16 });
+    st('Schedule B \u2014 Pricing');
+    doc.font('Helvetica', 10).fillColor('#222').text('This Schedule sets out the pricing structure, payment terms, and financial obligations applicable to Partner purchases.', { align: 'justify' });
+    doc.moveDown(0.3);
+    st('', ['Product pricing shall be as set out in the current Price List, which may be updated from time to time with reasonable notice.', 'Volume discounts may be offered at Moow.Hub\u2019s discretion based on order quantities.', 'Payment terms: 50% advance payment with order; balance payable before dispatch unless otherwise agreed in writing.', 'All prices are exclusive of applicable taxes, duties, and shipping costs.', 'Invoices shall be payable within 30 days of the invoice date unless otherwise specified.']);
 
-    addSection('4. Company Obligations', '', { marginTop: 16 });
-    addSection('', '', { bullet: ['Supply products', 'Maintain digital platform', 'Provide approved branding assets', 'Provide training material', 'Provide reasonable partner support'] });
+    st('Schedule C \u2014 Brand Guidelines');
+    doc.font('Helvetica', 10).fillColor('#222').text('This Schedule governs the use of Moow.Hub\u00AE brand assets, including logos, trademarks, and visual identity elements.', { align: 'justify' });
+    doc.moveDown(0.3);
+    st('', ['Brand assets may only be used in accordance with the current Brand Guidelines document provided by Moow.Hub.', 'The Partner shall not modify, alter, or adapt any brand assets without prior written approval.', 'Co-branding initiatives require express written approval from Moow.Hub.', 'All marketing and promotional materials featuring Moow.Hub branding must be submitted for approval before publication.', 'Brand usage rights are non-transferable and limited to the term of this Agreement.']);
 
-    addSection('5. Partner Obligations', '', { marginTop: 16 });
-    addSection('', '', { bullet: ['Promote ethically', 'Comply with laws', 'Protect brand reputation', 'Avoid misleading claims', 'Maintain records', 'Pay invoices', 'Provide campaign metrics upon request'] });
+    st('Schedule D \u2014 Data Processing Addendum');
+    doc.font('Helvetica', 10).fillColor('#222').text('This Schedule sets out the data protection and privacy obligations of the Parties.', { align: 'justify' });
+    doc.moveDown(0.3);
+    st('', ['Each Party shall independently determine its purposes and means of processing personal data.', 'Each Party shall comply with applicable data protection laws including India\u2019s DPDP Act, UK GDPR, EU GDPR, or equivalent local legislation.', 'Cross-border data transfers shall be subject to appropriate safeguards as required by applicable law.', 'Each Party shall implement appropriate technical and organisational measures to protect personal data.', 'Data breaches shall be notified to the relevant authority and affected individuals as required by law.']);
 
-    addSection('6. Intellectual Property', 'All copyrights, trademarks, patents, software, artwork, illustrations, QR codes, databases, educational content, logos and know-how remain exclusively owned by Moow.Hub®. No ownership transfers under this Agreement.', { marginTop: 16 });
+    st('Schedule E \u2014 Product Catalogue');
+    doc.font('Helvetica', 10).fillColor('#222').text('This Schedule describes the products available for purchase under this Agreement.', { align: 'justify' });
+    doc.moveDown(0.3);
+    st('', ['Apparel: Moow Wellness Tee (S\u2013XXL), Educator\u2019s Edition, Moow Wellness Cap.', 'Kits: Community Wellness Kit, School Starter Kit, Corporate Wellness Bundle.', 'Print Materials: Wellness Education Pack, QR-Code Poster Set (10 posters), Community Health Handbook.', 'Product specifications, quality standards, and packaging requirements are as set out in the current Product Catalogue.', 'Moow.Hub reserves the right to modify or discontinue products with reasonable notice.']);
 
-    addSection('7. Brand Usage', 'Brand assets may only be used according to the Brand Guidelines. Any co-branding requires prior written approval.', { marginTop: 16 });
+    st('Schedule F \u2014 Statement of Work / Purchase Orders');
+    doc.font('Helvetica', 10).fillColor('#222').text('This Schedule governs the process for issuing and accepting Statements of Work and Purchase Orders.', { align: 'justify' });
+    doc.moveDown(0.3);
+    st('', ['Each Purchase Order shall specify: product description, quantity, unit price, total amount, delivery date, shipping terms, and Incoterms.', 'Purchase Orders are binding upon written acceptance by Moow.Hub.', 'Delivery terms and Incoterms shall be as agreed in each Purchase Order.', 'Acceptance criteria: Products shall be inspected upon delivery; any non-conformities must be reported within 7 days.', 'Force Majeure provisions of the main Agreement apply to all Purchase Orders.']);
 
-    addSection('8. Orders & Payments', 'Commercial terms shall be defined in purchase orders. Default terms: 50% advance and balance before dispatch unless otherwise agreed.', { marginTop: 16 });
-
-    addSection('9. Shipping', 'Shipping, insurance, import duties, customs clearance and local taxes are allocated in the applicable purchase order or Incoterms.', { marginTop: 16 });
-
-    addSection('10. Confidentiality', 'Each Party shall keep confidential all business, pricing, customer, technical and strategic information. This survives five years after termination or longer where required by law.', { marginTop: 16 });
-
-    addSection('11. Data Protection', 'Each Party shall independently comply with applicable privacy legislation, including where applicable India\'s Digital Personal Data Protection Act, UK GDPR, EU GDPR or equivalent local laws.', { marginTop: 16 });
-
-    addSection('12. Compliance', 'Each Party shall comply with anti-bribery, anti-corruption, sanctions, export control and applicable regulatory requirements.', { marginTop: 16 });
-
-    addSection('13. Warranty', 'Products will substantially conform to agreed specifications. Except where prohibited by law, all other warranties are excluded.', { marginTop: 16 });
-
-    addSection('14. Limitation of Liability', 'Neither Party shall be liable for indirect or consequential damages. Aggregate liability shall not exceed the value of the affected order except where local law prohibits such limitation.', { marginTop: 16 });
-
-    addSection('15. Force Majeure', 'Neither Party is liable for delays caused by events beyond reasonable control.', { marginTop: 16 });
-
-    addSection('16. Term', 'Initial term of three years with automatic one-year renewals unless notice is given.', { marginTop: 16 });
-
-    addSection('17. Termination', '', { marginTop: 16 });
-    addSection('', '', { bullet: ['30 days written notice without cause', 'Immediate termination for material breach', 'Immediate termination for insolvency', 'Immediate termination for illegal conduct', 'Immediate termination for misuse of intellectual property'] });
-
-    addSection('18. Post-Termination', 'Partner shall cease using Moow.Hub® IP, return confidential information and settle outstanding payments.', { marginTop: 16 });
-
-    addSection('19. Governing Law', 'The Parties shall select the applicable governing law by completing appropriate Schedule (Schedule A) before execution. Suggested options include India, England & Wales, EU member state or another mutually agreed jurisdiction.', { marginTop: 16 });
-
-    addSection('20. Dispute Resolution', 'Negotiation followed by mediation where practical and then arbitration or competent courts as selected in Schedule (Schedule A).', { marginTop: 16 });
-
-    addSection('21. Entire Agreement', 'This Agreement together with its schedules constitutes the entire agreement.', { marginTop: 16 });
-
-    // Execution Block
-    doc.addPage();
-    addHeader();
-    doc.font('Helvetica-Bold', 18).fillColor('#1a2744').text('Execution', { align: 'center' });
+    // ── Execution Block ──
+    doc.addPage(); hdr();
+    doc.font('Helvetica-Bold', 16).fillColor('#1a2744').text('Execution', { align: 'center' });
     doc.moveDown(0.5);
-    doc.font('Helvetica', 11).fillColor('#222').text('The parties have executed this Agreement as of the date set forth below.', { align: 'center' });
-    doc.moveDown(2);
+    doc.font('Helvetica', 10).fillColor('#444').text('The parties have executed this Agreement as of the date set forth below.', { align: 'center' });
+    doc.moveDown(1.5);
 
-    const execLeft = leftX;
-    const execRight = leftX + 260;
-    const lineW = 200;
-    const fieldH = 45;
+    const colW = 210, gap = 40, rowH = 42;
+    const lcol = lx, rcol = lx + colW + gap;
 
-    doc.font('Helvetica-Bold', 12).fillColor('#1a2744');
-    doc.text('For Moow.Hub®', execLeft);
-    doc.text('For Partner', execRight);
-    doc.moveDown(0.5);
+    doc.font('Helvetica-Bold', 11).fillColor('#1a2744');
+    doc.text('For Moow.Hub\u00AE', lcol, doc.y, { continued: false });
+    doc.text('For Partner', rcol, doc.y - doc.currentLineHeight(), { continued: false });
+    doc.moveDown(1.2);
 
-    const fields = ['Name', 'Title', 'Signature', 'Date'];
+    const topY = doc.y;
+    const execFields = ['Name', 'Title', 'Signature', 'Date'];
     doc.font('Helvetica', 10).fillColor('#444');
-    fields.forEach((f, i) => {
-      const yy = doc.y + i * fieldH;
-      doc.text(f + ': ', execLeft, yy);
-      doc.text(f + ': ', execRight, yy);
-      doc.moveTo(execLeft + 55, yy + 14).lineTo(execLeft + 55 + lineW, yy + 14).strokeColor('#ccc').stroke();
-      doc.moveTo(execRight + 55, yy + 14).lineTo(execRight + 55 + lineW, yy + 14).strokeColor('#ccc').stroke();
+    execFields.forEach((f, i) => {
+      const yp = topY + i * rowH;
+      doc.text(`${f}:`, lcol, yp);
+      doc.text(`${f}:`, rcol, yp);
+      doc.moveTo(lcol + 42, yp + 13).lineTo(lcol + colW, yp + 13).strokeColor('#bbb').stroke();
+      doc.moveTo(rcol + 42, yp + 13).lineTo(rcol + colW, yp + 13).strokeColor('#bbb').stroke();
     });
 
-    const yyExtra = doc.y + fields.length * fieldH + 10;
-    doc.font('Helvetica', 10).fillColor('#444');
-    doc.text('Organisation: ', execRight, yyExtra);
-    doc.moveTo(execRight + 80, yyExtra + 14).lineTo(execRight + 80 + lineW, yyExtra + 14).strokeColor('#ccc').stroke();
+    const extraY = topY + execFields.length * rowH + 6;
+    doc.text('Organisation:', rcol, extraY);
+    doc.moveTo(rcol + 72, extraY + 13).lineTo(rcol + colW, extraY + 13).strokeColor('#bbb').stroke();
 
-    const sealY = yyExtra + fieldH;
-    doc.text('Seal: ', execRight, sealY);
-    doc.moveTo(execRight + 40, sealY + 14).lineTo(execRight + 40 + lineW, sealY + 14).strokeColor('#ccc').stroke();
+    const sealY = extraY + rowH;
+    doc.text('Seal:', rcol, sealY);
+    doc.moveTo(rcol + 32, sealY + 13).lineTo(rcol + colW, sealY + 13).strokeColor('#bbb').stroke();
 
     doc.end();
     return true;
