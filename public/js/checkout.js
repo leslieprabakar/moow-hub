@@ -319,7 +319,7 @@ const Checkout = {
     
     if (isINR) {
       container.innerHTML = `
-        <div class="payment-method selected" onclick="Checkout.selectPayment('upi')">
+        <div class="payment-method selected" onclick="Checkout.selectPayment('upi',this)">
           <input type="radio" name="payment" id="upi" checked>
           <label for="upi">
             <span class="payment-icon">📱</span>
@@ -327,7 +327,7 @@ const Checkout = {
             <span class="payment-desc">Google Pay, PhonePe, Paytm, etc.</span>
           </label>
         </div>
-        <div class="payment-method" onclick="Checkout.selectPayment('card')">
+        <div class="payment-method" onclick="Checkout.selectPayment('card',this)">
           <input type="radio" name="payment" id="card">
           <label for="card">
             <span class="payment-icon">💳</span>
@@ -335,7 +335,7 @@ const Checkout = {
             <span class="payment-desc">Visa, Mastercard, RuPay</span>
           </label>
         </div>
-        <div class="payment-method" onclick="Checkout.selectPayment('netbanking')">
+        <div class="payment-method" onclick="Checkout.selectPayment('netbanking',this)">
           <input type="radio" name="payment" id="netbanking">
           <label for="netbanking">
             <span class="payment-icon">🏦</span>
@@ -343,7 +343,7 @@ const Checkout = {
             <span class="payment-desc">All major banks</span>
           </label>
         </div>
-        <div class="payment-method" onclick="Checkout.selectPayment('cod')">
+        <div class="payment-method" onclick="Checkout.selectPayment('cod',this)">
           <input type="radio" name="payment" id="cod">
           <label for="cod">
             <span class="payment-icon">💵</span>
@@ -354,7 +354,7 @@ const Checkout = {
       `;
     } else {
       container.innerHTML = `
-        <div class="payment-method selected" onclick="Checkout.selectPayment('card')">
+        <div class="payment-method selected" onclick="Checkout.selectPayment('card',this)">
           <input type="radio" name="payment" id="card" checked>
           <label for="card">
             <span class="payment-icon">💳</span>
@@ -362,7 +362,7 @@ const Checkout = {
             <span class="payment-desc">Visa, Mastercard, AMEX</span>
           </label>
         </div>
-        <div class="payment-method" onclick="Checkout.selectPayment('paypal')">
+        <div class="payment-method" onclick="Checkout.selectPayment('paypal',this)">
           <input type="radio" name="payment" id="paypal">
           <label for="paypal">
             <span class="payment-icon">🅿️</span>
@@ -370,7 +370,7 @@ const Checkout = {
             <span class="payment-desc">Pay with your PayPal account</span>
           </label>
         </div>
-        <div class="payment-method" onclick="Checkout.selectPayment('cod')">
+        <div class="payment-method" onclick="Checkout.selectPayment('cod',this)">
           <input type="radio" name="payment" id="cod">
           <label for="cod">
             <span class="payment-icon">💵</span>
@@ -387,12 +387,12 @@ const Checkout = {
   /**
    * Select payment method
    */
-  selectPayment(method) {
+  selectPayment(method, targetEl) {
     this.paymentMethod = method;
-    document.querySelectorAll('.payment-method').forEach(el => {
-      el.classList.remove('selected');
+    document.querySelectorAll('.payment-method').forEach(pm => {
+      pm.classList.remove('selected');
     });
-    event.currentTarget.classList.add('selected');
+    (targetEl || event?.currentTarget)?.classList.add('selected');
     
     // Show/hide UPI ID field
     const upiField = document.getElementById('upiIdField');
@@ -484,7 +484,8 @@ const Checkout = {
         body: JSON.stringify({
           shipping_address: this.shippingData,
           currency: this.currency,
-          payment_method: this.paymentMethod
+          payment_method: this.paymentMethod,
+          items: this.cartItems
         })
       });
 
@@ -601,12 +602,13 @@ const Checkout = {
    * Place COD order
    */
   async placeCODOrder() {
-    // Send OTP for COD verification
     const response = await Auth.authenticatedFetch('/api/checkout/cod-send-otp', {
       method: 'POST',
       body: JSON.stringify({
         shipping_address: this.shippingData,
-        currency: this.currency
+        currency: this.currency,
+        items: this.cartItems,
+        totals: this.totals
       })
     });
 
@@ -620,8 +622,7 @@ const Checkout = {
       throw new Error(data.error || 'Failed to initiate COD order');
     }
 
-    // Show OTP verification modal
-    this.showOTPModal(data.otp_session_id);
+    this.showSuccess(data.data);
   },
 
   /**

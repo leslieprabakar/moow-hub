@@ -382,7 +382,10 @@ async function handleCart(req, res, path) {
   if (req.method === 'POST' && path === 'add') {
     const { product_id, quantity = 1, size } = req.body;
     if (!product_id) return res.status(400).json({ error: 'Product ID required' });
-    const { data: existing } = await db.from('cart_items').select('id, quantity').eq('user_id', user.id).eq('product_id', product_id).eq('size', size || null).single();
+    let query = db.from('cart_items').select('id, quantity').eq('user_id', user.id).eq('product_id', product_id);
+    if (size) { query = query.eq('size', size); }
+    else { query = query.is('size', null); }
+    const { data: existing } = await query.maybeSingle();
     if (existing) { await db.from('cart_items').update({ quantity: existing.quantity + quantity }).eq('id', existing.id); }
     else { await db.from('cart_items').insert({ user_id: user.id, product_id, quantity, size: size || null }); }
     return res.status(200).json({ success: true, message: 'Added to cart' });
@@ -412,19 +415,35 @@ async function handleCheckout(req, res, path) {
   const db = getAdminDB();
 
   if (req.method === 'POST' && path === 'create-order') {
-    const { shipping_address, currency = 'USD', payment_method } = req.body;
+    const { shipping_address, currency = 'USD', payment_method, items: clientItems } = req.body;
     if (!shipping_address || !payment_method) return res.status(400).json({ error: 'Missing required fields' });
-    const { data: cartItems } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
-    if (!cartItems || cartItems.length === 0) return res.status(400).json({ error: 'Cart is empty' });
-    let subtotal = 0;
-    const orderItems = cartItems.map(item => {
-      const itemTotal = item.products.price_usd * item.quantity;
-      subtotal += itemTotal;
-      return { product_id: item.product_id, product_name: item.products.name, product_image: item.products.image_url, quantity: item.quantity, unit_price: item.products.price_usd, total_price: itemTotal, size: item.size };
-    });
-    const shipping = calculateShipping(subtotal, shipping_address.country);
-    const tax = calculateTax(subtotal, shipping_address.country);
-    const total = subtotal + shipping.cost + tax;
+
+    let cartItems = null;
+    const { data: dbItems } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
+    if (dbItems && dbItems.length > 0) cartItems = dbItems;
+
+    if (!cartItems && (!clientItems || clientItems.length === 0)) {
+      return res.status(400).json({ error: 'Cart is empty' });
+    }
+
+    let orderItems, subtotal, total, shipping, tax;
+    if (cartItems) {
+      subtotal = 0;
+      orderItems = cartItems.map(item => {
+        const itemTotal = item.products.price_usd * item.quantity;
+        subtotal += itemTotal;
+        return { product_id: item.product_id, product_name: item.products.name, product_image: item.products.image_url, quantity: item.quantity, unit_price: item.products.price_usd, total_price: itemTotal, size: item.size };
+      });
+      shipping = calculateShipping(subtotal, shipping_address.country);
+      tax = calculateTax(subtotal, shipping_address.country);
+      total = subtotal + shipping.cost + tax;
+    } else {
+      subtotal = clientItems.reduce((s, i) => s + (i.price_usd * i.quantity), 0);
+      shipping = calculateShipping(subtotal, shipping_address.country);
+      tax = calculateTax(subtotal, shipping_address.country);
+      total = subtotal + shipping.cost + tax;
+      orderItems = clientItems.map(item => ({ product_id: item.product_id, product_name: item.product_name, product_image: item.product_image, quantity: item.quantity, unit_price: item.price_usd, total_price: item.price_usd * item.quantity, size: item.size || null }));
+    }
     const isINR = currency === 'INR';
     const paymentGateway = isINR ? 'razorpay' : 'stripe';
     const orderNumber = generateOrderNumber();
@@ -440,8 +459,10 @@ async function handleCheckout(req, res, path) {
     if (orderError || !order) return res.status(500).json({ error: 'Failed to create order', details: orderError?.message });
     const { error: itemsError } = await db.from('order_items').insert(orderItems.map(item => ({ ...item, order_id: order.id, currency })));
     if (itemsError) console.error('order_items insert error:', itemsError.message);
-    for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
-    await db.from('cart_items').delete().eq('user_id', user.id);
+    if (cartItems) {
+      for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
+      await db.from('cart_items').delete().eq('user_id', user.id);
+    }
     return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency, payment: { gateway: paymentGateway, razorpay_key: isINR ? config.RAZORPAY_KEY_ID : null, razorpay_order_id: isINR ? paymentOrder?.id : null, stripe_client_secret: !isINR ? paymentOrder?.client_secret : null, stripe_publishable_key: !isINR ? config.STRIPE_PUBLISHABLE_KEY : null } } });
   }
 
@@ -454,23 +475,41 @@ async function handleCheckout(req, res, path) {
   }
 
   if (req.method === 'POST' && path === 'cod-send-otp') {
-    const { shipping_address, currency = 'USD' } = req.body;
+    const { shipping_address, currency = 'USD', items: clientItems, totals: clientTotals } = req.body;
     if (!shipping_address) return res.status(400).json({ error: 'Shipping address required' });
-    const { data: cartItems } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
-    if (!cartItems || cartItems.length === 0) return res.status(400).json({ error: 'Cart is empty' });
-    let subtotal = 0;
-    const orderItems = cartItems.map(item => { const itemTotal = item.products.price_usd * item.quantity; subtotal += itemTotal; return { product_id: item.product_id, product_name: item.products.name, product_image: item.products.image_url, quantity: item.quantity, unit_price: item.products.price_usd, total_price: itemTotal, size: item.size }; });
-    const shipping = calculateShipping(subtotal, shipping_address.country);
-    const tax = calculateTax(subtotal, shipping_address.country);
-    const total = subtotal + shipping.cost + tax;
+
+    let cartItems = null;
+    const { data: dbItems } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
+    if (dbItems && dbItems.length > 0) cartItems = dbItems;
+
+    if (!cartItems && (!clientItems || clientItems.length === 0)) {
+      return res.status(400).json({ error: 'Cart is empty' });
+    }
+
+    let orderItems, subtotal, total, shipping, tax;
+    if (cartItems) {
+      subtotal = 0;
+      orderItems = cartItems.map(item => { const itemTotal = item.products.price_usd * item.quantity; subtotal += itemTotal; return { product_id: item.product_id, product_name: item.products.name, product_image: item.products.image_url, quantity: item.quantity, unit_price: item.products.price_usd, total_price: itemTotal, size: item.size }; });
+      shipping = calculateShipping(subtotal, shipping_address.country);
+      tax = calculateTax(subtotal, shipping_address.country);
+      total = subtotal + shipping.cost + tax;
+    } else {
+      subtotal = clientTotals?.subtotal || clientItems.reduce((s, i) => s + (i.price_usd * i.quantity), 0);
+      shipping = calculateShipping(subtotal, shipping_address.country);
+      tax = calculateTax(subtotal, shipping_address.country);
+      total = clientTotals?.total || (subtotal + shipping.cost + tax);
+      orderItems = clientItems.map(item => ({ product_id: item.product_id, product_name: item.product_name, product_image: item.product_image, quantity: item.quantity, unit_price: item.price_usd, total_price: item.price_usd * item.quantity, size: item.size || null }));
+    }
     const orderNumber = generateOrderNumber();
     const { data: order, error: orderError } = await db.from('orders').insert({ user_id: user.id, order_number: orderNumber, subtotal, shipping_cost: shipping.cost, tax, total, currency, status: 'confirmed', payment_method: 'cod', payment_gateway: 'cod', payment_status: 'pending', shipping_address: JSON.stringify(shipping_address) }).select().single();
     if (orderError || !order) return res.status(500).json({ error: 'Failed to create order', details: orderError?.message });
     const itemsToInsert = orderItems.map(item => ({ ...item, order_id: order.id, currency }));
     const { error: itemsError } = await db.from('order_items').insert(itemsToInsert).select();
     if (itemsError) console.error('order_items insert error:', itemsError.message);
-    for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
-    await db.from('cart_items').delete().eq('user_id', user.id);
+    if (cartItems) {
+      for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
+      await db.from('cart_items').delete().eq('user_id', user.id);
+    }
     return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency } });
   }
 
