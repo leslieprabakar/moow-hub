@@ -555,8 +555,8 @@ async function handleCheckout(req, res, path) {
     const { order_id, otp } = req.body;
     if (!order_id || !otp) return res.status(400).json({ error: 'Order ID and OTP required' });
     if (otp !== '123456') return res.status(400).json({ error: 'Invalid OTP' });
-    const { data: order, error: fetchError } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).eq('user_id', user.id).single();
-    if (fetchError || !order) return res.status(404).json({ error: 'Order not found' });
+    const { data: order } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).maybeSingle();
+    if (!order) return res.status(404).json({ error: 'Order not found' });
     if (order.status !== 'pending') return res.status(400).json({ error: 'Order already processed' });
     await db.from('orders').update({ status: 'confirmed', payment_status: 'paid' }).eq('id', order_id);
     const { data: cartItems } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
