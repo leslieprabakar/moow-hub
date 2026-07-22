@@ -296,8 +296,8 @@ const Auth = {
  * and saves pending data before logging out.
  */
 const SessionManager = {
-  TIMEOUT: 30 * 60 * 1000,
-  WARNING_AT: 5 * 60 * 1000,
+  TIMEOUT: 3 * 60 * 1000,
+  WARNING_AT: 2 * 60 * 1000,
   CHECK_MS: 30 * 1000,
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
@@ -423,7 +423,7 @@ const SessionManager = {
     const sec = s % 60;
     const el = document.getElementById('scd-time');
     if (el) el.textContent = m + ':' + String(sec).padStart(2, '0');
-    if (this.countdownEl) this.countdownEl.classList.toggle('scd-urgent', s <= 120);
+    if (this.countdownEl) this.countdownEl.classList.toggle('scd-urgent', s <= 60);
   },
 
   hideCountdown() {
@@ -451,7 +451,7 @@ const SessionManager = {
   extend() {
     this.markActive();
     this.hideCountdown();
-    this.toast('Session extended — you\'re active for another 30 minutes');
+    this.toast('Session extended — you\'re active for another 3 minutes');
   },
 
   async expire() {
