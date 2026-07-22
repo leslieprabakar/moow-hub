@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const Stripe = require('stripe');
 const { Resend } = require('resend');
+const PDFDocument = require('pdfkit');
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────────
 const config = {
@@ -677,6 +678,48 @@ async function handlePartner(req, res, path) {
     return res.status(200).json({ success: true, data: { is_partner: true, user: updated } });
   }
 
+  if (req.method === 'POST' && path === 'inquiry') {
+    const { first_name, last_name, email, phone, organisation, location, quantity, type, vision } = req.body;
+    const missing = validateRequired(req.body, ['first_name', 'last_name', 'email', 'organisation', 'location', 'vision']);
+    if (missing.length > 0) return res.status(400).json({ error: 'Missing required fields', fields: missing });
+    if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
+
+    const { data: inquiry, error } = await db.from('partner_inquiries').insert({
+      first_name: sanitizeString(first_name),
+      last_name: sanitizeString(last_name),
+      email: email.toLowerCase(),
+      phone: phone || null,
+      organisation: sanitizeString(organisation),
+      location: sanitizeString(location),
+      quantity: quantity || null,
+      type: type || null,
+      vision: sanitizeString(vision)
+    }).select().single();
+
+    if (error) return res.status(500).json({ error: 'Failed to submit inquiry', details: error.message });
+
+    const inquiryDate = new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+    const adminEmail = 'leslieprabakar@gmail.com';
+    sendEmail(adminEmail, `New Agreement Draft Request — ${first_name} ${last_name}`, emailTemplate(`
+      <h1 style="color:#1a2744;margin-bottom:20px;">New Agreement Draft Request</h1>
+      <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Date</td><td style="padding:8px;border-bottom:1px solid #eee;">${inquiryDate}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">First Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${first_name}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Last Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${last_name}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${email}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Phone</td><td style="padding:8px;border-bottom:1px solid #eee;">${phone || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Organisation</td><td style="padding:8px;border-bottom:1px solid #eee;">${organisation}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Location</td><td style="padding:8px;border-bottom:1px solid #eee;">${location}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Estimated Quantity</td><td style="padding:8px;border-bottom:1px solid #eee;">${quantity || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Organisation Type</td><td style="padding:8px;border-bottom:1px solid #eee;">${type || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Vision</td><td style="padding:8px;border-bottom:1px solid #eee;">${vision}</td></tr>
+      </table>
+      <p style="margin-top:20px;">View all inquiries in the admin panel.</p>
+    `), { emailType: 'welcome' }).catch(() => {});
+
+    return res.status(201).json({ success: true, message: 'Inquiry submitted successfully' });
+  }
+
   return false;
 }
 
@@ -824,6 +867,161 @@ async function handleWebhooks(req, res, path) {
   return null;
 }
 
+// ─── AGREEMENT HANDLER ────────────────────────────────────────────────────────
+async function handleAgreement(req, res, path) {
+  if (req.method === 'GET' && path === 'download-pdf') {
+    const doc = new PDFDocument({ size: 'A4', margins: { top: 72, bottom: 72, left: 72, right: 72 }, info: { Title: 'Moow.Hub Partnership Agreement', Author: 'Moow.Hub®', Subject: 'Partnership Agreement', Creator: 'Moow.Hub®' } });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="Moow.Hub-Partnership-Agreement.pdf"');
+    doc.pipe(res);
+
+    const pageW = 495;
+    const leftX = 72;
+
+    const addHeader = () => {
+      doc.font('Helvetica', 8).fillColor('#999');
+      doc.text('Moow.Hub® Partnership Agreement', leftX, 40, { align: 'right', width: pageW });
+      doc.fillColor('#000');
+    };
+    addHeader();
+
+    const finalizePages = () => {
+      const pageCount = doc.bufferedPageRange().count;
+      for (let i = 0; i < pageCount; i++) {
+        doc.switchToPage(i);
+        doc.save();
+        doc.opacity(0.08);
+        doc.font('Helvetica-Bold');
+        doc.fontSize(48);
+        doc.rotate(-35, { origin: [297, 420] });
+        doc.text('MOOW.HUB — CONFIDENTIAL', 50, 380, { align: 'center', width: 500 });
+        doc.restore();
+        doc.font('Helvetica', 8).fillColor('#999');
+        doc.text(`Page ${i + 1}`, leftX, doc.page.height - 40, { align: 'center', width: pageW });
+        doc.fillColor('#000');
+      }
+    };
+
+    const addSection = (title, body, opts = {}) => {
+      const { marginTop = 20, fontSize = 11, bold = false, bullet = false } = opts;
+      doc.moveDown(marginTop / doc.currentLineHeight() || 1);
+      if (title) {
+        doc.font('Helvetica-Bold', 13).fillColor('#1a2744').text(title, { continued: false });
+        doc.moveDown(0.3);
+      }
+      doc.font(bold ? 'Helvetica-Bold' : 'Helvetica', fontSize).fillColor('#222');
+      if (bullet) {
+        const lines = Array.isArray(body) ? body : [body];
+        lines.forEach(line => doc.text(`  •  ${line}`, { indent: 10 }));
+      } else {
+        doc.text(body, { align: 'justify' });
+      }
+    };
+
+    // Title
+    doc.font('Helvetica-Bold', 26).fillColor('#1a2744').text('PARTNERSHIP AGREEMENT', { align: 'center' });
+    doc.moveDown(0.5);
+    doc.font('Helvetica', 14).fillColor('#666').text('Moow.Hub®', { align: 'center' });
+    doc.moveDown(0.3);
+    doc.font('Helvetica', 10).fillColor('#888').text('Effective Date: ______________', { align: 'center' });
+    doc.moveDown(2);
+
+    // Sections
+    addSection('1. Purpose', 'This website and mobile responsive design will promote yoga, wellness, preventive healthcare, educational initiatives, fundraising, corporate wellness, schools, NGOs, charities, hospitals, Rotary, Lions Clubs, distributors, retailers, government bodies, and community organisations.');
+
+    addSection('2. Definitions', '', { marginTop: 16 });
+    doc.font('Helvetica', 11).fillColor('#222');
+    doc.text("'Moow.Hub®' includes the website, mobile application, QR-code ecosystem, educational content, digital services and future enhancements.", { align: 'justify' });
+    doc.moveDown(0.3);
+    doc.text("'Products' include T-Shirts, printed materials and associated merchandise.", { align: 'justify' });
+
+    addSection('3. Scope', 'Partner may market, distribute, promote and conduct wellness programmes using approved Moow.Hub® products and branding.', { marginTop: 16 });
+
+    addSection('4. Company Obligations', '', { marginTop: 16 });
+    addSection('', '', { bullet: ['Supply products', 'Maintain digital platform', 'Provide approved branding assets', 'Provide training material', 'Provide reasonable partner support'] });
+
+    addSection('5. Partner Obligations', '', { marginTop: 16 });
+    addSection('', '', { bullet: ['Promote ethically', 'Comply with laws', 'Protect brand reputation', 'Avoid misleading claims', 'Maintain records', 'Pay invoices', 'Provide campaign metrics upon request'] });
+
+    addSection('6. Intellectual Property', 'All copyrights, trademarks, patents, software, artwork, illustrations, QR codes, databases, educational content, logos and know-how remain exclusively owned by Moow.Hub®. No ownership transfers under this Agreement.', { marginTop: 16 });
+
+    addSection('7. Brand Usage', 'Brand assets may only be used according to the Brand Guidelines. Any co-branding requires prior written approval.', { marginTop: 16 });
+
+    addSection('8. Orders & Payments', 'Commercial terms shall be defined in purchase orders. Default terms: 50% advance and balance before dispatch unless otherwise agreed.', { marginTop: 16 });
+
+    addSection('9. Shipping', 'Shipping, insurance, import duties, customs clearance and local taxes are allocated in the applicable purchase order or Incoterms.', { marginTop: 16 });
+
+    addSection('10. Confidentiality', 'Each Party shall keep confidential all business, pricing, customer, technical and strategic information. This survives five years after termination or longer where required by law.', { marginTop: 16 });
+
+    addSection('11. Data Protection', 'Each Party shall independently comply with applicable privacy legislation, including where applicable India\'s Digital Personal Data Protection Act, UK GDPR, EU GDPR or equivalent local laws.', { marginTop: 16 });
+
+    addSection('12. Compliance', 'Each Party shall comply with anti-bribery, anti-corruption, sanctions, export control and applicable regulatory requirements.', { marginTop: 16 });
+
+    addSection('13. Warranty', 'Products will substantially conform to agreed specifications. Except where prohibited by law, all other warranties are excluded.', { marginTop: 16 });
+
+    addSection('14. Limitation of Liability', 'Neither Party shall be liable for indirect or consequential damages. Aggregate liability shall not exceed the value of the affected order except where local law prohibits such limitation.', { marginTop: 16 });
+
+    addSection('15. Force Majeure', 'Neither Party is liable for delays caused by events beyond reasonable control.', { marginTop: 16 });
+
+    addSection('16. Term', 'Initial term of three years with automatic one-year renewals unless notice is given.', { marginTop: 16 });
+
+    addSection('17. Termination', '', { marginTop: 16 });
+    addSection('', '', { bullet: ['30 days written notice without cause', 'Immediate termination for material breach', 'Immediate termination for insolvency', 'Immediate termination for illegal conduct', 'Immediate termination for misuse of intellectual property'] });
+
+    addSection('18. Post-Termination', 'Partner shall cease using Moow.Hub® IP, return confidential information and settle outstanding payments.', { marginTop: 16 });
+
+    addSection('19. Governing Law', 'The Parties shall select the applicable governing law by completing appropriate Schedule (Schedule A) before execution. Suggested options include India, England & Wales, EU member state or another mutually agreed jurisdiction.', { marginTop: 16 });
+
+    addSection('20. Dispute Resolution', 'Negotiation followed by mediation where practical and then arbitration or competent courts as selected in Schedule (Schedule A).', { marginTop: 16 });
+
+    addSection('21. Entire Agreement', 'This Agreement together with its schedules constitutes the entire agreement.', { marginTop: 16 });
+
+    // Execution Block
+    doc.addPage();
+    addHeader();
+    doc.font('Helvetica-Bold', 18).fillColor('#1a2744').text('Execution', { align: 'center' });
+    doc.moveDown(0.5);
+    doc.font('Helvetica', 11).fillColor('#222').text('The parties have executed this Agreement as of the date set forth below.', { align: 'center' });
+    doc.moveDown(2);
+
+    const execLeft = leftX;
+    const execRight = leftX + 260;
+    const lineW = 200;
+    const fieldH = 45;
+
+    doc.font('Helvetica-Bold', 12).fillColor('#1a2744');
+    doc.text('For Moow.Hub®', execLeft);
+    doc.text('For Partner', execRight);
+    doc.moveDown(0.5);
+
+    const fields = ['Name', 'Title', 'Signature', 'Date'];
+    doc.font('Helvetica', 10).fillColor('#444');
+    fields.forEach((f, i) => {
+      const yy = doc.y + i * fieldH;
+      doc.text(f + ': ', execLeft, yy);
+      doc.text(f + ': ', execRight, yy);
+      doc.moveTo(execLeft + 55, yy + 14).lineTo(execLeft + 55 + lineW, yy + 14).strokeColor('#ccc').stroke();
+      doc.moveTo(execRight + 55, yy + 14).lineTo(execRight + 55 + lineW, yy + 14).strokeColor('#ccc').stroke();
+    });
+
+    const yyExtra = doc.y + fields.length * fieldH + 10;
+    doc.font('Helvetica', 10).fillColor('#444');
+    doc.text('Organisation: ', execRight, yyExtra);
+    doc.moveTo(execRight + 80, yyExtra + 14).lineTo(execRight + 80 + lineW, yyExtra + 14).strokeColor('#ccc').stroke();
+
+    const sealY = yyExtra + fieldH;
+    doc.text('Seal: ', execRight, sealY);
+    doc.moveTo(execRight + 40, sealY + 14).lineTo(execRight + 40 + lineW, sealY + 14).strokeColor('#ccc').stroke();
+
+    finalizePages();
+    doc.end();
+    return true;
+  }
+
+  return false;
+}
+
 // ─── MAIN HANDLER ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   setCORS(res);
@@ -861,6 +1059,9 @@ module.exports = async function handler(req, res) {
         break;
       case 'admin':
         handled = await handleAdmin(req, res, subPath, url);
+        break;
+      case 'agreement':
+        handled = await handleAgreement(req, res, subPath);
         break;
       case 'currency':
         handled = await handleCurrency(req, res);

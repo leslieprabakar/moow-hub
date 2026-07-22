@@ -281,22 +281,58 @@ document.addEventListener('DOMContentLoaded', () => {
       submitBtn.innerHTML = 'Sending...';
       submitBtn.disabled = true;
 
-      setTimeout(() => {
-        submitBtn.innerHTML = 'Message Sent!';
-        submitBtn.style.background = '#2a7a4f';
+      const formData = {
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        organisation: document.getElementById('organisation').value,
+        location: document.getElementById('location').value,
+        quantity: document.getElementById('quantity').value,
+        type: document.getElementById('type').value,
+        vision: document.getElementById('vision').value
+      };
 
-        setTimeout(() => {
-          submitBtn.innerHTML = originalText;
-          submitBtn.style.background = '';
-          submitBtn.disabled = false;
-          contactForm.reset();
-          contactForm.querySelectorAll('.form-group').forEach(g => {
-            g.classList.remove('error', 'success');
-            const err = g.querySelector('.error-message');
-            if (err) err.textContent = '';
-          });
-        }, 2000);
-      }, 1500);
+      const token = localStorage.getItem('moow_token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      fetch('/api/partner/inquiry', { method: 'POST', headers, body: JSON.stringify(formData) })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            submitBtn.innerHTML = 'Message Sent!';
+            submitBtn.style.background = '#2a7a4f';
+            setTimeout(() => {
+              submitBtn.innerHTML = originalText;
+              submitBtn.style.background = '';
+              submitBtn.disabled = false;
+              contactForm.reset();
+              contactForm.querySelectorAll('.form-group').forEach(g => {
+                g.classList.remove('error', 'success');
+                const err = g.querySelector('.error-message');
+                if (err) err.textContent = '';
+              });
+            }, 2000);
+          } else {
+            submitBtn.innerHTML = 'Failed — Try Again';
+            submitBtn.style.background = '#c0392b';
+            setTimeout(() => {
+              submitBtn.innerHTML = originalText;
+              submitBtn.style.background = '';
+              submitBtn.disabled = false;
+            }, 3000);
+          }
+        })
+        .catch(() => {
+          submitBtn.innerHTML = 'Failed — Try Again';
+          submitBtn.style.background = '#c0392b';
+          setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.style.background = '';
+            submitBtn.disabled = false;
+          }, 3000);
+        });
     });
   }
 

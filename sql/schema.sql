@@ -241,6 +241,23 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
+-- --------------------------------------------------------
+-- Partner Inquiries Table
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS partner_inquiries (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    organisation VARCHAR(255),
+    location VARCHAR(255),
+    quantity VARCHAR(50),
+    type VARCHAR(50),
+    vision TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Currency rates: Anyone can read
 ALTER TABLE currency_rates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Currency rates are viewable by everyone" ON currency_rates FOR SELECT USING (true);
