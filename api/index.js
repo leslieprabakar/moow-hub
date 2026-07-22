@@ -678,12 +678,18 @@ async function handlePartner(req, res, path) {
     return res.status(200).json({ success: true, data: { is_partner: true, user: updated } });
   }
 
+  return false;
+}
+
+// ─── CONTACT HANDLER (public, no auth required) ──────────────────────────────
+async function handleContact(req, res, path) {
   if (req.method === 'POST' && path === 'inquiry') {
     const { first_name, last_name, email, phone, organisation, location, quantity, type, vision } = req.body;
     const missing = validateRequired(req.body, ['first_name', 'last_name', 'email', 'organisation', 'location', 'vision']);
     if (missing.length > 0) return res.status(400).json({ error: 'Missing required fields', fields: missing });
     if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
 
+    const db = getAdminDB();
     const { data: inquiry, error } = await db.from('partner_inquiries').insert({
       first_name: sanitizeString(first_name),
       last_name: sanitizeString(last_name),
@@ -878,6 +884,28 @@ async function handleAgreement(req, res, path) {
 
     const pageW = 495;
     const leftX = 72;
+    let pageNum = 0;
+    let decorating = false;
+
+    const decoratePage = () => {
+      if (decorating) return;
+      decorating = true;
+      pageNum++;
+      doc.save();
+      doc.opacity(0.08);
+      doc.font('Helvetica-Bold').fontSize(48);
+      doc.rotate(-35, { origin: [297, 420] });
+      doc.text('MOOW.HUB — CONFIDENTIAL', 50, 380, { align: 'center', width: 500 });
+      doc.restore();
+      doc.save();
+      doc.font('Helvetica', 8).fillColor('#999');
+      doc.text(`Page ${pageNum}`, leftX, doc.page.height - 40, { align: 'center', width: pageW });
+      doc.restore();
+      decorating = false;
+    };
+
+    decoratePage();
+    doc.on('pageAdded', decoratePage);
 
     const addHeader = () => {
       doc.font('Helvetica', 8).fillColor('#999');
@@ -885,23 +913,6 @@ async function handleAgreement(req, res, path) {
       doc.fillColor('#000');
     };
     addHeader();
-
-    const finalizePages = () => {
-      const pageCount = doc.bufferedPageRange().count;
-      for (let i = 0; i < pageCount; i++) {
-        doc.switchToPage(i);
-        doc.save();
-        doc.opacity(0.08);
-        doc.font('Helvetica-Bold');
-        doc.fontSize(48);
-        doc.rotate(-35, { origin: [297, 420] });
-        doc.text('MOOW.HUB — CONFIDENTIAL', 50, 380, { align: 'center', width: 500 });
-        doc.restore();
-        doc.font('Helvetica', 8).fillColor('#999');
-        doc.text(`Page ${i + 1}`, leftX, doc.page.height - 40, { align: 'center', width: pageW });
-        doc.fillColor('#000');
-      }
-    };
 
     const addSection = (title, body, opts = {}) => {
       const { marginTop = 20, fontSize = 11, bold = false, bullet = false } = opts;
@@ -1014,7 +1025,6 @@ async function handleAgreement(req, res, path) {
     doc.text('Seal: ', execRight, sealY);
     doc.moveTo(execRight + 40, sealY + 14).lineTo(execRight + 40 + lineW, sealY + 14).strokeColor('#ccc').stroke();
 
-    finalizePages();
     doc.end();
     return true;
   }
@@ -1053,6 +1063,9 @@ module.exports = async function handler(req, res) {
         break;
       case 'wishlist':
         handled = await handleWishlist(req, res, subPath);
+        break;
+      case 'contact':
+        handled = await handleContact(req, res, subPath);
         break;
       case 'partner':
         handled = await handlePartner(req, res, subPath);

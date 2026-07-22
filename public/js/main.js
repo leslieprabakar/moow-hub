@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const headers = { 'Content-Type': 'application/json' };
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
-      fetch('/api/partner/inquiry', { method: 'POST', headers, body: JSON.stringify(formData) })
+      fetch('/api/contact/inquiry', { method: 'POST', headers, body: JSON.stringify(formData) })
         .then(r => r.json())
         .then(data => {
           if (data.success) {
