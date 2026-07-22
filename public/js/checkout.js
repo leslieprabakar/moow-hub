@@ -622,23 +622,23 @@ const Checkout = {
       throw new Error(data.error || 'Failed to initiate COD order');
     }
 
-    this.showSuccess(data.data);
+    this.showOTPModal(data.data.order_id);
   },
 
   /**
    * Show OTP verification modal
    */
-  showOTPModal(sessionId) {
+  showOTPModal(orderId) {
     const modal = document.getElementById('otpModal');
     modal.style.display = 'flex';
-    
+
     document.getElementById('verifyOtpBtn').onclick = async () => {
       const otp = document.getElementById('otpInput').value;
-      
+
       const response = await Auth.authenticatedFetch('/api/checkout/cod-verify-otp', {
         method: 'POST',
         body: JSON.stringify({
-          session_id: sessionId,
+          order_id: orderId,
           otp: otp
         })
       });

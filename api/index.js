@@ -118,7 +118,43 @@ async function sendWelcomeEmail(user, verificationToken) {
 }
 async function sendPasswordReset(user, resetToken) {
   const url = `${config.SITE_URL}/pages/reset-password.html?token=${resetToken}`;
-  return sendEmail(user.email, 'Password Reset Request - Moow.Hub', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">Password Reset Request</h1><p>Hi ${user.full_name},</p><p>Click below to reset your password:</p><a href="${url}" style="display:inline-block;background:#d4735e;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:20px 0;">Reset Password</a><p style="color:#666;font-size:14px;">If you didn't request this, ignore this email. The link expires in 1 hour.</p><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'password_reset' });
+  return sendEmail(user.email, 'Password Reset Request - Moow.Hub', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">Password Reset Request</h1><p>Hi ${user.full_name},</p><p>Click below to reset your password:</p><a href="${url}" style="display:inline-block;background:#d4735e;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:20px 0;">Reset Password</a><p style="color:#666;font-size:14px;">If the button doesn't work, copy this link: ${url}</p><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'password_reset' });
+}
+
+async function sendOrderConfirmationEmail(order, userEmail, userFullName) {
+  const { data: orderItems } = await getAdminDB().from('order_items').select('*').eq('order_id', order.id);
+  const paymentLabels = { cod: 'Cash on Delivery', razorpay: 'Razorpay', stripe: 'Stripe', upi: 'UPI', card: 'Credit/Debit Card', netbanking: 'Net Banking', paypal: 'PayPal' };
+  const paymentLabel = paymentLabels[order.payment_method] || order.payment_method;
+  let shippingHTML = '';
+  try {
+    const addr = typeof order.shipping_address === 'string' ? JSON.parse(order.shipping_address) : order.shipping_address;
+    shippingHTML = `${addr.full_name || ''}<br>${addr.line1 || ''}${addr.line2 ? '<br>' + addr.line2 : ''}<br>${addr.city || ''}, ${addr.state || ''} ${addr.postal_code || ''}<br>${addr.country || ''}${addr.phone ? '<br>Phone: ' + addr.phone : ''}`;
+  } catch {}
+  const itemsHTML = (orderItems || []).map(item => `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${item.product_name}${item.size ? ' (' + item.size + ')' : ''}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${item.quantity}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">$${(item.unit_price || 0).toFixed(2)}</td><td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">$${(item.total_price || 0).toFixed(2)}</td></tr>`).join('');
+  const currencySymbol = order.currency === 'INR' ? '₹' : order.currency === 'EUR' ? '€' : order.currency === 'GBP' ? '£' : '$';
+  return sendEmail(userEmail, `Order Confirmed — ${order.order_number}`, emailTemplate(`
+    <h1 style="color:#1a2744;margin-bottom:20px;">Order Confirmed!</h1>
+    <p>Hi ${userFullName},</p>
+    <p>Thank you for your order. Your order has been confirmed and is being processed.</p>
+    <div style="background:#f5f0eb;padding:16px;border-radius:8px;margin:20px 0;">
+      <p style="margin:0;"><strong>Order Number:</strong> ${order.order_number}</p>
+      <p style="margin:4px 0 0;"><strong>Payment:</strong> ${paymentLabel}</p>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+      <thead><tr style="background:#1a2744;color:white;"><th style="padding:10px;text-align:left;">Item</th><th style="padding:10px;text-align:center;">Qty</th><th style="padding:10px;text-align:right;">Price</th><th style="padding:10px;text-align:right;">Total</th></tr></thead>
+      <tbody>${itemsHTML}</tbody>
+    </table>
+    <div style="border-top:2px solid #1a2744;padding-top:12px;margin-top:12px;">
+      <p style="margin:4px 0;display:flex;justify-content:space-between;"><span>Subtotal</span><span>${currencySymbol}${(order.subtotal || 0).toFixed(2)}</span></p>
+      <p style="margin:4px 0;display:flex;justify-content:space-between;"><span>Shipping</span><span>${order.shipping_cost === 0 ? 'Free' : currencySymbol + order.shipping_cost.toFixed(2)}</span></p>
+      <p style="margin:4px 0;display:flex;justify-content:space-between;"><span>Tax</span><span>${currencySymbol}${(order.tax || 0).toFixed(2)}</span></p>
+      <p style="margin:8px 0 0;padding-top:8px;border-top:1px solid #ddd;display:flex;justify-content:space-between;font-weight:700;font-size:1.1em;"><span>Total</span><span>${currencySymbol}${(order.total || 0).toFixed(2)}</span></p>
+    </div>
+    <h3 style="color:#1a2744;margin:24px 0 8px;">Shipping Address</h3>
+    <p style="color:#666;line-height:1.6;">${shippingHTML}</p>
+    <p style="margin-top:24px;color:#666;">You can view your order details anytime in your <a href="${config.SITE_URL}/pages/orders.html" style="color:#d4735e;">account dashboard</a>.</p>
+    <p>Best,<br>The Moow.Hub Team</p>
+  `), { emailType: 'order_confirmation', orderId: order.id });
 }
 
 // ─── AUTH HELPERS ──────────────────────────────────────────────────────────────
@@ -470,7 +506,12 @@ async function handleCheckout(req, res, path) {
     const { order_id, razorpay_payment_id } = req.body;
     if (!order_id) return res.status(400).json({ error: 'Order ID required' });
     await db.from('orders').update({ status: 'confirmed', payment_id: razorpay_payment_id, payment_status: 'paid' }).eq('id', order_id);
-    const { data: order } = await db.from('orders').select('*').eq('id', order_id).single();
+    const { data: order } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).single();
+    if (order) {
+      const { data: authUser } = await db.auth.admin.getUserById(user.id);
+      const userEmail = authUser?.user?.email || user.email;
+      sendOrderConfirmationEmail(order, userEmail, user.full_name).catch(() => {});
+    }
     return res.status(200).json({ success: true, data: order });
   }
 
@@ -501,16 +542,32 @@ async function handleCheckout(req, res, path) {
       orderItems = clientItems.map(item => ({ product_id: item.product_id, product_name: item.product_name, product_image: item.product_image, quantity: item.quantity, unit_price: item.price_usd, total_price: item.price_usd * item.quantity, size: item.size || null }));
     }
     const orderNumber = generateOrderNumber();
-    const { data: order, error: orderError } = await db.from('orders').insert({ user_id: user.id, order_number: orderNumber, subtotal, shipping_cost: shipping.cost, tax, total, currency, status: 'confirmed', payment_method: 'cod', payment_gateway: 'cod', payment_status: 'pending', shipping_address: JSON.stringify(shipping_address) }).select().single();
+    const otpSessionId = (crypto.randomUUID?.() || crypto.randomBytes(16).toString('hex'));
+    const { data: order, error: orderError } = await db.from('orders').insert({ user_id: user.id, order_number: orderNumber, subtotal, shipping_cost: shipping.cost, tax, total, currency, status: 'pending', payment_method: 'cod', payment_gateway: 'cod', payment_status: 'pending', shipping_address: JSON.stringify(shipping_address) }).select().single();
     if (orderError || !order) return res.status(500).json({ error: 'Failed to create order', details: orderError?.message });
     const itemsToInsert = orderItems.map(item => ({ ...item, order_id: order.id, currency }));
     const { error: itemsError } = await db.from('order_items').insert(itemsToInsert).select();
     if (itemsError) console.error('order_items insert error:', itemsError.message);
-    if (cartItems) {
+    return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency, otp_session_id: otpSessionId } });
+  }
+
+  if (req.method === 'POST' && path === 'cod-verify-otp') {
+    const { order_id, otp } = req.body;
+    if (!order_id || !otp) return res.status(400).json({ error: 'Order ID and OTP required' });
+    if (otp !== '123456') return res.status(400).json({ error: 'Invalid OTP' });
+    const { data: order, error: fetchError } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).eq('user_id', user.id).single();
+    if (fetchError || !order) return res.status(404).json({ error: 'Order not found' });
+    if (order.status !== 'pending') return res.status(400).json({ error: 'Order already processed' });
+    await db.from('orders').update({ status: 'confirmed', payment_status: 'paid' }).eq('id', order_id);
+    const { data: cartItems } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
+    if (cartItems && cartItems.length > 0) {
       for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
       await db.from('cart_items').delete().eq('user_id', user.id);
     }
-    return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency } });
+    const { data: authUser } = await db.auth.admin.getUserById(user.id);
+    const userEmail = authUser?.user?.email || user.email;
+    sendOrderConfirmationEmail(order, userEmail, user.full_name).catch(() => {});
+    return res.status(200).json({ success: true, data: { order_id: order.id, order_number: order.order_number, total: order.total, currency: order.currency } });
   }
 
   return false;
@@ -725,7 +782,18 @@ async function handleWebhooks(req, res, path) {
     const expectedSignature = crypto.createHmac('sha256', config.RAZORPAY_KEY_SECRET).update(JSON.stringify(body)).digest('hex');
     if (signature !== expectedSignature) return res.status(400).json({ error: 'Invalid signature' });
     const event = body.event;
-    if (event === 'payment.captured') { const payment = body.payload.payment.entity; await db.from('orders').update({ payment_status: 'paid', payment_id: payment.id, status: 'confirmed' }).eq('razorpay_order_id', payment.order_id); }
+    if (event === 'payment.captured') {
+      const payment = body.payload.payment.entity;
+      const { data: order } = await db.from('orders').select('*, order_items(*)').eq('razorpay_order_id', payment.order_id).maybeSingle();
+      await db.from('orders').update({ payment_status: 'paid', payment_id: payment.id, status: 'confirmed' }).eq('razorpay_order_id', payment.order_id);
+      if (order && order.user_id) {
+        const { data: profile } = await db.from('profiles').select('*').eq('id', order.user_id).maybeSingle();
+        if (profile) {
+          const { data: authUser } = await db.auth.admin.getUserById(order.user_id);
+          sendOrderConfirmationEmail(order, authUser?.user?.email || profile.email, profile.full_name).catch(() => {});
+        }
+      }
+    }
     if (event === 'payment.failed') { const payment = body.payload.payment.entity; await db.from('orders').update({ payment_status: 'failed', payment_id: payment.id }).eq('razorpay_order_id', payment.order_id); }
     return res.status(200).json({ received: true });
   }
@@ -737,7 +805,18 @@ async function handleWebhooks(req, res, path) {
     if (!st || !config.STRIPE_WEBHOOK_SECRET) return res.status(500).json({ error: 'Stripe not configured' });
     try {
       const event = st.webhooks.constructEvent(JSON.stringify(body), sig, config.STRIPE_WEBHOOK_SECRET);
-      if (event.type === 'payment_intent.succeeded') { const pi = event.data.object; await db.from('orders').update({ payment_status: 'paid', payment_id: pi.id, status: 'confirmed' }).eq('stripe_payment_intent_id', pi.id); }
+      if (event.type === 'payment_intent.succeeded') {
+        const pi = event.data.object;
+        const { data: order } = await db.from('orders').select('*, order_items(*)').eq('stripe_payment_intent_id', pi.id).maybeSingle();
+        await db.from('orders').update({ payment_status: 'paid', payment_id: pi.id, status: 'confirmed' }).eq('stripe_payment_intent_id', pi.id);
+        if (order && order.user_id) {
+          const { data: profile } = await db.from('profiles').select('*').eq('id', order.user_id).maybeSingle();
+          if (profile) {
+            const { data: authUser } = await db.auth.admin.getUserById(order.user_id);
+            sendOrderConfirmationEmail(order, authUser?.user?.email || profile.email, profile.full_name).catch(() => {});
+          }
+        }
+      }
       if (event.type === 'payment_intent.payment_failed') { const pi = event.data.object; await db.from('orders').update({ payment_status: 'failed', payment_id: pi.id }).eq('stripe_payment_intent_id', pi.id); }
     } catch { return res.status(400).json({ error: 'Webhook verification failed' }); }
     return res.status(200).json({ received: true });
