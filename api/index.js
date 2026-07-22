@@ -410,7 +410,7 @@ async function handleCart(req, res, path) {
   const db = getAdminDB();
 
   if (req.method === 'GET' && path === 'get') {
-    const { data: items, error } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id);
+    const { data: items, error } = await db.from('cart_items').select('*, products(*)').eq('user_id', user.id).order('created_at', { ascending: true });
     if (error) return res.status(500).json({ error: 'Failed to fetch cart' });
     return res.status(200).json({ success: true, data: items || [] });
   }

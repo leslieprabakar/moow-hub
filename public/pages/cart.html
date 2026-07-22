@@ -193,34 +193,33 @@
   <script defer src="../js/cart.js"></script>
   <script defer src="../js/main.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Check auth
-      if (!Auth.isAuthenticated()) {
-        // Allow guest cart viewing
-      }
-
+    async function loadCart() {
       const loading = document.getElementById('cartLoading');
       const empty = document.getElementById('cartEmpty');
       const content = document.getElementById('cartContent');
-      const itemsContainer = document.getElementById('cartItems');
 
       try {
         const items = await Cart.getItems();
-        
         loading.style.display = 'none';
 
         if (items.length === 0) {
+          content.style.display = 'none';
           empty.style.display = 'block';
-          return;
+          return [];
         }
 
         content.style.display = 'grid';
         renderCart(items);
-        await loadSuggestions(items);
-
+        return items;
       } catch (error) {
         loading.textContent = 'Failed to load cart';
+        return [];
       }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const items = await loadCart();
+      if (items.length > 0) await loadSuggestions(items);
     });
 
     function renderCart(items) {
@@ -263,14 +262,15 @@
         return;
       }
       await Cart.updateItem(itemId, newQty);
-      location.reload();
+      Cart.updateBadge();
+      await loadCart();
     }
 
     async function removeItem(itemId) {
-      if (confirm('Remove this item from your cart?')) {
-        await Cart.removeItem(itemId);
-        location.reload();
-      }
+      if (!confirm('Remove this item from your cart?')) return;
+      await Cart.removeItem(itemId);
+      Cart.updateBadge();
+      await loadCart();
     }
 
     async function loadSuggestions(cartItems) {
