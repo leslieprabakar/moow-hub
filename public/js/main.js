@@ -316,10 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Initialize Auth and Cart ---
-  if (typeof Auth !== 'undefined') {
-    Auth.init();
-  }
+  // --- Initialize Cart badge ---
   if (typeof Cart !== 'undefined') {
     Cart.updateBadge();
   }

@@ -16,8 +16,10 @@ const Auth = {
     const user = localStorage.getItem('moow_user');
     
     if (token && user) {
-      this.updateUI(JSON.parse(user));
-      return JSON.parse(user);
+      const parsed = JSON.parse(user);
+      this.updateUI(parsed);
+      if (typeof SessionManager !== 'undefined') SessionManager.init();
+      return parsed;
     }
     
     this.updateUI(null);
@@ -46,6 +48,7 @@ const Auth = {
     localStorage.setItem('moow_user', JSON.stringify(data.user));
 
     this.updateUI(data.user);
+    if (typeof SessionManager !== 'undefined') SessionManager.reset();
 
     if (typeof Cart !== 'undefined') {
       await Cart.mergeGuestCart();
@@ -82,6 +85,10 @@ const Auth = {
    * Logout
    */
   async logout() {
+    if (typeof SessionManager !== 'undefined') {
+      SessionManager.stop();
+      await SessionManager.flush();
+    }
     const token = this.getToken();
     
     if (token) {
@@ -147,7 +154,9 @@ const Auth = {
     const token = this.getToken();
     
     if (!token) {
-      window.location.href = '/pages/login.html';
+      if (!window.location.pathname.includes('login.html')) {
+        window.location.href = '/pages/login.html';
+      }
       return null;
     }
 
@@ -173,7 +182,13 @@ const Auth = {
           }
         });
       }
-      window.location.href = '/pages/login.html';
+      localStorage.removeItem('moow_token');
+      localStorage.removeItem('moow_refresh_token');
+      localStorage.removeItem('moow_user');
+      this.updateUI(null);
+      if (!window.location.pathname.includes('login.html')) {
+        window.location.href = '/pages/login.html';
+      }
       return null;
     }
 
@@ -272,6 +287,217 @@ const Auth = {
     } catch {
       badge.style.display = 'none';
     }
+  }
+};
+
+/**
+ * Session Manager — 30-minute inactivity timeout with countdown warning
+ * Tracks user activity, shows a non-intrusive countdown before expiry,
+ * and saves pending data before logging out.
+ */
+const SessionManager = {
+  TIMEOUT: 30 * 60 * 1000,
+  WARNING_AT: 5 * 60 * 1000,
+  CHECK_MS: 30 * 1000,
+  COUNTDOWN_MS: 1000,
+  THROTTLE_MS: 1000,
+  RE_SHOW_MS: 30000,
+
+  lastActivity: null,
+  checkTimer: null,
+  countdownTimer: null,
+  countdownEl: null,
+  warningVisible: false,
+  reShowTimer: null,
+  initialized: false,
+
+  isAuthPage() {
+    const p = window.location.pathname.toLowerCase();
+    return p.includes('login.html') || p.includes('register.html') ||
+           p.includes('forgot-password.html') || p.includes('reset-password.html');
+  },
+
+  init() {
+    if (this.initialized) return;
+    if (!Auth.isAuthenticated()) return;
+    if (this.isAuthPage()) return;
+
+    this.initialized = true;
+    this.lastActivity = this.loadActivity();
+    if (Date.now() - this.lastActivity > this.TIMEOUT) {
+      this.lastActivity = Date.now();
+    }
+    this.persist();
+    this.buildUI();
+    this.track();
+    this.startCheck();
+    this.watchCrossTab();
+  },
+
+  loadActivity() {
+    try {
+      const v = sessionStorage.getItem('moow_sa');
+      return v ? parseInt(v, 10) : Date.now();
+    } catch { return Date.now(); }
+  },
+
+  persist() {
+    try { sessionStorage.setItem('moow_sa', String(this.lastActivity)); } catch {}
+  },
+
+  buildUI() {
+    if (this.countdownEl) return;
+    const el = document.createElement('div');
+    el.id = 'session-countdown';
+    el.className = 'session-countdown';
+    el.setAttribute('role', 'alert');
+    el.setAttribute('aria-live', 'polite');
+    el.innerHTML =
+      '<div class="scd-inner">' +
+        '<svg class="scd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
+        '<span class="scd-msg">Session expires in <strong id="scd-time">5:00</strong></span>' +
+        '<button class="scd-btn" id="scd-extend" type="button">Keep Active</button>' +
+        '<button class="scd-x" id="scd-dismiss" type="button" aria-label="Dismiss">&times;</button>' +
+      '</div>';
+    document.body.appendChild(el);
+    this.countdownEl = el;
+
+    document.getElementById('scd-extend').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.extend();
+    });
+    document.getElementById('scd-dismiss').addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.dismiss();
+    });
+  },
+
+  track() {
+    let last = 0;
+    const fn = () => {
+      const now = Date.now();
+      if (now - last < this.THROTTLE_MS) return;
+      last = now;
+      this.markActive();
+    };
+    ['mousedown','mousemove','keydown','scroll','touchstart','touchmove','click'].forEach(e => {
+      document.addEventListener(e, fn, { passive: true });
+    });
+    window.addEventListener('focus', fn);
+  },
+
+  markActive() {
+    this.lastActivity = Date.now();
+    this.persist();
+    if (this.warningVisible) this.hideCountdown();
+  },
+
+  startCheck() {
+    this.checkTimer = setInterval(() => this.check(), this.CHECK_MS);
+  },
+
+  check() {
+    if (!Auth.isAuthenticated()) { this.stop(); return; }
+    const remaining = this.TIMEOUT - (Date.now() - this.lastActivity);
+    if (remaining <= 0) { this.expire(); return; }
+    if (remaining <= this.WARNING_AT) this.showCountdown(remaining);
+  },
+
+  showCountdown(ms) {
+    if (!this.countdownEl) return;
+    this.warningVisible = true;
+    this.countdownEl.classList.add('visible');
+    this.renderTime(ms);
+    if (!this.countdownTimer) {
+      this.countdownTimer = setInterval(() => {
+        const rem = this.TIMEOUT - (Date.now() - this.lastActivity);
+        if (rem <= 0) { this.expire(); return; }
+        this.renderTime(rem);
+      }, this.COUNTDOWN_MS);
+    }
+  },
+
+  renderTime(ms) {
+    const s = Math.max(0, Math.ceil(ms / 1000));
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    const el = document.getElementById('scd-time');
+    if (el) el.textContent = m + ':' + String(sec).padStart(2, '0');
+    if (this.countdownEl) this.countdownEl.classList.toggle('scd-urgent', s <= 120);
+  },
+
+  hideCountdown() {
+    this.warningVisible = false;
+    if (this.countdownEl) {
+      this.countdownEl.classList.remove('visible');
+      this.countdownEl.classList.remove('scd-urgent');
+    }
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+  },
+
+  dismiss() {
+    this.hideCountdown();
+    clearTimeout(this.reShowTimer);
+    this.reShowTimer = setTimeout(() => {
+      if (!Auth.isAuthenticated() || this.warningVisible) return;
+      const rem = this.TIMEOUT - (Date.now() - this.lastActivity);
+      if (rem > 0 && rem <= this.WARNING_AT) this.showCountdown(rem);
+    }, this.RE_SHOW_MS);
+  },
+
+  extend() {
+    this.markActive();
+    this.hideCountdown();
+    this.toast('Session extended — you\'re active for another 30 minutes');
+  },
+
+  async expire() {
+    this.stop();
+    await this.flush();
+    Auth.logout();
+  },
+
+  async flush() {
+    try { await new Promise(r => setTimeout(r, 600)); } catch {}
+  },
+
+  toast(msg) {
+    const t = document.createElement('div');
+    t.className = 'session-toast';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('visible'));
+    setTimeout(() => {
+      t.classList.remove('visible');
+      setTimeout(() => t.remove(), 300);
+    }, 2500);
+  },
+
+  watchCrossTab() {
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'moow_token' && !e.newValue) {
+        this.stop();
+        if (!this.isAuthPage()) window.location.href = '/pages/login.html';
+      }
+    });
+  },
+
+  stop() {
+    clearTimeout(this.reShowTimer);
+    if (this.checkTimer) { clearInterval(this.checkTimer); this.checkTimer = null; }
+    if (this.countdownTimer) { clearInterval(this.countdownTimer); this.countdownTimer = null; }
+    this.hideCountdown();
+    this.initialized = false;
+  },
+
+  reset() {
+    this.stop();
+    this.lastActivity = Date.now();
+    this.persist();
+    this.init();
   }
 };
 

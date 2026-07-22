@@ -326,8 +326,3 @@ const Cart = {
     };
   }
 };
-
-// Update badge on page load
-document.addEventListener('DOMContentLoaded', () => {
-  Cart.updateBadge();
-});
