@@ -65,8 +65,9 @@ const Orders = {
         ? JSON.parse(order.shipping_address) 
         : order.shipping_address;
       
-      const date = new Date(order.created_at).toLocaleDateString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric'
+      const date = new Date(order.created_at).toLocaleString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
       });
 
       const statusClass = this.getStatusClass(order.status);
