@@ -26,12 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
       menuToggle.setAttribute('aria-expanded', isOpen);
     });
 
+    const closeMobileMenu = () => {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', (e) => {
-        if (link.closest('.nav-dropdown')) return;
-        menuToggle.classList.remove('active');
-        navLinks.classList.remove('active');
-        document.body.style.overflow = '';
+        if (window.innerWidth > 768 && link.closest('.nav-dropdown')) return;
+        closeMobileMenu();
         const href = link.getAttribute('href');
         if (href && !href.startsWith('#') && !link.getAttribute('target') && !e.metaKey && !e.ctrlKey && e.button === 0) {
           e.preventDefault();
@@ -48,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.stopPropagation();
       const dropdown = trigger.closest('.nav-dropdown');
       const isOpen = dropdown.classList.contains('open');
+      const windowW = window.innerWidth;
 
       document.querySelectorAll('.nav-dropdown.open').forEach(d => {
         if (d !== dropdown) d.classList.remove('open');

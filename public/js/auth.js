@@ -387,10 +387,14 @@ const SessionManager = {
       last = now;
       this.markActive();
     };
-    ['mousedown','mousemove','keydown','scroll','touchstart','touchmove','click'].forEach(e => {
+    ['mousedown','mousemove','keydown','scroll','touchstart','touchend','touchmove','click','pointerdown'].forEach(e => {
       document.addEventListener(e, this._trackFn, { passive: true });
     });
     window.addEventListener('focus', this._trackFn);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') this._trackFn();
+    });
+    window.addEventListener('pageshow', this._trackFn);
     this._tracked = true;
   },
 
