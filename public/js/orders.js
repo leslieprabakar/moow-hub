@@ -153,6 +153,8 @@ const Orders = {
     const existing = document.getElementById('cancelModal');
     if (existing) existing.remove();
 
+    const isDetailPage = window.location.pathname.includes('order-detail.html');
+
     const modal = document.createElement('div');
     modal.id = 'cancelModal';
     modal.className = 'cancel-modal-overlay';
@@ -182,37 +184,53 @@ const Orders = {
 
     document.getElementById('cancelModalYes').onclick = async () => {
       const reason = document.getElementById('cancelReason').value.trim();
-      document.getElementById('cancelModalYes').disabled = true;
-      document.getElementById('cancelModalYes').textContent = 'Cancelling…';
+      const yesBtn = document.getElementById('cancelModalYes');
+      yesBtn.disabled = true;
+      yesBtn.textContent = 'Cancelling…';
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
       try {
         const response = await Auth.authenticatedFetch('/api/orders/cancel', {
           method: 'POST',
+          signal: controller.signal,
           body: JSON.stringify({
             order_id: orderId,
             reason: reason || undefined
           })
         });
 
+        clearTimeout(timeout);
+
         if (!response) {
-          document.getElementById('cancelModalYes').textContent = 'Failed – Try Again';
-          document.getElementById('cancelModalYes').disabled = false;
+          yesBtn.textContent = 'Failed – Try Again';
+          yesBtn.disabled = false;
           return;
         }
 
         const data = await response.json();
 
         if (!response.ok) {
-          document.getElementById('cancelModalYes').textContent = data.error || 'Failed – Try Again';
-          document.getElementById('cancelModalYes').disabled = false;
+          yesBtn.textContent = data.error || 'Failed – Try Again';
+          yesBtn.disabled = false;
           return;
         }
 
         close();
-        this.loadOrders(this.currentPage, this.currentFilter);
+        if (isDetailPage) {
+          window.location.href = 'orders.html';
+        } else {
+          this.loadOrders(this.currentPage, this.currentFilter);
+        }
       } catch (error) {
-        document.getElementById('cancelModalYes').textContent = 'Failed – Try Again';
-        document.getElementById('cancelModalYes').disabled = false;
+        clearTimeout(timeout);
+        if (error.name === 'AbortError') {
+          yesBtn.textContent = 'Request timed out – Try Again';
+        } else {
+          yesBtn.textContent = 'Failed – Try Again';
+        }
+        yesBtn.disabled = false;
       }
     };
   },
