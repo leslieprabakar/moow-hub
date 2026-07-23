@@ -4,6 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+});
+
 const apiHandler = require('./api/index');
 
 const MIME_TYPES = {
@@ -103,14 +110,12 @@ const server = http.createServer(async (req, res) => {
   // If still doesn't exist, serve 404
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
     filePath = path.join(__dirname, 'public', '404.html');
-    const ext = path.extname(filePath);
-    const contentType = MIME_TYPES[ext] || 'text/html';
     try {
       const content = fs.readFileSync(filePath);
-      res.writeHead(404, { 'Content-Type': contentType });
+      if (!res.headersSent) res.writeHead(404, { 'Content-Type': 'text/html' });
       res.end(content);
     } catch {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      if (!res.headersSent) res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.end('Not Found');
     }
     return;
@@ -120,10 +125,10 @@ const server = http.createServer(async (req, res) => {
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
   try {
     const content = fs.readFileSync(filePath);
-    res.writeHead(200, { 'Content-Type': contentType });
+    if (!res.headersSent) res.writeHead(200, { 'Content-Type': contentType });
     res.end(content);
   } catch {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    if (!res.headersSent) res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
   }
 });

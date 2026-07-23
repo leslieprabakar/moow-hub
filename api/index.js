@@ -897,7 +897,7 @@ async function handleAgreement(req, res, subPath) {
       res.setHeader('Content-Length', data.length);
       res.statusCode = 200;
       res.end(data);
-      return;
+      return true;
     } catch (err) {
       return res.status(500).json({ error: 'Failed to serve PDF' });
     }
