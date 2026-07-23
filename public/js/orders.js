@@ -143,39 +143,78 @@ const Orders = {
    * Cancel an order
    */
   async cancelOrder(orderId, orderNumber) {
-    if (!confirm(`Are you sure you want to cancel order ${orderNumber}?`)) {
-      return;
-    }
+    this.showCancelModal(orderId, orderNumber);
+  },
 
-    const reason = prompt('Please provide a reason for cancellation (optional):');
+  /**
+   * Show cancel confirmation modal (mobile-friendly)
+   */
+  showCancelModal(orderId, orderNumber) {
+    const existing = document.getElementById('cancelModal');
+    if (existing) existing.remove();
 
-    try {
-      const response = await Auth.authenticatedFetch('/api/orders/cancel', {
-        method: 'POST',
-        body: JSON.stringify({
-          order_id: orderId,
-          reason: reason || undefined
-        })
-      });
+    const modal = document.createElement('div');
+    modal.id = 'cancelModal';
+    modal.className = 'cancel-modal-overlay';
+    modal.innerHTML = `
+      <div class="cancel-modal">
+        <button class="cancel-modal-x" id="cancelModalClose" type="button" aria-label="Close">&times;</button>
+        <h3>Cancel Order</h3>
+        <p>Are you sure you want to cancel order <strong>${orderNumber}</strong>?</p>
+        <div class="cancel-modal-field">
+          <label for="cancelReason">Reason for cancellation <span class="cancel-modal-opt">(optional)</span></label>
+          <textarea id="cancelReason" rows="3" placeholder="Tell us why you're cancelling…"></textarea>
+        </div>
+        <div class="cancel-modal-actions">
+          <button class="btn btn-outline" id="cancelModalNo">Keep Order</button>
+          <button class="btn btn-danger" id="cancelModalYes">Yes, Cancel Order</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
 
-      if (!response) {
-        alert('Failed to cancel order');
-        return;
+    const close = () => { modal.remove(); };
+    document.getElementById('cancelModalClose').onclick = close;
+    document.getElementById('cancelModalNo').onclick = close;
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+
+    document.getElementById('cancelModalYes').onclick = async () => {
+      const reason = document.getElementById('cancelReason').value.trim();
+      document.getElementById('cancelModalYes').disabled = true;
+      document.getElementById('cancelModalYes').textContent = 'Cancelling…';
+
+      try {
+        const response = await Auth.authenticatedFetch('/api/orders/cancel', {
+          method: 'POST',
+          body: JSON.stringify({
+            order_id: orderId,
+            reason: reason || undefined
+          })
+        });
+
+        if (!response) {
+          document.getElementById('cancelModalYes').textContent = 'Failed – Try Again';
+          document.getElementById('cancelModalYes').disabled = false;
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          document.getElementById('cancelModalYes').textContent = data.error || 'Failed – Try Again';
+          document.getElementById('cancelModalYes').disabled = false;
+          return;
+        }
+
+        close();
+        this.loadOrders(this.currentPage, this.currentFilter);
+      } catch (error) {
+        document.getElementById('cancelModalYes').textContent = 'Failed – Try Again';
+        document.getElementById('cancelModalYes').disabled = false;
       }
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || 'Failed to cancel order');
-        return;
-      }
-
-      alert('Order cancelled successfully');
-      this.loadOrders(this.currentPage, this.currentFilter);
-
-    } catch (error) {
-      alert('Failed to cancel order');
-    }
+    };
   },
 
   /**

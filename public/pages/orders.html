@@ -46,12 +46,58 @@
     .order-total { font-weight: 600; color: var(--navy); }
     .order-actions { display: flex; gap: 0.5rem; }
     .btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-danger:hover { background: #c82333; }
     
     /* Empty state */
     .orders-empty { text-align: center; padding: 4rem 2rem; }
     .orders-empty h2 { font-family: var(--font-serif); color: var(--navy); margin-bottom: 1rem; }
     .orders-empty p { color: var(--text-light); margin-bottom: 2rem; }
     
+    /* Cancel Modal */
+    .cancel-modal-overlay {
+      position: fixed; inset: 0; z-index: 10000;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .cancel-modal {
+      background: var(--white); border-radius: var(--radius);
+      padding: 2rem; max-width: 480px; width: 100%;
+      position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .cancel-modal h3 {
+      font-family: var(--font-serif); color: var(--navy);
+      margin: 0 0 0.75rem; font-size: 1.3rem;
+    }
+    .cancel-modal p { color: var(--text-light); font-size: 0.95rem; margin: 0 0 1.25rem; }
+    .cancel-modal-x {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      background: none; border: none; font-size: 1.5rem;
+      line-height: 1; cursor: pointer; color: var(--text-light);
+      padding: 0.25rem;
+    }
+    .cancel-modal-field { margin-bottom: 1.25rem; }
+    .cancel-modal-field label {
+      display: block; font-size: 0.85rem; font-weight: 500;
+      color: var(--navy); margin-bottom: 0.35rem;
+    }
+    .cancel-modal-opt { font-weight: 400; color: var(--text-light); }
+    .cancel-modal-field textarea {
+      width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-family: var(--font-ui);
+      font-size: 0.9rem; resize: vertical;
+    }
+    .cancel-modal-actions {
+      display: flex; gap: 0.75rem; justify-content: flex-end;
+    }
+    .cancel-modal-actions .btn { min-width: 100px; }
+    @media (max-width: 480px) {
+      .cancel-modal { padding: 1.5rem; }
+      .cancel-modal-actions { flex-direction: column; }
+      .cancel-modal-actions .btn { width: 100%; }
+    }
+
     /* Loading */
     .orders-loading { text-align: center; padding: 4rem; color: var(--text-light); }
     
