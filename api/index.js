@@ -881,7 +881,7 @@ async function handleAgreement(req, res, subPath) {
     const user = await verifyAuth(req);
     const isPartner = user?.is_partner === true;
 
-    const pdfDir = 'D:\\4. L E S L I E\\LeslieProjects';
+    const pdfDir = path.join(__dirname, '..', 'public', 'pdfs');
     const fileName = isPartner
       ? 'Partnership Agreement with Schedules.pdf'
       : 'Partnership Agreement.pdf';
