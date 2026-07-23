@@ -2448,6 +2448,8 @@ p {
     font-family: var(--font-ui);
     font-size: 0.9rem;
     font-weight: 500;
+    justify-content: center;
+    text-align: center;
   }
 
   .nav-dropdown-icon .nav-dropdown-trigger:hover {
@@ -2489,6 +2491,7 @@ p {
     font-size: 0.9rem;
     border-radius: var(--radius);
     margin-bottom: 0.15rem;
+    text-align: center;
   }
 
   .nav-dropdown-item:hover {
