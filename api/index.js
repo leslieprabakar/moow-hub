@@ -6,6 +6,8 @@
 const { createClient } = require('@supabase/supabase-js');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const Razorpay = require('razorpay');
 const Stripe = require('stripe');
 const { Resend } = require('resend');
@@ -874,146 +876,31 @@ async function handleWebhooks(req, res, path) {
 }
 
 // ─── AGREEMENT HANDLER ────────────────────────────────────────────────────────
-async function handleAgreement(req, res, path) {
-  if (req.method === 'GET' && path === 'download-pdf') {
-    const doc = new PDFDocument({ size: 'A4', bufferPages: true, margins: { top: 72, bottom: 72, left: 72, right: 72 }, info: { Title: 'Moow.Hub Partnership Agreement', Author: 'Moow.Hub®', Subject: 'Partnership Agreement', Creator: 'Moow.Hub®' } });
+async function handleAgreement(req, res, subPath) {
+  if (req.method === 'GET' && subPath === 'download-pdf') {
+    const user = await verifyAuth(req);
+    const isPartner = user?.is_partner === true;
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="Moow.Hub-Partnership-Agreement.pdf"');
-    doc.pipe(res);
+    const pdfDir = 'D:\\4. L E S L I E\\LeslieProjects';
+    const fileName = isPartner
+      ? 'Partnership Agreement with Schedules.pdf'
+      : 'Partnership Agreement.pdf';
+    const filePath = path.join(pdfDir, fileName);
 
-    const pw = 495, lx = 72;
-
-    const st = (title, body) => {
-      if (title) {
-        doc.font('Helvetica-Bold', 12).fillColor('#1a2744').text(title);
-        doc.moveDown(0.15);
+    try {
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'PDF file not found' });
       }
-      if (Array.isArray(body)) {
-        doc.font('Helvetica', 10).fillColor('#333');
-        body.forEach((line, i) => {
-          if (i > 0) doc.moveDown(0.08);
-          doc.text(`  \u2022  ${line}`, { indent: 12, align: 'justify' });
-        });
-      } else if (body) {
-        doc.font('Helvetica', 10).fillColor('#333').text(body, { align: 'justify' });
-      }
-    };
-
-    // ── Title ──
-    doc.font('Helvetica-Bold', 24).fillColor('#1a2744').text('PARTNERSHIP AGREEMENT', { align: 'center' });
-    doc.moveDown(0.8);
-    doc.font('Helvetica', 14).fillColor('#555').text('Moow.Hub\u00AE', { align: 'center' });
-    doc.moveDown(0.5);
-    doc.font('Helvetica', 11).fillColor('#888').text('Effective Date: ______________', { align: 'center' });
-    doc.moveDown(2);
-
-    // ── Main Agreement ──
-    st('1. Purpose', 'This website and mobile responsive design will promote yoga, wellness, preventive healthcare, educational initiatives, fundraising, corporate wellness, schools, NGOs, charities, hospitals, Rotary, Lions Clubs, distributors, retailers, government bodies, and community organisations.');
-    st('2. Definitions');
-    doc.font('Helvetica', 10).fillColor('#333').text('\u201CMoow.Hub\u00AE\u201D includes the website, mobile application, QR-code ecosystem, educational content, digital services and future enhancements.', { align: 'justify' });
-    doc.moveDown(0.15);
-    doc.font('Helvetica', 10).fillColor('#333').text('\u201CProducts\u201D include T-Shirts, printed materials and associated merchandise.', { align: 'justify' });
-    st('3. Scope', 'Partner may market, distribute, promote and conduct wellness programmes using approved Moow.Hub\u00AE products and branding.');
-    st('4. Company Obligations', ['Supply products', 'Maintain digital platform', 'Provide approved branding assets', 'Provide training material', 'Provide reasonable partner support']);
-    st('5. Partner Obligations', ['Promote ethically', 'Comply with laws', 'Protect brand reputation', 'Avoid misleading claims', 'Maintain records', 'Pay invoices', 'Provide campaign metrics upon request']);
-    st('6. Intellectual Property', 'All copyrights, trademarks, patents, software, artwork, illustrations, QR codes, databases, educational content, logos and know-how remain exclusively owned by Moow.Hub\u00AE. No ownership transfers under this Agreement.');
-    st('7. Brand Usage', 'Brand assets may only be used according to the Brand Guidelines. Any co-branding requires prior written approval.');
-    st('8. Orders & Payments', 'Commercial terms shall be defined in purchase orders. Default terms: 50% advance and balance before dispatch unless otherwise agreed.');
-    st('9. Shipping', 'Shipping, insurance, import duties, customs clearance and local taxes are allocated in the applicable purchase order or Incoterms.');
-    st('10. Confidentiality', 'Each Party shall keep confidential all business, pricing, customer, technical and strategic information. This obligation survives five years after termination or longer where required by law.');
-    st('11. Data Protection', 'Each Party shall independently comply with applicable privacy legislation, including where applicable India\u2019s Digital Personal Data Protection Act, UK GDPR, EU GDPR or equivalent local laws.');
-    st('12. Compliance', 'Each Party shall comply with anti-bribery, anti-corruption, sanctions, export control and applicable regulatory requirements.');
-    st('13. Warranty', 'Products will substantially conform to agreed specifications. Except where prohibited by law, all other warranties are excluded.');
-    st('14. Limitation of Liability', 'Neither Party shall be liable for indirect or consequential damages. Aggregate liability shall not exceed the value of the affected order except where local law prohibits such limitation.');
-    st('15. Force Majeure', 'Neither Party is liable for delays caused by events beyond reasonable control.');
-    st('16. Term', 'Initial term of three years with automatic one-year renewals unless notice is given.');
-    st('17. Termination', ['30 days written notice without cause', 'Immediate termination for material breach', 'Immediate termination for insolvency', 'Immediate termination for illegal conduct', 'Immediate termination for misuse of intellectual property']);
-    st('18. Post-Termination', 'Partner shall cease using Moow.Hub\u00AE IP, return confidential information and settle outstanding payments.');
-    st('19. Governing Law', 'The Parties shall select the applicable governing law by completing the appropriate Schedule (Schedule A) before execution. Suggested options include India, England & Wales, an EU member state, or another mutually agreed jurisdiction.');
-    st('20. Dispute Resolution', 'Negotiation followed by mediation where practical and then arbitration or competent courts as selected in Schedule A.');
-    st('21. Entire Agreement', 'This Agreement together with its schedules constitutes the entire agreement between the Parties.');
-
-    // ── Schedules (headings only — full content for partners only) ──
-    doc.addPage();
-    doc.font('Helvetica-Bold', 16).fillColor('#1a2744').text('SCHEDULES', { align: 'center' });
-    doc.moveDown(0.8);
-    doc.font('Helvetica', 10).fillColor('#666').text('The following Schedules form an integral part of this Agreement.', { align: 'center' });
-    doc.moveDown(1.2);
-    doc.font('Helvetica', 10).fillColor('#333');
-    const schedules = [
-      'Schedule A \u2014 Country Legal Addendum',
-      'Schedule B \u2014 Pricing',
-      'Schedule C \u2014 Brand Guidelines',
-      'Schedule D \u2014 Data Processing Addendum',
-      'Schedule E \u2014 Product Catalogue',
-      'Schedule F \u2014 Statement of Work / Purchase Orders'
-    ];
-    schedules.forEach((s, i) => {
-      if (i > 0) doc.moveDown(0.5);
-      doc.font('Helvetica-Bold', 11).fillColor('#1a2744').text(s);
-    });
-
-    // ── Execution ──
-    doc.addPage();
-    doc.font('Helvetica-Bold', 16).fillColor('#1a2744').text('Execution', { align: 'center' });
-    doc.moveDown(0.5);
-    doc.font('Helvetica', 10).fillColor('#555').text('The parties have executed this Agreement as of the date set forth below.', { align: 'center' });
-    doc.moveDown(1.5);
-
-    const colW = 210, gap = 40, rowH = 36;
-    const lcol = lx, rcol = lx + colW + gap;
-    doc.font('Helvetica-Bold', 11).fillColor('#1a2744');
-    doc.text('For Moow.Hub\u00AE', lcol, doc.y, { continued: false });
-    doc.text('For Partner', rcol, doc.y - doc.currentLineHeight(), { continued: false });
-    doc.moveDown(1.2);
-
-    const topY = doc.y;
-    const execFields = ['Name', 'Title', 'Signature', 'Date'];
-    doc.font('Helvetica', 10).fillColor('#444');
-    execFields.forEach((f, i) => {
-      const yp = topY + i * rowH;
-      doc.text(`${f}:`, lcol, yp);
-      doc.text(`${f}:`, rcol, yp);
-      doc.moveTo(lcol + 42, yp + 12).lineTo(lcol + colW, yp + 12).strokeColor('#bbb').stroke();
-      doc.moveTo(rcol + 42, yp + 12).lineTo(rcol + colW, yp + 12).strokeColor('#bbb').stroke();
-    });
-    const extraY = topY + execFields.length * rowH + 4;
-    doc.text('Organisation:', rcol, extraY);
-    doc.moveTo(rcol + 72, extraY + 12).lineTo(rcol + colW, extraY + 12).strokeColor('#bbb').stroke();
-    const sealY = extraY + rowH;
-    doc.text('Seal:', rcol, sealY);
-    doc.moveTo(rcol + 32, sealY + 12).lineTo(rcol + colW, sealY + 12).strokeColor('#bbb').stroke();
-
-    // ── Post-process all buffered pages: watermark + footer ──
-    const range = doc.bufferedPageRange();
-    for (let i = range.start; i < range.start + range.count; i++) {
-      doc.switchToPage(i);
-      const { width, height } = doc.page;
-
-      // Reset position to avoid auto-page-break from stale doc.y
-      doc.x = lx;
-      doc.y = 72;
-
-      // Diagonal watermark (explicit 0,0 in rotated coords = page center)
-      doc.save();
-      doc.font('Helvetica-Bold', 36).fillColor('#d0d0d0');
-      doc.translate(width / 2, height / 2);
-      doc.rotate(-45);
-      doc.text('MOOW.HUB \u2014 CONFIDENTIAL', 0, 0, { align: 'center' });
-      doc.restore();
-
-      // Footer line + page number
-      const fty = height - 60;
-      doc.lineWidth(0.5).strokeColor('#ccc');
-      doc.moveTo(lx, fty).lineTo(lx + pw, fty).stroke();
-      doc.font('Helvetica', 8).fillColor('#888');
-      doc.text('Moow.Hub Partnership Agreement', lx, fty + 6, { align: 'left' });
-      doc.text(`Page ${i - range.start + 1} of ${range.count}`, lx, fty + 6, { align: 'right' });
+      const data = fs.readFileSync(filePath);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Length', data.length);
+      res.statusCode = 200;
+      res.end(data);
+      return;
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to serve PDF' });
     }
-
-    doc.end();
-    return true;
   }
 
   return false;
