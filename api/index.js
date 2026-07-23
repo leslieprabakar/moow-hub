@@ -876,34 +876,13 @@ async function handleWebhooks(req, res, path) {
 // ─── AGREEMENT HANDLER ────────────────────────────────────────────────────────
 async function handleAgreement(req, res, path) {
   if (req.method === 'GET' && path === 'download-pdf') {
-    const doc = new PDFDocument({ size: 'A4', margins: { top: 72, bottom: 90, left: 72, right: 72 }, info: { Title: 'Moow.Hub Partnership Agreement', Author: 'Moow.Hub®', Subject: 'Partnership Agreement', Creator: 'Moow.Hub®' } });
+    const doc = new PDFDocument({ size: 'A4', bufferPages: true, margins: { top: 72, bottom: 72, left: 72, right: 72 }, info: { Title: 'Moow.Hub Partnership Agreement', Author: 'Moow.Hub®', Subject: 'Partnership Agreement', Creator: 'Moow.Hub®' } });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="Moow.Hub-Partnership-Agreement.pdf"');
     doc.pipe(res);
 
-    const pw = 495, lx = 72, fy = 780;
-    let pg = 0, decorating = false;
-
-    const decorate = () => {
-      if (decorating) return;
-      decorating = true;
-      pg++;
-      doc.opacity(0.08).font('Helvetica-Bold').fontSize(48);
-      doc.rotate(-35, { origin: [297, 420] });
-      doc.text('MOOW.HUB \u2014 CONFIDENTIAL', 50, 380, { align: 'center', width: 500 });
-      doc.rotate(35, { origin: [297, 420] });
-      doc.opacity(1);
-      doc.font('Helvetica-Bold', 7).fillColor('#aaa');
-      doc.text('Moow.Hub\u00AE Partnership Agreement', lx, fy, { align: 'center', width: pw });
-      doc.moveTo(lx, fy + 10).lineTo(lx + pw, fy + 10).strokeColor('#ddd').stroke();
-      doc.font('Helvetica', 7).fillColor('#aaa');
-      doc.text(`Page ${pg}`, lx, fy + 14, { align: 'center', width: pw });
-      doc.fillColor('#222');
-      decorating = false;
-    };
-    decorate();
-    doc.on('pageAdded', decorate);
+    const pw = 495, lx = 72;
 
     const st = (title, body) => {
       if (title) {
@@ -1005,6 +984,33 @@ async function handleAgreement(req, res, path) {
     const sealY = extraY + rowH;
     doc.text('Seal:', rcol, sealY);
     doc.moveTo(rcol + 32, sealY + 12).lineTo(rcol + colW, sealY + 12).strokeColor('#bbb').stroke();
+
+    // ── Post-process all buffered pages: watermark + footer ──
+    const range = doc.bufferedPageRange();
+    for (let i = range.start; i < range.start + range.count; i++) {
+      doc.switchToPage(i);
+      const { width, height } = doc.page;
+
+      // Reset position to avoid auto-page-break from stale doc.y
+      doc.x = lx;
+      doc.y = 72;
+
+      // Diagonal watermark (explicit 0,0 in rotated coords = page center)
+      doc.save();
+      doc.font('Helvetica-Bold', 36).fillColor('#d0d0d0');
+      doc.translate(width / 2, height / 2);
+      doc.rotate(-45);
+      doc.text('MOOW.HUB \u2014 CONFIDENTIAL', 0, 0, { align: 'center' });
+      doc.restore();
+
+      // Footer line + page number
+      const fty = height - 60;
+      doc.lineWidth(0.5).strokeColor('#ccc');
+      doc.moveTo(lx, fty).lineTo(lx + pw, fty).stroke();
+      doc.font('Helvetica', 8).fillColor('#888');
+      doc.text('Moow.Hub Partnership Agreement', lx, fty + 6, { align: 'left' });
+      doc.text(`Page ${i - range.start + 1} of ${range.count}`, lx, fty + 6, { align: 'right' });
+    }
 
     doc.end();
     return true;

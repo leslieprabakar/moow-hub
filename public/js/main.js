@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       location: 'Please enter your location (at least 2 characters).',
       quantity: 'Estimated quantity cannot exceed 50 characters.',
       type: 'Please select your organisation type.',
-      vision: 'Please tell us about your vision (at least 10 characters).'
+      vision: 'At least 10 characters.'
     };
 
     const validateField = (field) => {
