@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS products (
     image_url VARCHAR(500),
     gallery_images JSONB,
     stock INTEGER DEFAULT 0,
-    category VARCHAR(20) NOT NULL CHECK (category IN ('apparel', 'kits', 'print')),
+    category VARCHAR(20) NOT NULL CHECK (category IN ('apparel', 'kits', 'print', 'accessories', 'ayurveda', 'supplements', 'books', 'digital', 'services')),
+    featured BOOLEAN DEFAULT FALSE,
     badge VARCHAR(50),
     sizes JSONB,
     weight_grams INTEGER,
@@ -76,6 +77,7 @@ CREATE TABLE IF NOT EXISTS orders (
     currency VARCHAR(3) DEFAULT 'USD',
     exchange_rate DECIMAL(10,4),
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled')),
+    payment_status VARCHAR(20) DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded')),
     payment_method VARCHAR(20) NOT NULL CHECK (payment_method IN ('upi', 'card', 'netbanking', 'wallet', 'emi', 'cod', 'stripe')),
     payment_gateway VARCHAR(20) NOT NULL CHECK (payment_gateway IN ('razorpay', 'stripe', 'cod')),
     payment_id VARCHAR(255),
@@ -261,3 +263,27 @@ CREATE TABLE IF NOT EXISTS partner_inquiries (
 -- Currency rates: Anyone can read
 ALTER TABLE currency_rates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Currency rates are viewable by everyone" ON currency_rates FOR SELECT USING (true);
+
+-- Partner inquiries: Anyone can insert, only admins can view
+ALTER TABLE partner_inquiries ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can submit partner inquiry" ON partner_inquiries FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view partner inquiries" ON partner_inquiries FOR SELECT USING (auth.role() = 'service_role');
+
+-- Email logs: Service role only
+ALTER TABLE email_log ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role manages email_log" ON email_log FOR ALL USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+
+-- Rate limits: Service role only
+ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role manages rate_limits" ON rate_limits FOR ALL USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+
+-- --------------------------------------------------------
+-- Functions
+-- --------------------------------------------------------
+-- Increment stock (used for order cancellation)
+CREATE OR REPLACE FUNCTION increment_stock(p_product_id UUID, p_quantity INTEGER)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE products SET stock = stock + p_quantity WHERE id = p_product_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

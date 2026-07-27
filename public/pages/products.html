@@ -120,22 +120,24 @@
       <div class="marquee-track">
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Global Studios <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> International Yoga Day <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Rotary International <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Ministry of AYUSH <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> NGOs &amp; Schools <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/yoga-group-park.webp" alt="" class="marquee-img"> Rotary International <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/Ministry of AYUSH.png" alt="" class="marquee-img-ayush"> Ministry of Ayush <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/school-wellness.webp" alt="" class="marquee-img"> NGOs &amp; Schools <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Lions Clubs <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Corporate Wellness <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/corporate-wellness.webp" alt="" class="marquee-img"> Corporate Wellness <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Community Health <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/wellness-kit.webp" alt="" class="marquee-img"> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/IN_ambafrance.png" alt="" class="marquee-img"> L'ambassade de France en Inde (République Française) <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Global Studios <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> International Yoga Day <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Rotary International <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Ministry of AYUSH <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> NGOs &amp; Schools <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/yoga-group-park.webp" alt="" class="marquee-img"> Rotary International <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/Ministry of AYUSH.png" alt="" class="marquee-img-ayush"> Ministry of Ayush <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/school-wellness.webp" alt="" class="marquee-img"> NGOs &amp; Schools <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Lions Clubs <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Corporate Wellness <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/corporate-wellness.webp" alt="" class="marquee-img"> Corporate Wellness <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Community Health <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/wellness-kit.webp" alt="" class="marquee-img"> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/IN_ambafrance.png" alt="" class="marquee-img"> L'ambassade de France en Inde (République Française) <span class="marquee-divider"></span></div>
       </div>
     </div>
   </section>
@@ -149,164 +151,40 @@
     </div>
   </section>
 
-  <!-- T-Shirts -->
-  <section class="section">
+  <!-- Products Section (loaded dynamically from API) -->
+  <section class="section" id="productsSection">
     <div class="container">
-      <div class="section-header">
-        <div class="label">Apparel</div>
-        <h2 style="margin-top: 0.5rem;">Wellness <span class="italic-gold">T-Shirts</span></h2>
+      <div id="productsLoading" style="text-align:center;padding:3rem 0;">
+        <div class="spinner" style="width:40px;height:40px;border:4px solid var(--border-light);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem;"></div>
+        <p style="color:var(--text-muted);">Loading products...</p>
       </div>
-      <div class="products-grid" style="margin-bottom: 4rem;">
-        <article class="product-card reveal">
-          <div class="product-image" style="background: linear-gradient(135deg, #f0e8df, #e0d8d0);">
-            <div class="product-badge">Best Seller</div>
-            <img src="../images/wellness-tshirt.png" alt="Moow Wellness Tee - premium cotton yoga pose T-Shirt" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">T-Shirt</div>
-            <h4>Moow Wellness Tee</h4>
-            <p>100% premium cotton with beautifully illustrated yoga pose and QR code. Available in S-XXL.</p>
-            <div class="product-footer">
-              <span class="product-price">$29.99</span>
-              <button class="btn-add-cart" data-product-slug="moow-wellness-tee">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-        <article class="product-card reveal reveal-delay-1">
-          <div class="product-image" style="background: linear-gradient(135deg, #e8ddd2, #d4c8b8);">
-            <img src="../images/educator-edition.webp" alt="Educator's Edition wellness T-Shirt with inspirational quotes" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">T-Shirt</div>
-            <h4>Educator's Edition</h4>
-            <p>Designed for teachers and educators. Premium fit with inspirational wellness quotes.</p>
-            <div class="product-footer">
-              <span class="product-price">$34.99</span>
-              <button class="btn-add-cart" data-product-slug="educators-edition">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-        <article class="product-card reveal reveal-delay-2">
-          <div class="product-image" style="background: linear-gradient(135deg, #d4c8b8, #c0b0a0);">
-            <div class="product-badge">Limited</div>
-            <img src="../images/TShirt with QR - Front side view.png" alt="Moow Wellness Cap - adjustable with embroidered logo" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Accessories</div>
-            <h4>Moow Wellness Cap</h4>
-            <p>Adjustable cap with embroidered logo. UV protection and breathable mesh back.</p>
-            <div class="product-footer">
-              <span class="product-price">$19.99</span>
-              <button class="btn-add-cart" data-product-slug="moow-wellness-cap">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Kits -->
-      <div class="section-header">
-        <div class="label">Kits</div>
-        <h2 style="margin-top: 0.5rem;">Wellness <span class="italic-gold">Kits</span></h2>
-      </div>
-      <div class="products-grid" style="margin-bottom: 4rem;">
-        <article class="product-card reveal">
-          <div class="product-image" style="background: linear-gradient(135deg, #c5d5c0, #a8c4a0);">
-            <div class="product-badge">Popular</div>
-            <img src="../images/wellness-kit.webp" alt="Community Wellness Kit with branded materials and guides" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Kit</div>
-            <h4>Community Wellness Kit</h4>
-            <p>Includes branded materials, educational guides, QR-code posters, and wellness merchandise.</p>
-            <div class="product-footer">
-              <span class="product-price">$89.99</span>
-              <button class="btn-add-cart" data-product-slug="community-wellness-kit">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-        <article class="product-card reveal reveal-delay-1">
-          <div class="product-image" style="background: linear-gradient(135deg, #b8c8d8, #98b0c8);">
-            <img src="../images/school-kit.webp" alt="School Starter Kit for wellness programme launch" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Kit</div>
-            <h4>School Starter Kit</h4>
-            <p>Everything schools need to launch a wellness programme — printed materials and student kits.</p>
-            <div class="product-footer">
-              <span class="product-price">$149.99</span>
-              <button class="btn-add-cart" data-product-slug="school-starter-kit">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-        <article class="product-card reveal reveal-delay-2">
-          <div class="product-image" style="background: linear-gradient(135deg, #d4c0b0, #c0a890);">
-            <div class="product-badge">Premium</div>
-            <img src="../images/corporate-bundle.webp" alt="Corporate Wellness Bundle with branded merchandise" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Kit</div>
-            <h4>Corporate Wellness Bundle</h4>
-            <p>Premium bundle with branded merchandise, wellness guides, and impact reports.</p>
-            <div class="product-footer">
-              <span class="product-price">$299.99</span>
-              <button class="btn-add-cart" data-product-slug="corporate-wellness-bundle">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Printed Materials -->
-      <div class="section-header">
-        <div class="label">Education</div>
-        <h2 style="margin-top: 0.5rem;">Printed <span class="italic-gold">Materials</span></h2>
-      </div>
-      <div class="products-grid">
-        <article class="product-card reveal">
-          <div class="product-image" style="background: linear-gradient(135deg, #e0d0c0, #d0c0b0);">
-            <img src="../images/education-materials.webp" alt="Wellness Education Pack - comprehensive printed guides" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Print</div>
-            <h4>Wellness Education Pack</h4>
-            <p>Comprehensive printed guides covering yoga, nutrition, mental health, and preventive healthcare.</p>
-            <div class="product-footer">
-              <span class="product-price">$49.99</span>
-              <button class="btn-add-cart" data-product-slug="wellness-education-pack">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-        <article class="product-card reveal reveal-delay-1">
-          <div class="product-image" style="background: linear-gradient(135deg, #c8d8c0, #b0c8a8);">
-            <img src="../images/TShirt with QR - Set of images.png" alt="QR-Code Poster Set - wellness posters with QR codes" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Print</div>
-            <h4>QR-Code Poster Set</h4>
-            <p>Set of 10 wellness posters with QR codes linking to digital content and resources.</p>
-            <div class="product-footer">
-              <span class="product-price">$39.99</span>
-              <button class="btn-add-cart" data-product-slug="qr-code-poster-set">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-        <article class="product-card reveal reveal-delay-2">
-          <div class="product-image" style="background: linear-gradient(135deg, #d0c8d8, #b8b0c8);">
-            <div class="product-badge">New</div>
-            <img src="../images/handbook.webp" alt="Community Health Handbook for wellness coordinators" width="400" height="400" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;">
-          </div>
-          <div class="product-info">
-            <div class="product-category">Print</div>
-            <h4>Community Health Handbook</h4>
-            <p>Illustrated handbook for community health workers and wellness programme coordinators.</p>
-            <div class="product-footer">
-              <span class="product-price">$24.99</span>
-              <button class="btn-add-cart" data-product-slug="community-health-handbook">Add to Cart</button>
-            </div>
-          </div>
-        </article>
-      </div>
+      <div id="productsError" style="display:none;text-align:center;padding:3rem 0;color:#dc3545;"></div>
+      <div id="productsContent" style="display:none;"></div>
     </div>
   </section>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .product-image { cursor: pointer; }
+    .product-image .image-overlay {
+      position: absolute; inset: 0; z-index: 2;
+      background: rgba(0,0,0,0.35);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .product-image:hover .image-overlay {
+      opacity: 1;
+    }
+    .product-image .image-overlay span {
+      color: #fff; font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(0,0,0,0.55); padding: 0.6rem 1.2rem;
+      border-radius: 999px; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .product-image .image-overlay span::after {
+      content: '→'; font-size: 1.1rem;
+    }
+  </style>
 
   <!-- Order Process -->
   <section class="section" style="background: var(--white); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
@@ -394,5 +272,117 @@
   <script defer src="../js/auth.js"></script>
   <script defer src="../js/cart.js"></script>
   <script defer src="../js/main.js"></script>
+  <script>
+  const CATEGORY_META = {
+    apparel: { label: 'Apparel', heading: 'Wellness <span class="italic-gold">T-Shirts</span>' },
+    kits: { label: 'Kits', heading: 'Wellness <span class="italic-gold">Kits</span>' },
+    print: { label: 'Education', heading: 'Printed <span class="italic-gold">Materials</span>' },
+    accessories: { label: 'Accessories', heading: 'Wellness <span class="italic-gold">Accessories</span>' },
+    ayurveda: { label: 'Ayurveda', heading: 'Ayurveda, Siddha <span class="italic-gold">&amp; Herbal</span>' },
+    supplements: { label: 'Supplements', heading: 'Health <span class="italic-gold">Supplements</span>' },
+    books: { label: 'Books', heading: 'Yoga, Health <span class="italic-gold">&amp; Medicinal Books</span>' },
+    digital: { label: 'Digital', heading: 'Digital Programs <span class="italic-gold">&amp; Downloads</span>' },
+    services: { label: 'Services', heading: 'Corporate Wellness <span class="italic-gold">&amp; Consulting</span>' }
+  };
+
+  const GRADIENT_MAP = [
+    'linear-gradient(135deg, #f0e8df, #e0d8d0)',
+    'linear-gradient(135deg, #e8ddd2, #d4c8b8)',
+    'linear-gradient(135deg, #d4c8b8, #c0b0a0)',
+    'linear-gradient(135deg, #c5d5c0, #a8c4a0)',
+    'linear-gradient(135deg, #b8c8d8, #98b0c8)',
+    'linear-gradient(135deg, #d4c0b0, #c0a890)',
+    'linear-gradient(135deg, #e0d0c0, #d0c0b0)',
+    'linear-gradient(135deg, #c8d8c0, #b0c8a8)',
+    'linear-gradient(135deg, #d0c8d8, #b8b0c8)'
+  ];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const loadingEl = document.getElementById('productsLoading');
+    const errorEl = document.getElementById('productsError');
+    const contentEl = document.getElementById('productsContent');
+
+    try {
+      const res = await fetch('/api/products/list?limit=100');
+      const body = await res.json();
+      if (!body.success) throw new Error(body.error || 'Failed to load products');
+
+      const products = body.data || [];
+      if (products.length === 0) {
+        loadingEl.style.display = 'none';
+        errorEl.style.display = 'block';
+        errorEl.innerHTML = 'No products available yet. Check back soon!';
+        return;
+      }
+
+      const grouped = {};
+      for (const p of products) {
+        if (!grouped[p.category]) grouped[p.category] = [];
+        grouped[p.category].push(p);
+      }
+
+      let html = '';
+      let idx = 0;
+      for (const [cat, items] of Object.entries(grouped)) {
+        const meta = CATEGORY_META[cat] || { label: cat, heading: cat };
+        html += `<div class="section-header"><div class="label">${meta.label}</div><h2 style="margin-top:0.5rem;">${meta.heading}</h2></div>`;
+        html += `<div class="products-grid"${idx < Object.keys(grouped).length - 1 ? ' style="margin-bottom:4rem;"' : ''}>`;
+        for (const p of items) {
+          const gradient = GRADIENT_MAP[idx % GRADIENT_MAP.length];
+          const badgeHtml = p.badge ? `<div class="product-badge">${p.badge}</div>` : '';
+          const stockClass = p.stock > 0 ? (p.stock <= 5 ? 'stock-low' : '') : 'out-of-stock';
+          const stockText = p.stock > 0 ? (p.stock <= 5 ? `Only ${p.stock} left` : '') : 'Out of Stock';
+          const disabledAttr = p.stock <= 0 ? 'disabled' : '';
+          const imgSrc = p.image_url && !p.image_url.includes('placeholder')
+            ? (p.image_url.startsWith('http') ? p.image_url : `../${p.image_url}`)
+            : '../images/placeholder.svg';
+          html += `<article class="product-card reveal${idx > 0 ? ' reveal-delay-' + (idx % 3) : ''}">
+            <a href="product-detail.html?id=${p.id}" class="product-image" style="background:${gradient};display:block;text-decoration:none;">
+              ${badgeHtml}
+              <img src="${imgSrc}" alt="${p.name}" width="400" height="400" loading="lazy" onerror="this.src='../images/placeholder.svg';this.onerror=null;" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+              <div class="image-overlay"><span>View Details</span></div>
+            </a>
+            <div class="product-info">
+              <div class="product-category">${meta.label}</div>
+              <h4><a href="product-detail.html?id=${p.id}" style="color:inherit;text-decoration:none;">${p.name}</a></h4>
+              <p>${p.short_description || p.description || ''}</p>
+              <div class="product-footer">
+                <span class="product-price">$${parseFloat(p.price_usd).toFixed(2)}</span>
+                <button class="btn-add-cart" data-product-slug="${p.slug}" ${disabledAttr}>${p.stock > 0 ? 'Add to Cart' : 'Out of Stock'}</button>
+              </div>
+              ${stockText ? `<div class="${stockClass}" style="font-size:0.8rem;margin-top:0.25rem;text-align:right;">${stockText}</div>` : ''}
+            </div>
+          </article>`;
+          idx++;
+        }
+        html += '</div>';
+        idx++;
+      }
+
+      loadingEl.style.display = 'none';
+      contentEl.style.display = 'block';
+      contentEl.innerHTML = html;
+
+      // Observe newly added reveal elements for scroll animation
+      document.querySelectorAll('.reveal:not(.observed)').forEach(el => {
+        el.classList.add('observed');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        observer.observe(el);
+      });
+    } catch (e) {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'Failed to load products. Please refresh the page.';
+      console.error('Product load error:', e);
+    }
+  });
+  </script>
 </body>
 </html>

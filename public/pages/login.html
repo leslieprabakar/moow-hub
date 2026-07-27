@@ -177,6 +177,35 @@
     .forgot-link a:hover {
       color: var(--primary);
     }
+    .role-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 2rem;
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 3px;
+    }
+    .role-tab {
+      flex: 1;
+      padding: 0.6rem 0.5rem;
+      text-align: center;
+      border: none;
+      background: transparent;
+      border-radius: calc(var(--radius) - 3px);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-muted);
+      font-family: var(--font-ui);
+    }
+    .role-tab:hover { color: var(--navy); }
+    .role-tab.active {
+      background: var(--white);
+      color: var(--navy);
+      box-shadow: var(--shadow-sm);
+    }
+    .role-tab-icon { display: block; font-size: 1.1rem; margin-bottom: 0.15rem; }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -188,8 +217,20 @@
           <a href="../index.html">Moow<span class="dot">.</span>Hub®</a>
         </div>
 
-        <h1 class="auth-title">Welcome back</h1>
-        <p class="auth-subtitle">Sign in to your account</p>
+        <div class="role-tabs" role="tablist">
+          <button class="role-tab active" data-role="user" role="tab" aria-selected="true">
+            <span class="role-tab-icon">👤</span> User
+          </button>
+          <button class="role-tab" data-role="partner" role="tab" aria-selected="false">
+            <span class="role-tab-icon">🤝</span> Partner
+          </button>
+          <button class="role-tab" data-role="admin" role="tab" aria-selected="false">
+            <span class="role-tab-icon">🔧</span> Admin
+          </button>
+        </div>
+
+        <h1 class="auth-title" id="authTitle">Welcome back</h1>
+        <p class="auth-subtitle" id="authSubtitle">Sign in to your account</p>
 
         <div id="alert" class="alert"></div>
 
@@ -224,25 +265,48 @@
 
   <script defer src="../js/auth.js"></script>
   <script>
+    const ROLE_META = {
+      user:    { title: 'Welcome back', subtitle: 'Sign in to your account', redirect: '../index.html', btn: 'Sign In', placeholder: 'you@example.com' },
+      partner: { title: 'Partner Portal', subtitle: 'Sign in to your partner dashboard', redirect: '../index.html', btn: 'Partner Sign In', placeholder: 'partner@example.com' },
+      admin:   { title: 'Admin Panel', subtitle: 'Sign in to manage the store', redirect: '../pages/admin/dashboard.html', btn: 'Admin Sign In', placeholder: 'admin@example.com' }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-      // Redirect if already logged in
       if (Auth.isAuthenticated()) {
         window.location.href = '../index.html';
         return;
       }
 
+      let selectedRole = 'user';
       const form = document.getElementById('loginForm');
       const alert = document.getElementById('alert');
       const submitBtn = document.getElementById('submitBtn');
+      const emailInput = document.getElementById('email');
+      const titleEl = document.getElementById('authTitle');
+      const subtitleEl = document.getElementById('authSubtitle');
+      const tabs = document.querySelectorAll('.role-tab');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          selectedRole = tab.dataset.role;
+          const meta = ROLE_META[selectedRole];
+          titleEl.textContent = meta.title;
+          subtitleEl.textContent = meta.subtitle;
+          submitBtn.textContent = meta.btn;
+          emailInput.placeholder = meta.placeholder;
+        });
+      });
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         alert.style.display = 'none';
 
-        const email = document.getElementById('email').value.trim();
+        const email = emailInput.value.trim();
         const password = document.getElementById('password').value;
 
-        // Validate
         if (!email || !password) {
           showAlert('Please fill in all fields', 'error');
           return;
@@ -252,15 +316,17 @@
         submitBtn.textContent = 'Signing in...';
 
         try {
-          await Auth.login(email, password);
+          const user = await Auth.login(email, password);
+          const meta = ROLE_META[selectedRole];
           showAlert('Login successful! Redirecting...', 'success');
           setTimeout(() => {
-            window.location.href = '../index.html';
+            window.location.href = meta.redirect;
           }, 1000);
         } catch (error) {
           showAlert(error.message, 'error');
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Sign In';
+          const meta = ROLE_META[selectedRole];
+          submitBtn.textContent = meta.btn;
         }
       });
 

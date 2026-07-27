@@ -9,10 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../../css/styles.css">
   <style>
+    * { box-sizing: border-box; }
     .admin-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
-    .admin-sidebar { background: var(--navy); color: white; padding: 2rem 0; position: fixed; width: 250px; height: 100vh; }
+    .admin-sidebar { background: var(--navy); color: white; padding: 2rem 0; }
     .admin-logo { padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
     .admin-logo h2 { color: white; font-family: var(--font-serif); font-size: 1.3rem; margin: 0; }
     .admin-logo span { color: var(--primary); }
@@ -22,7 +23,7 @@
     .admin-nav-item.active { background: var(--primary); color: white; }
     .admin-nav-item svg { width: 18px; height: 18px; }
     
-    .admin-main { margin-left: 250px; padding: 2rem; background: var(--bg); min-height: 100vh; }
+    .admin-main { padding: 2rem; background: var(--bg); min-height: 100vh; }
     .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .admin-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
     
@@ -80,7 +81,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           Customers
         </a>
-        <a href="../pages/products.html" class="admin-nav-item" target="_blank">
+        <a href="../products.html" class="admin-nav-item" target="_blank">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           View Store
         </a>
@@ -130,8 +131,13 @@
         <select id="productCategory">
           <option value="apparel">Apparel</option>
           <option value="kits">Kits</option>
-          <option value="prints">Print Materials</option>
+          <option value="print">Print Materials</option>
           <option value="accessories">Accessories</option>
+          <option value="ayurveda">Ayurveda, Siddha &amp; Herbal</option>
+          <option value="supplements">Health Supplements</option>
+          <option value="books">Books</option>
+          <option value="digital">Digital Programs</option>
+          <option value="services">Corporate Wellness &amp; Consulting</option>
         </select>
       </div>
       
@@ -156,27 +162,29 @@
         <input type="text" id="productImage" placeholder="images/product.jpg">
       </div>
       
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="productFeatured"> Featured Product
-        </label>
+      <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;">
+        <input type="checkbox" id="productFeatured" style="width:auto;padding:0;margin:0;">
+        <label for="productFeatured" style="margin:0;font-size:0.9rem;">Featured Product</label>
       </div>
       
       <div class="modal-actions">
-        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+        <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveProduct()">Save Product</button>
       </div>
     </div>
   </div>
 
-  <script defer src="../js/auth.js"></script>
+  <script defer src="../../js/auth.js"></script>
   <script>
+    let allProducts = [];
+
     document.addEventListener('DOMContentLoaded', () => {
       if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
         window.location.href = '/pages/login.html';
         return;
       }
       loadProducts();
+      document.getElementById('cancelBtn').addEventListener('click', closeModal);
     });
 
     async function loadProducts() {
@@ -185,7 +193,8 @@
         if (!response || !response.ok) throw new Error('Failed');
 
         const data = await response.json();
-        renderProducts(data.data);
+        allProducts = data.data || [];
+        renderProducts(allProducts);
       } catch (error) {
         console.error('Load products error:', error);
       }
@@ -201,15 +210,15 @@
 
       tbody.innerHTML = products.map(p => `
         <tr>
-          <td><img src="../${p.image_url}" alt="${p.name}" class="product-thumb"></td>
+          <td><img src="../../${p.image_url}" alt="${p.name.replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='../../images/placeholder.svg';this.onerror=null;"></td>
           <td><strong>${p.name}</strong></td>
           <td>${p.category}</td>
           <td>$${Number(p.price_usd).toFixed(2)}</td>
           <td class="${p.stock <= 5 ? 'stock-low' : 'stock-ok'}">${p.stock}</td>
-          <td>${p.featured ? '✓' : '-'}</td>
+          <td>${p.featured ? '&#10003;' : '-'}</td>
           <td>
-            <button class="action-btn action-btn-primary" onclick="editProduct('${p.id}', ${JSON.stringify(p).replace(/"/g, '&quot;')})">Edit</button>
-            <button class="action-btn action-btn-danger" onclick="deleteProduct('${p.id}', '${p.name}')">Delete</button>
+            <button class="action-btn action-btn-primary" onclick="editProduct('${p.id}')">Edit</button>
+            <button class="action-btn action-btn-danger" onclick="deleteProduct('${p.id}')">Delete</button>
           </td>
         </tr>
       `).join('');
@@ -244,47 +253,86 @@
       document.getElementById('productModal').style.display = 'none';
     }
 
-    function editProduct(id, product) {
-      openModal(product);
+    function editProduct(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (product) openModal(product);
     }
 
     async function saveProduct() {
-      const id = document.getElementById('productId').value;
-      const productData = {
-        name: document.getElementById('productName').value,
-        category: document.getElementById('productCategory').value,
-        description: document.getElementById('productDescription').value,
-        price_usd: parseFloat(document.getElementById('productPrice').value),
-        stock: parseInt(document.getElementById('productStock').value),
-        image_url: document.getElementById('productImage').value || 'images/placeholder.jpg',
-        featured: document.getElementById('productFeatured').checked
-      };
-
-      if (!productData.name || !productData.price_usd) {
-        alert('Please fill in required fields');
-        return;
-      }
-
       try {
-        const response = await Auth.authenticatedFetch('/api/admin/products', {
-          method: id ? 'PUT' : 'POST',
-          body: JSON.stringify(id ? { id, ...productData } : productData)
-        });
+        const idEl = document.getElementById('productId');
+        const nameEl = document.getElementById('productName');
+        const catEl = document.getElementById('productCategory');
+        const descEl = document.getElementById('productDescription');
+        const priceEl = document.getElementById('productPrice');
+        const stockEl = document.getElementById('productStock');
+        const imgEl = document.getElementById('productImage');
+        const featEl = document.getElementById('productFeatured');
 
-        if (!response || !response.ok) {
-          alert('Failed to save product');
+        if (!nameEl || !priceEl) {
+          alert('Form elements not found. Please refresh the page.');
           return;
         }
 
+        const id = idEl ? idEl.value : '';
+        const price = parseFloat(priceEl.value);
+        const stock = parseInt(stockEl.value);
+
+        if (!nameEl.value || isNaN(price)) {
+          alert('Please fill in required fields (Name and Price)');
+          return;
+        }
+
+        const productData = {
+          name: nameEl.value,
+          category: catEl ? catEl.value : '',
+          description: descEl ? descEl.value : '',
+          price_usd: price,
+          stock: isNaN(stock) ? 0 : stock,
+          image_url: imgEl ? (imgEl.value || 'images/placeholder.jpg') : 'images/placeholder.jpg',
+          featured: featEl ? featEl.checked : false
+        };
+
+        const body = id ? JSON.stringify(Object.assign({ id }, productData)) : JSON.stringify(productData);
+
+        const response = await Auth.authenticatedFetch('/api/admin/products', {
+          method: id ? 'PUT' : 'POST',
+          body
+        });
+
+        if (!response) {
+          alert('Session expired. Please log out and log back in.');
+          return;
+        }
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          alert('Failed to save product: ' + (errData.error || response.statusText || 'Unknown error'));
+          return;
+        }
+
+        const result = await response.json().catch(() => ({}));
+        const updatedProduct = result && result.data;
+        if (updatedProduct) {
+          const idx = allProducts.findIndex(p => p.id === updatedProduct.id);
+          if (idx !== -1) {
+            allProducts[idx] = updatedProduct;
+          } else {
+            allProducts.unshift(updatedProduct);
+          }
+          renderProducts(allProducts);
+        } else {
+          loadProducts();
+        }
         closeModal();
-        loadProducts();
       } catch (error) {
-        alert('Failed to save product');
+        console.error('saveProduct error:', error);
+        alert('Failed to save product: ' + (error.message || 'Unknown error'));
       }
     }
 
-    async function deleteProduct(id, name) {
-      if (!confirm(`Delete "${name}"? This action cannot be undone.`)) return;
+    async function deleteProduct(id) {
+      if (!confirm('Delete this product? This action cannot be undone.')) return;
 
       try {
         const response = await Auth.authenticatedFetch(`/api/admin/products?id=${id}`, {

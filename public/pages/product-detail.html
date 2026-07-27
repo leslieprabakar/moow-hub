@@ -95,9 +95,13 @@
     .meta-icon { width: 24px; color: var(--primary); }
     .meta-text { font-size: 0.9rem; color: var(--text-light); }
     
-    .stock-status { font-size: 0.9rem; margin-bottom: 1rem; }
+    .stock-status { font-size: 0.9rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
     .in-stock { color: #28a745; }
     .low-stock { color: #ffc107; }
+    .quantity-row { display: flex; align-items: center; gap: 0.5rem; }
+    .bulk-order-link { display: inline-flex; align-items: center; gap: 0.5rem; color: white; font-size: 0.95rem; font-weight: 600; padding: 0.5rem 1rem; background: var(--primary); border-radius: var(--radius); text-decoration: none; white-space: nowrap; transition: var(--transition); }
+    .bulk-order-link:hover { background: var(--primary-hover); text-decoration: none; }
+    .bulk-order-link svg { width: 16px; height: 16px; }
     .out-of-stock { color: #dc3545; }
     
     .loading-state { text-align: center; padding: 4rem; color: var(--text-light); }
@@ -172,22 +176,24 @@
       <div class="marquee-track">
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Global Studios <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> International Yoga Day <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Rotary International <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Ministry of AYUSH <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> NGOs &amp; Schools <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/yoga-group-park.webp" alt="" class="marquee-img"> Rotary International <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/Ministry of AYUSH.png" alt="" class="marquee-img-ayush"> Ministry of Ayush <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/school-wellness.webp" alt="" class="marquee-img"> NGOs &amp; Schools <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Lions Clubs <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Corporate Wellness <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/corporate-wellness.webp" alt="" class="marquee-img"> Corporate Wellness <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Community Health <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/wellness-kit.webp" alt="" class="marquee-img"> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/IN_ambafrance.png" alt="" class="marquee-img"> L'ambassade de France en Inde (République Française) <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Global Studios <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> International Yoga Day <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Rotary International <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Ministry of AYUSH <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> NGOs &amp; Schools <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/yoga-group-park.webp" alt="" class="marquee-img"> Rotary International <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/Ministry of AYUSH.png" alt="" class="marquee-img-ayush"> Ministry of Ayush <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/school-wellness.webp" alt="" class="marquee-img"> NGOs &amp; Schools <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Lions Clubs <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Corporate Wellness <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/corporate-wellness.webp" alt="" class="marquee-img"> Corporate Wellness <span class="marquee-divider"></span></div>
         <div class="marquee-item"><span class="marquee-icon">&#9733;</span> Community Health <span class="marquee-divider"></span></div>
-        <div class="marquee-item"><span class="marquee-icon">&#9733;</span> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/wellness-kit.webp" alt="" class="marquee-img"> <a href="https://relaxkeralaayurveda.com/" target="_blank" rel="noopener noreferrer">Relax Kerala Ayurveda</a> <span class="marquee-divider"></span></div>
+        <div class="marquee-item"><img src="../../images/IN_ambafrance.png" alt="" class="marquee-img"> L'ambassade de France en Inde (République Française) <span class="marquee-divider"></span></div>
       </div>
     </div>
   </section>
@@ -219,10 +225,12 @@
           
           <div class="quantity-selector">
             <label>Quantity</label>
-            <div class="quantity-input">
-              <button onclick="updateQuantity(-1)">-</button>
-              <input type="number" id="quantity" value="1" min="1" max="10">
-              <button onclick="updateQuantity(1)">+</button>
+            <div class="quantity-row">
+              <div class="quantity-input">
+                <button onclick="updateQuantity(-1)">-</button>
+                <input type="number" id="quantity" value="1" min="1" max="20">
+                <button onclick="updateQuantity(1)">+</button>
+              </div>
             </div>
           </div>
           
@@ -336,12 +344,13 @@
       
       // Stock status
       const stockEl = document.getElementById('stockStatus');
+      const bulkLink = '<a href="contact.html" class="bulk-order-link">For Bulk Order <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>';
       if (product.stock > 10) {
-        stockEl.innerHTML = '<span class="in-stock">In Stock</span>';
+        stockEl.innerHTML = '<span class="in-stock">In Stock</span>' + bulkLink;
       } else if (product.stock > 0) {
-        stockEl.innerHTML = `<span class="low-stock">Low Stock - Only ${product.stock} left</span>`;
+        stockEl.innerHTML = `<span class="low-stock">Low Stock - Only ${product.stock} left</span>` + bulkLink;
       } else {
-        stockEl.innerHTML = '<span class="out-of-stock">Out of Stock</span>';
+        stockEl.innerHTML = '<span class="out-of-stock">Out of Stock</span>' + bulkLink;
         document.getElementById('addToCartBtn').disabled = true;
       }
       
@@ -388,7 +397,7 @@
       const input = document.getElementById('quantity');
       let newQty = parseInt(input.value) + change;
       if (newQty < 1) newQty = 1;
-      if (newQty > 10) newQty = 10;
+      if (newQty > 20) newQty = 20;
       input.value = newQty;
       selectedQuantity = newQty;
     }

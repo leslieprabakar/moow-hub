@@ -622,28 +622,34 @@ const Checkout = {
       throw new Error(data.error || 'Failed to initiate COD order');
     }
 
-    this.showOTPModal(data.data.order_id);
+    this.showOTPModal(data.data.order_id, data.data.otp);
   },
 
-  /**
-   * Show OTP verification modal
-   */
-  showOTPModal(orderId) {
+  showOTPModal(orderId, otp) {
+    this.currentOtp = otp;
     const modal = document.getElementById('otpModal');
     modal.style.display = 'flex';
 
-    document.getElementById('verifyOtpBtn').onclick = async () => {
-      const otp = document.getElementById('otpInput').value;
+    const otpDisplay = document.getElementById('otpDisplay') || (() => {
+      const el = document.createElement('p');
+      el.id = 'otpDisplay';
+      el.style.cssText = 'font-size:2rem;font-weight:700;letter-spacing:0.3em;color:var(--navy);margin:0.5rem 0 1rem;';
+      document.querySelector('#otpModal .otp-modal-content').insertBefore(el, document.getElementById('otpInput'));
+      return el;
+    })();
+    otpDisplay.textContent = otp;
 
-      if (otp !== '123456') {
+    document.getElementById('verifyOtpBtn').onclick = async () => {
+      const enteredOtp = document.getElementById('otpInput').value;
+
+      if (enteredOtp !== this.currentOtp) {
         alert('Invalid OTP');
         return;
       }
 
-      // Confirm the order on server
       const response = await Auth.authenticatedFetch('/api/checkout/cod-confirm', {
         method: 'POST',
-        body: JSON.stringify({ order_id: orderId })
+        body: JSON.stringify({ order_id: orderId, otp: enteredOtp })
       });
 
       if (!response) {

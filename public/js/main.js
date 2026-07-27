@@ -169,44 +169,45 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- Cart Functionality (integrated with Cart module) ---
-  document.querySelectorAll('.btn-add-cart').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      let productId = btn.getAttribute('data-product-id');
-      const slug = btn.getAttribute('data-product-slug');
+  // Event delegation on document to handle dynamically added buttons
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.btn-add-cart');
+    if (!btn) return;
+    e.preventDefault();
+    let productId = btn.getAttribute('data-product-id');
+    const slug = btn.getAttribute('data-product-slug');
 
-      if (!productId && slug) {
-        try {
-          const res = await fetch(`/api/products/list?search=${encodeURIComponent(slug)}&limit=1`);
-          const data = await res.json();
-          const match = (data.data || []).find(p => p.slug === slug);
-          if (match) productId = match.id;
-        } catch {}
-      }
-      if (!productId) return;
-
-      const originalText = btn.textContent;
-      btn.textContent = 'Adding...';
-      btn.disabled = true;
-
+    if (!productId && slug) {
       try {
-        await Cart.addItem(productId, 1);
-        btn.textContent = 'Added!';
-        btn.style.background = 'var(--primary)';
-        
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.style.background = '';
-          btn.disabled = false;
-        }, 1500);
-      } catch (error) {
-        btn.textContent = 'Error';
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 1500);
-      }
-    });
+        const res = await fetch(`/api/products/list?search=${encodeURIComponent(slug)}&limit=1`);
+        const data = await res.json();
+        const match = (data.data || []).find(p => p.slug === slug);
+        if (match) productId = match.id;
+      } catch {}
+    }
+    if (!productId) return;
+
+    const originalText = btn.textContent;
+    btn.textContent = 'Adding...';
+    btn.disabled = true;
+
+    try {
+      await Cart.addItem(productId, 1);
+      btn.textContent = 'Added!';
+      btn.style.background = 'var(--primary)';
+      
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 1500);
+    } catch (error) {
+      btn.textContent = 'Error';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 1500);
+    }
   });
 
   // --- Form Validation ---

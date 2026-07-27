@@ -5,8 +5,8 @@
 
 const Auth = {
   // Supabase config (loaded from environment or defaults)
-  supabaseUrl: window.SUPABASE_URL || 'YOUR_SUPABASE_URL',
-  supabaseKey: window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY',
+  supabaseUrl: window.SUPABASE_URL || 'https://xvhlvaqpinfahhullsqh.supabase.co',
+  supabaseKey: window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh2aGx2YXFwaW5mYWhodWxsc3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2MTgwMTYsImV4cCI6MjA5OTE5NDAxNn0.ETM-zSQDRuERao3qNd0zEfnEBdSJYUhOcYGfTAmPTgc',
 
   /**
    * Initialize auth - check if user is logged in
@@ -18,7 +18,6 @@ const Auth = {
     if (token && user) {
       const parsed = JSON.parse(user);
       this.updateUI(parsed);
-      console.log('[SM-debug] typeof SessionManager =', typeof SessionManager);
       if (typeof SessionManager !== 'undefined') SessionManager.init();
       return parsed;
     }
@@ -292,13 +291,13 @@ const Auth = {
 };
 
 /**
- * Session Manager — 3-minute inactivity timeout with countdown warning
+ * Session Manager — 7-minute inactivity timeout with countdown warning
  * Tracks user activity, shows a non-intrusive countdown before expiry,
  * and saves pending data before logging out.
  */
 const SessionManager = {
-  TIMEOUT: 3 * 60 * 1000,
-  WARNING_AT: 2 * 60 * 1000,
+  TIMEOUT: 7 * 60 * 1000,
+  WARNING_AT: 5 * 60 * 1000,
   CHECK_MS: 30 * 1000,
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
@@ -321,12 +320,10 @@ const SessionManager = {
   },
 
   init() {
-    console.log('[SM-debug] init() called, initialized=', this.initialized, 'isAuth=', Auth.isAuthenticated(), 'isAuthPage=', this.isAuthPage());
     if (this.initialized) return;
     if (!Auth.isAuthenticated()) return;
     if (this.isAuthPage()) return;
 
-    console.log('[SM-debug] initializing session manager');
     this.initialized = true;
     this.lastActivity = this.loadActivity();
     if (Date.now() - this.lastActivity > this.TIMEOUT) {
@@ -347,11 +344,10 @@ const SessionManager = {
   },
 
   persist() {
-    try { sessionStorage.setItem('moow_sa', String(this.lastActivity)); } catch {}
+    try { sessionStorage.setItem('moow_sa', String(this.lastActivity)); } catch (e) { console.warn('Session persist failed:', e.message); }
   },
 
   buildUI() {
-    console.log('[SM-debug] buildUI() called');
     if (this.countdownEl) return;
     const el = document.createElement('div');
     el.id = 'session-countdown';
@@ -361,7 +357,7 @@ const SessionManager = {
     el.innerHTML =
       '<div class="scd-inner">' +
         '<svg class="scd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
-        '<span class="scd-msg">Session expires in <strong id="scd-time">3:00</strong></span>' +
+        '<span class="scd-msg">Session expires in <strong id="scd-time">7:00</strong></span>' +
         '<button class="scd-btn" id="scd-extend" type="button">Keep Active</button>' +
         '<button class="scd-x" id="scd-dismiss" type="button" aria-label="Dismiss">&times;</button>' +
       '</div>';
@@ -399,27 +395,23 @@ const SessionManager = {
   },
 
   markActive() {
-    console.log('[SM-debug] markActive() - resetting timer');
     this.lastActivity = Date.now();
     this.persist();
     if (this.warningVisible) this.hideCountdown();
   },
 
   startCheck() {
-    console.log('[SM-debug] startCheck() - interval every', this.CHECK_MS, 'ms');
     this.checkTimer = setInterval(() => this.check(), this.CHECK_MS);
   },
 
   check() {
-    if (!Auth.isAuthenticated()) { console.log('[SM-debug] check() not authenticated, stopping'); this.stop(); return; }
+    if (!Auth.isAuthenticated()) { this.stop(); return; }
     const remaining = this.TIMEOUT - (Date.now() - this.lastActivity);
-    console.log('[SM-debug] check() remaining=', Math.round(remaining/1000), 's, WARNING_AT=', this.WARNING_AT/1000, 's');
     if (remaining <= 0) { this.expire(); return; }
     if (remaining <= this.WARNING_AT) this.showCountdown(remaining);
   },
 
   showCountdown(ms) {
-    console.log('[SM-debug] showCountdown() ms=', Math.round(ms/1000), 's, countdownEl exists=', !!this.countdownEl);
     if (!this.countdownEl) return;
     this.warningVisible = true;
     this.countdownEl.classList.add('visible');
@@ -467,7 +459,7 @@ const SessionManager = {
   extend() {
     this.markActive();
     this.hideCountdown();
-    this.toast('Session extended — you\'re active for another 3 minutes');
+    this.toast('Session extended — you\'re active for another 7 minutes');
   },
 
   async expire() {

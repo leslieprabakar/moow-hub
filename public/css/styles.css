@@ -870,6 +870,29 @@ p {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.marquee-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.marquee-img[src*="ambafrance"] {
+  width: auto;
+  height: 28px;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+.marquee-img-ayush {
+  height: 36px;
+  width: auto;
+  border-radius: 0;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .marquee-item:hover .marquee-icon {
   opacity: 1;
   transform: scale(1.3);

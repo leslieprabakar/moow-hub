@@ -102,14 +102,18 @@ function getResend() { if (!resend && config.RESEND_API_KEY) resend = new Resend
 async function sendEmail(to, subject, htmlBody, options = {}) {
   try {
     const r = getResend();
-    if (!r) return { success: false, error: 'Email service not configured' };
+    if (!r) {
+      console.error('Email send skipped: RESEND_API_KEY not configured');
+      await dbLogEmail(to, subject, 'failed', null, options.orderId, options.emailType);
+      return { success: false, error: 'Email service not configured' };
+    }
     const result = await r.emails.send({ from: config.EMAIL_FROM, to: [to], subject, html: htmlBody });
     await dbLogEmail(to, subject, 'sent', result.data?.id, options.orderId, options.emailType);
     return { success: true, id: result.data?.id };
   } catch (error) { console.error('Email send failed:', error); await dbLogEmail(to, subject, 'failed', null, options.orderId, options.emailType); return { success: false, error: error.message }; }
 }
 async function dbLogEmail(recipient, subject, status, resendId = null, orderId = null, emailType = 'order_confirmation') {
-  try { await getAdminDB().from('email_log').insert({ order_id: orderId, email_type: emailType, recipient, subject, status, resend_id: resendId }); } catch {}
+  try { await getAdminDB().from('email_log').insert({ order_id: orderId, email_type: emailType, recipient, subject, status, resend_id: resendId }); } catch (e) { console.error('dbLogEmail insert failed:', e.message || e); }
 }
 function emailTemplate(content) {
   const year = new Date().getFullYear();
@@ -221,7 +225,7 @@ async function handleAuth(req, res, path) {
     }
     const verificationToken = crypto.randomBytes(32).toString('hex');
     await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken });
-    sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(() => {});
+    sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(e => console.error('Welcome email failed:', e));
     return res.status(201).json({ success: true, message: 'Account created', user: { id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) } });
   }
 
@@ -373,17 +377,21 @@ async function handleProducts(req, res, path, url) {
   const db = getAdminDB();
 
   if (path === 'list') {
-    const { page = 1, limit = 20, category, search, sort = 'newest' } = url.searchParams;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const category = url.searchParams.get('category') || '';
+    const search = url.searchParams.get('search') || '';
+    const sort = url.searchParams.get('sort') || 'newest';
+    const offset = (page - 1) * limit;
     let query = db.from('products').select('*', { count: 'exact' }).eq('is_active', true);
     if (category) query = query.eq('category', category);
     if (search) query = query.ilike('name', `%${search}%`);
     if (sort === 'price-low') query = query.order('price_usd', { ascending: true });
     else if (sort === 'price-high') query = query.order('price_usd', { ascending: false });
     else query = query.order('created_at', { ascending: false });
-    const { data: products, count, error } = await query.range(offset, offset + parseInt(limit) - 1);
+    const { data: products, count, error } = await query.range(offset, offset + limit - 1);
     if (error) return res.status(500).json({ error: 'Failed to fetch products' });
-    return res.status(200).json({ success: true, data: products || [], pagination: { page: parseInt(page), limit: parseInt(limit), total: count || 0 } });
+    return res.status(200).json({ success: true, data: products || [], pagination: { page, limit, total: count || 0 } });
   }
 
   if (path === 'detail') {
@@ -499,7 +507,6 @@ async function handleCheckout(req, res, path) {
     const { error: itemsError } = await db.from('order_items').insert(orderItems.map(item => ({ ...item, order_id: order.id, currency })));
     if (itemsError) console.error('order_items insert error:', itemsError.message);
     if (cartItems) {
-      for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
       await db.from('cart_items').delete().eq('user_id', user.id);
     }
     return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency, payment: { gateway: paymentGateway, razorpay_key: isINR ? config.RAZORPAY_KEY_ID : null, razorpay_order_id: isINR ? paymentOrder?.id : null, stripe_client_secret: !isINR ? paymentOrder?.client_secret : null, stripe_publishable_key: !isINR ? config.STRIPE_PUBLISHABLE_KEY : null } } });
@@ -509,11 +516,24 @@ async function handleCheckout(req, res, path) {
     const { order_id, razorpay_payment_id } = req.body;
     if (!order_id) return res.status(400).json({ error: 'Order ID required' });
     await db.from('orders').update({ status: 'confirmed', payment_id: razorpay_payment_id, payment_status: 'paid' }).eq('id', order_id);
-    const { data: order } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).single();
+    const { data: order, error: refetchErr } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).single();
+    if (refetchErr) return res.status(500).json({ error: 'Failed to refetch order' });
     if (order) {
-      const { data: authUser } = await db.auth.admin.getUserById(user.id);
-      const userEmail = authUser?.user?.email || user.email;
-      sendOrderConfirmationEmail(order, userEmail, user.full_name).catch(() => {});
+      const { data: items } = await db.from('order_items').select('product_id, quantity').eq('order_id', order.id);
+      if (items) for (const item of items) {
+        const { data: product } = await db.from('products').select('stock').eq('id', item.product_id).single();
+        if (product) await db.from('products').update({ stock: product.stock - item.quantity }).eq('id', item.product_id);
+      }
+      let userEmail = null;
+      try {
+        const { data: authUser } = await db.auth.admin.getUserById(user.id);
+        userEmail = authUser?.user?.email || null;
+      } catch (e) { console.error('Failed to fetch user email for verify-payment:', e.message); }
+      if (!userEmail) {
+        console.error('No email found for user', order.user_id, '- skipping order confirmation email for', order.order_number);
+      } else {
+        sendOrderConfirmationEmail(order, userEmail, user.full_name).catch(e => console.error('Verify-payment confirmation email failed for order', order.order_number, ':', e));
+      }
     }
     return res.status(200).json({ success: true, data: order });
   }
@@ -545,17 +565,17 @@ async function handleCheckout(req, res, path) {
       orderItems = clientItems.map(item => ({ product_id: item.product_id, product_name: item.product_name, product_image: item.product_image, quantity: item.quantity, unit_price: item.price_usd, total_price: item.price_usd * item.quantity, size: item.size || null }));
     }
     const orderNumber = generateOrderNumber();
-    const otpSessionId = (crypto.randomUUID?.() || crypto.randomBytes(16).toString('hex'));
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const { data: order, error: orderError } = await db.from('orders').insert({ user_id: user.id, order_number: orderNumber, subtotal, shipping_cost: shipping.cost, tax, total, currency, status: 'pending', payment_method: 'cod', payment_gateway: 'cod', payment_status: 'pending', shipping_address: JSON.stringify(shipping_address) }).select().single();
     if (orderError || !order) return res.status(500).json({ error: 'Failed to create order', details: orderError?.message });
     const itemsToInsert = orderItems.map(item => ({ ...item, order_id: order.id, currency }));
     const { error: itemsError } = await db.from('order_items').insert(itemsToInsert).select();
     if (itemsError) console.error('order_items insert error:', itemsError.message);
-    return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency, otp_session_id: otpSessionId } });
+    return res.status(200).json({ success: true, data: { order_id: order.id, order_number: orderNumber, total, currency, otp } });
   }
 
   if (req.method === 'POST' && path === 'cod-confirm') {
-    const { order_id } = req.body;
+    const { order_id, otp: submittedOtp } = req.body;
     if (!order_id) return res.status(400).json({ error: 'Order ID required' });
     const { data: order } = await db.from('orders').select('*, order_items(*)').eq('id', order_id).maybeSingle();
     if (!order) return res.status(404).json({ error: 'Order not found' });
@@ -566,9 +586,16 @@ async function handleCheckout(req, res, path) {
       for (const item of cartItems) await db.from('products').update({ stock: item.products.stock - item.quantity }).eq('id', item.product_id);
       await db.from('cart_items').delete().eq('user_id', user.id);
     }
-    const { data: authUser } = await db.auth.admin.getUserById(user.id);
-    const userEmail = authUser?.user?.email || user.email;
-    sendOrderConfirmationEmail(order, userEmail, user.full_name).catch(() => {});
+    let userEmail = null;
+    try {
+      const { data: authUser } = await db.auth.admin.getUserById(user.id);
+      userEmail = authUser?.user?.email || null;
+    } catch (e) { console.error('Failed to fetch user email for COD confirm:', e.message); }
+    if (!userEmail) {
+      console.error('No email found for user', order.user_id, '- skipping order confirmation email for', order.order_number);
+    } else {
+      sendOrderConfirmationEmail(order, userEmail, user.full_name).catch(e => console.error('COD confirmation email failed for order', order.order_number, ':', e));
+    }
     return res.status(200).json({ success: true, data: { order_id: order.id, order_number: order.order_number, total: order.total, currency: order.currency } });
   }
 
@@ -581,13 +608,15 @@ async function handleOrders(req, res, path, url) {
   const db = getAdminDB();
 
   if (req.method === 'GET' && path === 'list') {
-    const { page = 1, limit = 10, status } = url.searchParams;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+    const status = url.searchParams.get('status') || '';
+    const offset = (page - 1) * limit;
     let query = db.from('orders').select('*, order_items(*)', { count: 'exact' }).eq('user_id', user.id).order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
-    const { data: orders, count, error } = await query.range(offset, offset + parseInt(limit) - 1);
+    const { data: orders, count, error } = await query.range(offset, offset + limit - 1);
     if (error) return res.status(500).json({ error: 'Failed to fetch orders' });
-    return res.status(200).json({ success: true, data: orders || [], pagination: { page: parseInt(page), limit: parseInt(limit), total: count || 0 } });
+    return res.status(200).json({ success: true, data: orders || [], pagination: { page, limit, total: count || 0 } });
   }
 
   if (req.method === 'GET' && path === 'detail') {
@@ -676,7 +705,7 @@ async function handlePartner(req, res, path) {
     const { error } = await db.from('profiles').update(updates).eq('id', user.id);
     if (error) return res.status(500).json({ error: 'Failed to apply as partner' });
     const { data: updated } = await db.from('profiles').select('*').eq('id', user.id).single();
-    sendEmail(user.email, 'Welcome to Moow.Hub Partner Network', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">You're Now a Moow.Hub Partner!</h1><p>Hi ${user.full_name || 'Partner'},</p><p>Congratulations! Your partner application has been approved. You now have full access to partnership schedules, pricing, and resources.</p><p><strong>What's next:</strong></p><ul style="color:#666;"><li>Review the <a href="${config.SITE_URL}/pages/agreement.html">Partnership Agreement</a></li><li>Access exclusive partner pricing</li><li>Download brand assets and marketing materials</li></ul><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'welcome' }).catch(() => {});
+    sendEmail(user.email, 'Welcome to Moow.Hub Partner Network', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">You're Now a Moow.Hub Partner!</h1><p>Hi ${user.full_name || 'Partner'},</p><p>Congratulations! Your partner application has been approved. You now have full access to partnership schedules, pricing, and resources.</p><p><strong>What's next:</strong></p><ul style="color:#666;"><li>Review the <a href="${config.SITE_URL}/pages/agreement.html">Partnership Agreement</a></li><li>Access exclusive partner pricing</li><li>Download brand assets and marketing materials</li></ul><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'welcome' }).catch(e => console.error('Partner welcome email failed:', e));
     return res.status(200).json({ success: true, data: { is_partner: true, user: updated } });
   }
 
@@ -707,7 +736,7 @@ async function handleContact(req, res, path) {
     if (error) return res.status(500).json({ error: 'Failed to submit inquiry', details: error.message });
 
     const inquiryDate = new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
-    const adminEmail = 'leslieprabakar@gmail.com';
+    const adminEmail = config.ADMIN_EMAIL || 'leslieprabakar@gmail.com';
     sendEmail(adminEmail, `New Agreement Draft Request — ${first_name} ${last_name}`, emailTemplate(`
       <h1 style="color:#1a2744;margin-bottom:20px;">New Agreement Draft Request</h1>
       <table style="width:100%;border-collapse:collapse;margin:20px 0;">
@@ -723,7 +752,7 @@ async function handleContact(req, res, path) {
         <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Vision</td><td style="padding:8px;border-bottom:1px solid #eee;">${vision}</td></tr>
       </table>
       <p style="margin-top:20px;">View all inquiries in the admin panel.</p>
-    `), { emailType: 'welcome' }).catch(() => {});
+    `), { emailType: 'welcome' }).catch(e => console.error('Contact inquiry email failed:', e));
 
     return res.status(201).json({ success: true, message: 'Inquiry submitted successfully' });
   }
@@ -763,15 +792,19 @@ async function handleAdmin(req, res, path, url) {
   if (req.method === 'POST' && path === 'products') {
     const { name, price_usd, category } = req.body;
     if (!name || !price_usd || !category) return res.status(400).json({ error: 'Missing required fields' });
-    const { data: product } = await db.from('products').insert({ name, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'), description: req.body.description || '', price_usd, category, image_url: req.body.image_url || 'images/placeholder.jpg', stock: req.body.stock || 0, featured: req.body.featured || false }).select().single();
+    const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const slug = baseSlug + '-' + Date.now().toString(36);
+    const { data: product } = await db.from('products').insert({ name, slug, description: req.body.description || '', price_usd, category, image_url: req.body.image_url || 'images/placeholder.svg', stock: req.body.stock || 0, featured: req.body.featured || false }).select().single();
     return res.status(200).json({ success: true, data: product });
   }
 
   if (req.method === 'PUT' && path === 'products') {
     const { id, ...updates } = req.body;
     if (!id) return res.status(400).json({ error: 'Product ID required' });
-    const { data: product } = await db.from('products').update(updates).eq('id', id).select().single();
-    return res.status(200).json({ success: true, data: product });
+    const { error: updateError } = await db.from('products').update(updates).eq('id', id);
+    if (updateError) return res.status(400).json({ error: updateError.message });
+    const { data: product } = await db.from('products').select('*').eq('id', id).maybeSingle();
+    return res.status(200).json({ success: true, data: product || null });
   }
 
   if (req.method === 'DELETE' && path === 'products') {
@@ -782,13 +815,37 @@ async function handleAdmin(req, res, path, url) {
   }
 
   if (req.method === 'GET' && path === 'orders') {
-    const { page = 1, limit = 20, status, search } = url.searchParams;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const status = url.searchParams.get('status') || '';
+    const search = url.searchParams.get('search') || '';
+    const offset = (page - 1) * limit;
     let query = db.from('orders').select('*, order_items(*)', { count: 'exact' }).order('created_at', { ascending: false });
     if (status) query = query.eq('status', status);
     if (search) query = query.ilike('order_number', `%${search}%`);
-    const { data: orders, count } = await query.range(offset, offset + parseInt(limit) - 1);
-    return res.status(200).json({ success: true, data: (orders || []).map(o => ({ id: o.id, order_number: o.order_number, customer: typeof o.shipping_address === 'string' ? JSON.parse(o.shipping_address)?.full_name : o.shipping_address?.full_name, total: o.total, currency: o.currency, status: o.status, payment_method: o.payment_method, created_at: o.created_at, items_count: o.order_items?.length || 0 })), pagination: { page: parseInt(page), limit: parseInt(limit), total: count || 0 } });
+    const { data: orders, count } = await query.range(offset, offset + limit - 1);
+    return res.status(200).json({ success: true, data: (orders || []).map(o => ({ id: o.id, order_number: o.order_number, customer: typeof o.shipping_address === 'string' ? JSON.parse(o.shipping_address)?.full_name : o.shipping_address?.full_name, total: o.total, currency: o.currency, status: o.status, payment_method: o.payment_method, created_at: o.created_at, items_count: o.order_items?.length || 0 })), pagination: { page, limit, total: count || 0 } });
+  }
+
+  if (req.method === 'GET' && path === 'customers') {
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const search = url.searchParams.get('search') || '';
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    let query = db.from('profiles').select('*', { count: 'exact' }).order('created_at', { ascending: false });
+    if (search) query = query.ilike('full_name', `%${search}%`);
+    const { data: customers, count } = await query.range(offset, offset + parseInt(limit) - 1);
+    let emailMap = {};
+    try {
+      const authRes = await fetch(`${config.SUPABASE_URL}/auth/v1/admin/users`, {
+        headers: { Authorization: `Bearer ${config.SUPABASE_SERVICE_KEY}`, apikey: config.SUPABASE_ANON_KEY }
+      });
+      if (authRes.ok) {
+        const authData = await authRes.json();
+        if (authData.users) emailMap = Object.fromEntries(authData.users.map(u => [u.id, u.email]));
+      }
+    } catch (e) { console.error('Failed to fetch auth users:', e.message); }
+    return res.status(200).json({ success: true, data: (customers || []).map(c => ({ id: c.id, full_name: c.full_name || 'N/A', email: emailMap[c.id] || '', phone: c.phone || '', is_admin: c.is_admin || false, is_partner: c.is_partner || false, created_at: c.created_at })), pagination: { page: parseInt(page), limit: parseInt(limit), total: count || 0 } });
   }
 
   if (req.method === 'PUT' && path === 'orders') {
@@ -816,7 +873,7 @@ async function handleCurrency(req, res) {
     try {
       const response = await fetch(`https://openexchangerates.org/api/latest.json?app_id=${config.OER_APP_ID}&symbols=INR,EUR,GBP,AED,SGD`);
       if (response.ok) { const data = await response.json(); const rates = data.rates || {}; await db.from('currency_rates').insert({ base_currency: 'USD', rates }); return res.status(200).json({ success: true, rates, cached: false }); }
-    } catch {}
+    } catch (e) { console.error('Failed to fetch OER rates:', e.message || e); }
   }
   return res.status(200).json({ success: true, rates: { INR: 83.50, EUR: 0.92, GBP: 0.79, AED: 3.67, SGD: 1.34 }, cached: false, fallback: true });
 }
@@ -839,8 +896,10 @@ async function handleWebhooks(req, res, path) {
       if (order && order.user_id) {
         const { data: profile } = await db.from('profiles').select('*').eq('id', order.user_id).maybeSingle();
         if (profile) {
-          const { data: authUser } = await db.auth.admin.getUserById(order.user_id);
-          sendOrderConfirmationEmail(order, authUser?.user?.email || profile.email, profile.full_name).catch(() => {});
+          let email = null;
+          try { const { data: au } = await db.auth.admin.getUserById(order.user_id); email = au?.user?.email || null; } catch (e) { console.error('Razorpay webhook: failed to fetch user email:', e.message); }
+          if (!email) { console.error('Razorpay webhook: no email for user', order.user_id, '- skipping email for order', order.order_number); }
+          else { sendOrderConfirmationEmail(order, email, profile.full_name).catch(e => console.error('Razorpay webhook email failed for order', order.order_number, ':', e)); }
         }
       }
     }
@@ -862,8 +921,10 @@ async function handleWebhooks(req, res, path) {
         if (order && order.user_id) {
           const { data: profile } = await db.from('profiles').select('*').eq('id', order.user_id).maybeSingle();
           if (profile) {
-            const { data: authUser } = await db.auth.admin.getUserById(order.user_id);
-            sendOrderConfirmationEmail(order, authUser?.user?.email || profile.email, profile.full_name).catch(() => {});
+            let email = null;
+            try { const { data: au } = await db.auth.admin.getUserById(order.user_id); email = au?.user?.email || null; } catch (e) { console.error('Stripe webhook: failed to fetch user email:', e.message); }
+            if (!email) { console.error('Stripe webhook: no email for user', order.user_id, '- skipping email for order', order.order_number); }
+            else { sendOrderConfirmationEmail(order, email, profile.full_name).catch(e => console.error('Stripe webhook email failed for order', order.order_number, ':', e)); }
           }
         }
       }
