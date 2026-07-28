@@ -806,10 +806,11 @@ async function handleAdmin(req, res, path, url) {
 
   if (req.method === 'POST' && path === 'products') {
     const { name, price_usd, category } = req.body;
-    if (!name || !price_usd || !category) return res.status(400).json({ error: 'Missing required fields' });
-    const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (!name || price_usd === undefined || !category) return res.status(400).json({ error: 'Missing required fields' });
+    const baseSlug = String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     const slug = baseSlug + '-' + Date.now().toString(36);
-    const { data: product } = await db.from('products').insert({ name, slug, description: req.body.description || '', price_usd, category, image_url: req.body.image_url || 'images/placeholder.svg', stock: req.body.stock || 0, featured: req.body.featured || false }).select().single();
+    const { data: product, error: insertErr } = await db.from('products').insert({ name, slug, description: req.body.description || '', price_usd, category, image_url: req.body.image_url || 'images/placeholder.svg', stock: typeof req.body.stock === 'number' ? req.body.stock : 0, featured: !!req.body.featured }).select().single();
+    if (insertErr) return res.status(500).json({ error: insertErr.message });
     return res.status(200).json({ success: true, data: product });
   }
 
@@ -819,12 +820,7 @@ async function handleAdmin(req, res, path, url) {
     if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'No fields to update' });
     const { data: before } = await db.from('products').select('stock, name').eq('id', id).maybeSingle();
     if (!before) return res.status(404).json({ error: 'Product not found' });
-    const fs = require('fs');
-    const log = m => fs.appendFileSync('put_debug.log', new Date().toISOString() + ' ' + m + '\n');
-    log(`BEFORE id=${id} name="${before.name}" stock=${before.stock}`);
-    log(`UPDATES: ${JSON.stringify(updates)}`);
 
-    // Primary: raw PostgREST fetch (bypasses Supabase JS client state issues)
     let product;
     try {
       const url = `${config.SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
@@ -839,41 +835,24 @@ async function handleAdmin(req, res, path, url) {
         body: JSON.stringify(updates)
       });
       const result = await resp.json();
-      if (!resp.ok) {
-        log(`FETCH_ERROR: HTTP ${resp.status} ${JSON.stringify(result)}`);
-        throw new Error(`PostgREST error: ${resp.status}`);
-      }
-      if (Array.isArray(result) && result.length > 0) {
+      if (resp.ok && Array.isArray(result) && result.length > 0) {
         product = result[0];
-        log(`FETCH_OK: rows=${result.length} name="${product.name}" stock=${product.stock}`);
       }
     } catch (e) {
-      log(`FETCH_FAILED: ${e.message} — falling back to Supabase client`);
+      console.error('PostgREST fallback:', e.message);
     }
 
-    // Fallback: Supabase JS client .update().eq().select()
     if (!product) {
       const { data: fallback, error: fbErr } = await db.from('products').update(updates).eq('id', id).select();
-      if (fbErr) {
-        log(`FALLBACK_ERROR: ${fbErr.message}`);
-        return res.status(400).json({ error: fbErr.message });
-      }
-      if (fallback?.length > 0) {
-        product = fallback[0];
-        log(`FALLBACK_OK: rows=${fallback.length} name="${product.name}" stock=${product.stock}`);
-      }
+      if (fbErr) return res.status(400).json({ error: fbErr.message });
+      if (fallback?.length > 0) product = fallback[0];
     }
 
     if (!product) {
       const { data: refetch } = await db.from('products').select('*').eq('id', id).maybeSingle();
-      log(`REFETCH: name="${refetch?.name}" stock=${refetch?.stock}`);
-      if (!refetch) {
-        log('PRODUCT_REMOVED');
-        return res.status(400).json({ error: 'Update failed — product may have been removed' });
-      }
+      if (!refetch) return res.status(400).json({ error: 'Update failed — product may have been removed' });
       product = refetch;
     }
-    log(`SUCCESS name="${product.name}"`);
     return res.status(200).json({ success: true, data: product });
   }
 
