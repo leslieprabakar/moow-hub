@@ -3407,6 +3407,15 @@ p {
     gap: 1rem;
   }
 
+  .marquee-item .marquee-img,
+  .marquee-item .marquee-img-ayush,
+  .marquee-img[src*="ambafrance"] {
+    width: auto;
+    height: 30px;
+    border-radius: 0;
+    object-fit: contain;
+  }
+
   .marquee-track {
     padding: 1rem 0;
   }
