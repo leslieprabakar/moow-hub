@@ -195,7 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
       await Cart.addItem(productId, 1);
       btn.textContent = 'Added!';
       btn.style.background = 'var(--primary)';
-      
+
+      showNotification('Added to cart!', 'success', 'View Cart', '/pages/cart.html');
+
       setTimeout(() => {
         btn.textContent = originalText;
         btn.style.background = '';
@@ -203,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 1500);
     } catch (error) {
       btn.textContent = 'Error';
+      showNotification('Failed to add item', 'error');
       setTimeout(() => {
         btn.textContent = originalText;
         btn.disabled = false;
@@ -558,10 +561,9 @@ if (aiForm) {
   });
 }
 
-function showNotification(message, type = 'success') {
+function showNotification(message, type = 'success', actionText, actionUrl) {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
-  notification.textContent = message;
   notification.style.cssText = `
     position: fixed;
     bottom: 2rem;
@@ -573,12 +575,34 @@ function showNotification(message, type = 'success') {
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     z-index: 9999;
     animation: slideIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 400px;
   `;
-  
+
+  const msgSpan = document.createElement('span');
+  msgSpan.textContent = message;
+  notification.appendChild(msgSpan);
+
+  if (actionText && actionUrl) {
+    const link = document.createElement('a');
+    link.href = actionUrl;
+    link.className = 'notification-action';
+    link.textContent = actionText + ' \u2192';
+    notification.appendChild(link);
+  }
+
   document.body.appendChild(notification);
-  
-  setTimeout(() => {
+
+  const dismiss = () => {
     notification.style.animation = 'slideOut 0.3s ease';
     setTimeout(() => notification.remove(), 300);
-  }, 3000);
+  };
+
+  notification.addEventListener('click', (e) => {
+    if (e.target === notification || e.target === msgSpan) dismiss();
+  });
+
+  setTimeout(dismiss, 3500);
 }

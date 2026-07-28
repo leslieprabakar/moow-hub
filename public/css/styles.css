@@ -23,9 +23,11 @@
   --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-body: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --radius-sm: 6px;
   --radius: 12px;
   --radius-lg: 20px;
   --radius-pill: 50px;
+  --shadow-sm: 0 1px 8px rgba(26, 39, 68, 0.05);
   --shadow: 0 2px 20px rgba(26, 39, 68, 0.06);
   --shadow-lg: 0 8px 40px rgba(26, 39, 68, 0.1);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -375,6 +377,79 @@ p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Nav cart icon (always visible) */
+.nav-cart-icon {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.nav-cart-icon a {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem;
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-cart-icon a::after {
+  display: none;
+}
+
+.nav-cart-icon a svg {
+  width: 22px;
+  height: 22px;
+  color: var(--text);
+  transition: color 0.3s ease;
+}
+
+.nav-cart-icon a:hover svg {
+  color: var(--primary);
+}
+
+.nav-cart-icon .cart-count {
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  background: var(--primary);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--white);
+  line-height: 1;
+}
+
+/* Notification action link */
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.notification-action {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  padding: 0.3rem 0.75rem;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 6px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  margin-left: auto;
+}
+
+.notification-action:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.85);
 }
 
 /* Mobile Menu */
@@ -1234,8 +1309,8 @@ p {
 }
 
 .feature-icon {
-  width: 56px;
-  height: 56px;
+  width: 120px;
+  height: 120px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -1437,8 +1512,8 @@ p {
 }
 
 .partner-icon {
-  width: 56px;
-  height: 56px;
+  width: 100px;
+  height: 100px;
   margin: 0 auto 1rem;
   border-radius: 50%;
   display: flex;
@@ -2519,6 +2594,21 @@ p {
 
   .nav-dropdown-item:hover {
     background: var(--bg);
+  }
+
+  .nav-cart-icon {
+    justify-content: center;
+    padding: 0.5rem 0;
+  }
+
+  .nav-cart-icon a svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-cart-icon .cart-count {
+    top: -4px;
+    right: -8px;
   }
 
   .hero,

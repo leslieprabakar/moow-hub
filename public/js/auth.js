@@ -160,39 +160,52 @@ const Auth = {
       return null;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    // If 401, try to refresh token
-    if (response.status === 401) {
-      const refreshed = await this.refreshToken();
-      if (refreshed) {
-        return fetch(url, {
-          ...options,
-          headers: {
-            ...options.headers,
-            'Authorization': `Bearer ${this.getToken()}`,
-            'Content-Type': 'application/json'
-          }
-        });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          ...options.headers,
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // If 401, try to refresh token
+      if (response.status === 401) {
+        const refreshed = await this.refreshToken();
+        if (refreshed) {
+          return fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              'Authorization': `Bearer ${this.getToken()}`,
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+        localStorage.removeItem('moow_token');
+        localStorage.removeItem('moow_refresh_token');
+        localStorage.removeItem('moow_user');
+        this.updateUI(null);
+        if (!window.location.pathname.includes('login.html')) {
+          window.location.href = '/pages/login.html';
+        }
+        return null;
       }
-      localStorage.removeItem('moow_token');
-      localStorage.removeItem('moow_refresh_token');
-      localStorage.removeItem('moow_user');
-      this.updateUI(null);
-      if (!window.location.pathname.includes('login.html')) {
-        window.location.href = '/pages/login.html';
+
+      return response;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out');
       }
-      return null;
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return response;
   },
 
   /**

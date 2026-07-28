@@ -15,8 +15,24 @@
     .admin-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
     .admin-sidebar { background: var(--navy); color: white; padding: 2rem 0; }
     .admin-logo { padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+    .admin-logo a { color: white; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
     .admin-logo h2 { color: white; font-family: var(--font-serif); font-size: 1.3rem; margin: 0; }
     .admin-logo span { color: var(--primary); }
+    .admin-logo-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .admin-toggle { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; }
+    @media (max-width: 768px) {
+      .admin-toggle { display: block; }
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; z-index: 2000; transition: left 0.3s ease; overflow-y: auto; }
+      .admin-sidebar.open { left: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
+      .admin-sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+      .admin-sidebar-header .admin-logo { padding: 0; border-bottom: none; margin-bottom: 0; }
+      .admin-sidebar-header .admin-toggle { color: white; font-size: 1.5rem; }
+      .admin-main { padding: 1rem; }
+      .admin-table table { min-width: 500px; }
+      .admin-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1999; }
+      .admin-overlay.show { display: block; }
+    }
     .admin-nav { padding: 0 1rem; }
     .admin-nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; color: rgba(255,255,255,0.7); border-radius: var(--radius); margin-bottom: 0.25rem; cursor: pointer; transition: var(--transition); font-size: 0.9rem; text-decoration: none; }
     .admin-nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
@@ -58,11 +74,18 @@
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
+  <div class="admin-overlay" onclick="toggleSidebar()"></div>
   <div class="admin-layout">
-    <aside class="admin-sidebar">
-      <div class="admin-logo">
-        <h2>Moow<span>.</span>Hub</h2>
-        <p style="font-size:0.8rem;opacity:0.7;margin:0.25rem 0 0;">Admin Panel</p>
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-header">
+        <div class="admin-logo">
+          <a href="dashboard.html">
+            <span class="admin-logo-icon">🌿</span>
+            <h2>Moow<span>.</span>Hub</h2>
+          </a>
+          <p style="font-size:0.8rem;opacity:0.7;margin:0.25rem 0 0;">Admin Panel</p>
+        </div>
+        <button class="admin-toggle" onclick="toggleSidebar()" aria-label="Close menu">&times;</button>
       </div>
       <nav class="admin-nav">
         <a href="dashboard.html" class="admin-nav-item">
@@ -85,12 +108,20 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           View Store
         </a>
+        <div style="border-top:1px solid rgba(255,255,255,0.1);margin:1rem 1rem 0.5rem;"></div>
+        <a href="#" class="admin-nav-item" onclick="Auth.logout();return false;" style="color:rgba(255,255,255,0.5);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Logout
+        </a>
       </nav>
     </aside>
 
     <main class="admin-main">
       <div class="admin-header">
-        <h1>Products</h1>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <button class="admin-toggle" onclick="toggleSidebar()" aria-label="Open menu" style="color:var(--navy);">&#9776;</button>
+          <h1>Products</h1>
+        </div>
         <button class="btn btn-primary" onclick="openModal()">+ Add Product</button>
       </div>
 
@@ -169,26 +200,34 @@
       
       <div class="modal-actions">
         <button class="btn btn-outline" id="cancelBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveBtn" onclick="saveProduct()">Save Product</button>
+        <button class="btn btn-primary" id="saveBtn">Save Product</button>
       </div>
     </div>
   </div>
 
+  <script>
+    function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('open'); document.querySelector('.admin-overlay').classList.toggle('show'); }
+  </script>
   <script defer src="../../js/auth.js"></script>
   <script>
     let allProducts = [];
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function initPage() {
       if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
         window.location.href = '/pages/login.html';
         return;
       }
       loadProducts();
       document.getElementById('cancelBtn').addEventListener('click', closeModal);
-    });
+      document.getElementById('saveBtn').addEventListener('click', saveProduct);
+    }
+    document.addEventListener('DOMContentLoaded', initPage);
+    window.addEventListener('pageshow', e => { if (e.persisted) initPage(); });
 
     async function loadProducts() {
+      const tbody = document.getElementById('productsTable');
       try {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>';
         const response = await Auth.authenticatedFetch('/api/admin/products');
         if (!response || !response.ok) throw new Error('Failed');
 
@@ -197,6 +236,7 @@
         renderProducts(allProducts);
       } catch (error) {
         console.error('Load products error:', error);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#dc3545;">Failed to load products. <button onclick="loadProducts()" style="background:none;border:none;color:var(--primary);cursor:pointer;text-decoration:underline;">Retry</button></td></tr>';
       }
     }
 
@@ -293,12 +333,15 @@
           featured: featEl ? featEl.checked : false
         };
 
+        const method = id ? 'PUT' : 'POST';
         const body = id ? JSON.stringify(Object.assign({ id }, productData)) : JSON.stringify(productData);
+        console.log('[saveProduct] method:', method, 'id:', JSON.stringify(id), 'body preview:', body.substring(0, 120));
 
         const response = await Auth.authenticatedFetch('/api/admin/products', {
-          method: id ? 'PUT' : 'POST',
+          method,
           body
         });
+        console.log('[saveProduct] response status:', response?.status);
 
         if (!response) {
           alert('Session expired. Please log out and log back in.');
@@ -307,24 +350,13 @@
 
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
+          console.log('[saveProduct] ERROR response:', errData);
           alert('Failed to save product: ' + (errData.error || response.statusText || 'Unknown error'));
           return;
         }
 
-        const result = await response.json().catch(() => ({}));
-        const updatedProduct = result && result.data;
-        if (updatedProduct) {
-          const idx = allProducts.findIndex(p => p.id === updatedProduct.id);
-          if (idx !== -1) {
-            allProducts[idx] = updatedProduct;
-          } else {
-            allProducts.unshift(updatedProduct);
-          }
-          renderProducts(allProducts);
-        } else {
-          loadProducts();
-        }
         closeModal();
+        await loadProducts();
       } catch (error) {
         console.error('saveProduct error:', error);
         alert('Failed to save product: ' + (error.message || 'Unknown error'));

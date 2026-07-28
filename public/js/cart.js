@@ -279,12 +279,14 @@ const Cart = {
    * Update cart badge in UI
    */
   async updateBadge() {
-    const badge = document.querySelector('.cart-count');
-    if (!badge) return;
+    const badges = document.querySelectorAll('.cart-count');
+    if (!badges.length) return;
 
     const count = await this.getCount();
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+    badges.forEach(badge => {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'inline-flex' : 'none';
+    });
   },
 
   /**

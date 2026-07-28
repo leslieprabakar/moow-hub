@@ -47,10 +47,8 @@ function getSupabase() {
   return supabase;
 }
 function getAdminDB() {
-  if (!supabaseAdmin) {
-    if (!config.SUPABASE_URL || !config.SUPABASE_SERVICE_KEY) throw new Error('Missing Supabase env vars');
-    supabaseAdmin = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY);
-  }
+  if (!config.SUPABASE_URL || !config.SUPABASE_SERVICE_KEY) throw new Error('Missing Supabase env vars');
+  supabaseAdmin = createClient(config.SUPABASE_URL, config.SUPABASE_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
   return supabaseAdmin;
 }
 
@@ -224,7 +222,12 @@ async function handleAuth(req, res, path) {
       return res.status(500).json({ error: 'Failed to create account', details: authError.message });
     }
     const verificationToken = crypto.randomBytes(32).toString('hex');
-    await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken });
+    const { error: profileError } = await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken });
+    if (profileError) {
+      console.error('Profile insert error:', profileError.message);
+      try { await db.auth.admin.deleteUser(authUser.user.id); } catch (e) { console.error('Failed to rollback user:', e.message); }
+      return res.status(500).json({ error: 'Failed to create profile', details: profileError.message });
+    }
     sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(e => console.error('Welcome email failed:', e));
     return res.status(201).json({ success: true, message: 'Account created', user: { id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) } });
   }
@@ -767,18 +770,30 @@ async function handleAdmin(req, res, path, url) {
   const db = getAdminDB();
 
   if (req.method === 'GET' && path === 'dashboard') {
-    const [ordersResult, productsResult, usersResult] = await Promise.all([
+    const [ordersResult, productsResult] = await Promise.all([
       db.from('orders').select('id', { count: 'exact', head: true }),
-      db.from('products').select('id', { count: 'exact', head: true }),
-      db.from('profiles').select('id', { count: 'exact', head: true })
+      db.from('products').select('id', { count: 'exact', head: true })
     ]);
+    // Count total users matching customers page logic: auth users + orphan profiles
+    let totalUsers = 0;
+    try {
+      const { data: authData } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      const authUsers = authData?.users || [];
+      const authUserIds = new Set(authUsers.map(u => u.id));
+      const { data: profileIds } = await db.from('profiles').select('id');
+      const orphanCount = (profileIds || []).filter(p => !authUserIds.has(p.id)).length;
+      totalUsers = authUsers.length + orphanCount;
+    } catch (e) {
+      const { count } = await db.from('profiles').select('id', { count: 'exact', head: true });
+      totalUsers = count || 0;
+    }
     const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const { data: recentOrders } = await db.from('orders').select('total, status, created_at').gte('created_at', thirtyDaysAgo.toISOString()).neq('status', 'cancelled');
     const revenue = (recentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
     const { data: recentOrdersList } = await db.from('orders').select('id, order_number, total, status, created_at, shipping_address').order('created_at', { ascending: false }).limit(10);
     const { data: lowStock } = await db.from('products').select('id, name, stock').lte('stock', 5).order('stock', { ascending: true });
     return res.status(200).json({ success: true, data: {
-      stats: { totalOrders: ordersResult.count || 0, totalProducts: productsResult.count || 0, totalUsers: usersResult.count || 0, revenue30Days: Math.round(revenue * 100) / 100 },
+      stats: { totalOrders: ordersResult.count || 0, totalProducts: productsResult.count || 0, totalUsers, revenue30Days: Math.round(revenue * 100) / 100 },
       recentOrders: (recentOrdersList || []).map(o => ({ id: o.id, order_number: o.order_number, total: o.total, status: o.status, created_at: o.created_at, customer: typeof o.shipping_address === 'string' ? JSON.parse(o.shipping_address)?.full_name : o.shipping_address?.full_name })),
       lowStockProducts: lowStock || []
     }});
@@ -801,10 +816,65 @@ async function handleAdmin(req, res, path, url) {
   if (req.method === 'PUT' && path === 'products') {
     const { id, ...updates } = req.body;
     if (!id) return res.status(400).json({ error: 'Product ID required' });
-    const { error: updateError } = await db.from('products').update(updates).eq('id', id);
-    if (updateError) return res.status(400).json({ error: updateError.message });
-    const { data: product } = await db.from('products').select('*').eq('id', id).maybeSingle();
-    return res.status(200).json({ success: true, data: product || null });
+    if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'No fields to update' });
+    const { data: before } = await db.from('products').select('stock, name').eq('id', id).maybeSingle();
+    if (!before) return res.status(404).json({ error: 'Product not found' });
+    const fs = require('fs');
+    const log = m => fs.appendFileSync('put_debug.log', new Date().toISOString() + ' ' + m + '\n');
+    log(`BEFORE id=${id} name="${before.name}" stock=${before.stock}`);
+    log(`UPDATES: ${JSON.stringify(updates)}`);
+
+    // Primary: raw PostgREST fetch (bypasses Supabase JS client state issues)
+    let product;
+    try {
+      const url = `${config.SUPABASE_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}`;
+      const resp = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': config.SUPABASE_SERVICE_KEY,
+          'Authorization': `Bearer ${config.SUPABASE_SERVICE_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(updates)
+      });
+      const result = await resp.json();
+      if (!resp.ok) {
+        log(`FETCH_ERROR: HTTP ${resp.status} ${JSON.stringify(result)}`);
+        throw new Error(`PostgREST error: ${resp.status}`);
+      }
+      if (Array.isArray(result) && result.length > 0) {
+        product = result[0];
+        log(`FETCH_OK: rows=${result.length} name="${product.name}" stock=${product.stock}`);
+      }
+    } catch (e) {
+      log(`FETCH_FAILED: ${e.message} — falling back to Supabase client`);
+    }
+
+    // Fallback: Supabase JS client .update().eq().select()
+    if (!product) {
+      const { data: fallback, error: fbErr } = await db.from('products').update(updates).eq('id', id).select();
+      if (fbErr) {
+        log(`FALLBACK_ERROR: ${fbErr.message}`);
+        return res.status(400).json({ error: fbErr.message });
+      }
+      if (fallback?.length > 0) {
+        product = fallback[0];
+        log(`FALLBACK_OK: rows=${fallback.length} name="${product.name}" stock=${product.stock}`);
+      }
+    }
+
+    if (!product) {
+      const { data: refetch } = await db.from('products').select('*').eq('id', id).maybeSingle();
+      log(`REFETCH: name="${refetch?.name}" stock=${refetch?.stock}`);
+      if (!refetch) {
+        log('PRODUCT_REMOVED');
+        return res.status(400).json({ error: 'Update failed — product may have been removed' });
+      }
+      product = refetch;
+    }
+    log(`SUCCESS name="${product.name}"`);
+    return res.status(200).json({ success: true, data: product });
   }
 
   if (req.method === 'DELETE' && path === 'products') {
@@ -831,21 +901,47 @@ async function handleAdmin(req, res, path, url) {
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '20');
     const search = url.searchParams.get('search') || '';
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    let query = db.from('profiles').select('*', { count: 'exact' }).order('created_at', { ascending: false });
-    if (search) query = query.ilike('full_name', `%${search}%`);
-    const { data: customers, count } = await query.range(offset, offset + parseInt(limit) - 1);
-    let emailMap = {};
+    let allAuthUsers = [];
     try {
-      const authRes = await fetch(`${config.SUPABASE_URL}/auth/v1/admin/users`, {
-        headers: { Authorization: `Bearer ${config.SUPABASE_SERVICE_KEY}`, apikey: config.SUPABASE_ANON_KEY }
-      });
-      if (authRes.ok) {
-        const authData = await authRes.json();
-        if (authData.users) emailMap = Object.fromEntries(authData.users.map(u => [u.id, u.email]));
+      const { data: authUsers, error: authError } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      if (!authError && authUsers?.users) {
+        allAuthUsers = authUsers.users;
       }
     } catch (e) { console.error('Failed to fetch auth users:', e.message); }
-    return res.status(200).json({ success: true, data: (customers || []).map(c => ({ id: c.id, full_name: c.full_name || 'N/A', email: emailMap[c.id] || '', phone: c.phone || '', is_admin: c.is_admin || false, is_partner: c.is_partner || false, created_at: c.created_at })), pagination: { page: parseInt(page), limit: parseInt(limit), total: count || 0 } });
+    const { data: profiles, error: profilesError } = await db.from('profiles').select('*');
+    if (profilesError) console.error('Failed to fetch profiles:', profilesError.message);
+    const profileMap = Object.fromEntries((profiles || []).map(p => [p.id, p]));
+    let customers = allAuthUsers.map(authUser => {
+      const profile = profileMap[authUser.id];
+      let fullName = profile?.full_name || authUser.user_metadata?.full_name || '';
+      if (!fullName && authUser.email) {
+        fullName = authUser.email.split('@')[0].replace(/[._-]/g, ' ');
+      }
+      return {
+        id: authUser.id,
+        full_name: fullName || 'No name',
+        email: authUser.email || '',
+        phone: profile?.phone || '',
+        is_admin: profile?.is_admin || false,
+        is_partner: profile?.is_partner || false,
+        created_at: profile?.created_at || authUser.created_at
+      };
+    });
+    if (search) {
+      const searchLower = search.toLowerCase();
+      customers = customers.filter(c => (c.full_name || '').toLowerCase().includes(searchLower) || (c.email || '').toLowerCase().includes(searchLower));
+    }
+    const authUserIds = new Set(allAuthUsers.map(u => u.id));
+    for (const profile of (profiles || [])) {
+      if (!authUserIds.has(profile.id)) {
+        customers.push({ id: profile.id, full_name: profile.full_name || 'No name', email: '', phone: profile.phone || '', is_admin: profile.is_admin || false, is_partner: profile.is_partner || false, created_at: profile.created_at });
+      }
+    }
+    customers.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    const total = customers.length;
+    const offset = (page - 1) * limit;
+    const paginatedCustomers = customers.slice(offset, offset + limit);
+    return res.status(200).json({ success: true, data: paginatedCustomers, pagination: { page, limit, total } });
   }
 
   if (req.method === 'PUT' && path === 'orders') {
@@ -970,6 +1066,9 @@ async function handleAgreement(req, res, subPath) {
 // ─── MAIN HANDLER ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   setCORS(res);
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const url = new URL(req.url, `https://${req.headers.host}`);
