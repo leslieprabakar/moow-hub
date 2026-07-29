@@ -205,29 +205,6 @@
   </script>
   <script src="../../js/auth.js"></script>
   <script>
-    (async function() {
-      if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
-        window.location.href = '/pages/login.html';
-        return;
-      }
-
-      var user = Auth.getUser();
-      var nameEl = document.getElementById('adminUser');
-      if (nameEl) nameEl.textContent = user && (user.full_name || user.email);
-
-      var today = new Date();
-      var thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
-      document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-
-      document.getElementById('applyDateBtn').addEventListener('click', function() {
-        loadDashboard();
-      });
-
-      await loadDashboard();
-    })();
-
     async function loadDashboard() {
       try {
         var from = document.getElementById('dateFrom').value;
@@ -290,6 +267,26 @@
         document.getElementById('statRevenue').textContent = 'Error';
       }
     }
+
+    (function() {
+      if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
+        window.location.href = '/pages/login.html';
+        return;
+      }
+
+      var from = new Date();
+      from.setDate(from.getDate() - 30);
+      document.getElementById('dateFrom').value = from.toISOString().split('T')[0];
+      document.getElementById('dateTo').value = new Date().toISOString().split('T')[0];
+
+      var user = Auth.getUser();
+      var nameEl = document.getElementById('adminUser');
+      if (nameEl && user) nameEl.textContent = user.full_name || user.email || '';
+
+      document.getElementById('applyDateBtn').addEventListener('click', loadDashboard);
+
+      loadDashboard();
+    })();
   </script>
 </body>
 </html>

@@ -145,12 +145,14 @@
   </script>
   <script src="../../js/auth.js"></script>
   <script>
+    var currentPage;
+
     (function() {
       if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
         window.location.href = '/pages/login.html';
         return;
       }
-      var currentPage = 1;
+      currentPage = 1;
       loadCustomers(1);
     })();
 
@@ -161,7 +163,7 @@
 
       try {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">' + (search ? 'Searching...' : 'Loading...') + '</td></tr>';
-        const params = new URLSearchParams({ page, limit: 20 });
+        const params = new URLSearchParams({ page, limit: 20, _t: Date.now() });
         if (search) params.set('search', search);
         const response = await Auth.authenticatedFetch('/api/admin/customers?' + params.toString());
         if (!response || !response.ok) {
@@ -244,7 +246,16 @@
           loadCustomers(currentPage);
           return;
         }
-        loadCustomers(currentPage);
+        var roleCell = tr.cells[3];
+        if (roleCell) {
+          if (adminBox.checked) {
+            roleCell.innerHTML = '<span class="badge badge-admin">Admin</span>';
+          } else if (partnerBox.checked) {
+            roleCell.innerHTML = '<span class="badge badge-partner">Partner</span>';
+          } else {
+            roleCell.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">User</span>';
+          }
+        }
       } catch (error) {
         console.error('updateCustomerRole error:', error);
         loadCustomers(currentPage);
