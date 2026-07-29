@@ -312,8 +312,8 @@ const Auth = {
  * and saves pending data before logging out.
  */
 const SessionManager = {
-  TIMEOUT: 7 * 60 * 1000,
-  WARNING_AT: 5 * 60 * 1000,
+  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 7 * 60 * 1000,
+  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 5 * 60 * 1000,
   CHECK_MS: 30 * 1000,
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
@@ -475,7 +475,7 @@ const SessionManager = {
   extend() {
     this.markActive();
     this.hideCountdown();
-    this.toast('Session extended — you\'re active for another 7 minutes');
+    this.toast('Session extended — you\'re active for another ' + Math.round(this.TIMEOUT / 60000) + ' minutes');
   },
 
   async expire() {

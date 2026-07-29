@@ -81,7 +81,7 @@
         <div class="admin-logo">
           <a href="dashboard.html">
             <span class="admin-logo-icon">🌿</span>
-            <h2>Moow<span>.</span>Hub</h2>
+            <h2>Moow<span>.</span>Hub®</h2>
           </a>
           <p style="font-size:0.8rem;opacity:0.7;margin:0.25rem 0 0;">Admin Panel</p>
         </div>
@@ -241,6 +241,8 @@
       }
     }
 
+    function capitalize(str) { return str ? str.replace(/\b\w/g, c => c.toUpperCase()) : ''; }
+
     function renderProducts(products) {
       const tbody = document.getElementById('productsTable');
 
@@ -253,7 +255,7 @@
         <tr>
           <td><img src="../../${p.image_url}" alt="${p.name.replace(/"/g, '&quot;')}" class="product-thumb" onerror="this.src='../../images/placeholder.svg';this.onerror=null;"></td>
           <td><strong>${p.name}</strong></td>
-          <td>${p.category}</td>
+          <td>${capitalize(p.category)}</td>
           <td>$${Number(p.price_usd).toFixed(2)}</td>
           <td class="${p.stock <= 5 ? 'stock-low' : 'stock-ok'}">${p.stock}</td>
           <td>${p.featured ? '&#10003;' : '-'}</td>

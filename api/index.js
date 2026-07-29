@@ -128,7 +128,7 @@ async function dbLogEmail(recipient, subject, status, resendId = null, orderId =
 }
 function emailTemplate(content) {
   const year = new Date().getFullYear();
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;font-family:Inter,sans-serif;background:#f5f0eb;"><div style="max-width:600px;margin:0 auto;padding:40px 20px;"><div style="text-align:center;margin-bottom:30px;"><h1 style="font-family:Playfair Display,serif;color:#1a2744;margin:0;">Moow<span style="color:#d4735e;">.</span>Hub</h1></div><div style="background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">${content}</div><div style="text-align:center;margin-top:30px;color:#666;font-size:14px;"><p style="margin:0 0 4px;">Wear a pose. Awaken an ecosystem.</p><p style="margin:4px 0;font-size:12px;">Moow Hub Inc, 3rd Cross Rd, Hosakerehalli Layout, Bengaluru, Karnataka 560085, India</p><p style="margin:4px 0 0;">&copy; ${year} Moow.Hub. All rights reserved.</p></div></div></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;font-family:Inter,sans-serif;background:#f5f0eb;"><div style="max-width:600px;margin:0 auto;padding:40px 20px;"><div style="text-align:center;margin-bottom:30px;"><h1 style="font-family:Playfair Display,serif;color:#1a2744;margin:0;">Moow<span style="color:#d4735e;">.</span>Hub</h1></div><div style="background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">${content}</div><div style="text-align:center;margin-top:30px;color:#666;font-size:14px;"><p style="margin:0 0 4px;">Wear a pose. Awaken an ecosystem.</p><p style="margin:4px 0;font-size:12px;">10 Avenue Percier 75008, Paris - France</p><p style="margin:4px 0 0;">&copy; ${year} Moow.Hub. All rights reserved.</p></div></div></body></html>`;
 }
 async function sendWelcomeEmail(user, verificationToken) {
   const url = `${config.SITE_URL}/api/auth/verify?token=${verificationToken}`;
@@ -181,6 +181,21 @@ async function verifyAuth(req) {
   if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
   try {
     const token = authHeader.split(' ')[1];
+    if (config.SUPABASE_JWT_SECRET) {
+      try {
+        const decoded = jwt.verify(token, config.SUPABASE_JWT_SECRET);
+        if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+          console.warn('verifyAuth: token expired');
+          return null;
+        }
+      } catch (jwtErr) {
+        if (jwtErr.name === 'TokenExpiredError') {
+          console.warn('verifyAuth: token expired');
+          return null;
+        }
+        console.warn('verifyAuth: JWT verify failed, falling back to Supabase API');
+      }
+    }
     const response = await fetch(`${config.SUPABASE_URL}/auth/v1/user`, {
       headers: { Authorization: `Bearer ${token}`, apikey: config.SUPABASE_ANON_KEY }
     });
@@ -247,16 +262,25 @@ async function handleAuth(req, res, path) {
   }
 
   if (req.method === 'POST' && path === 'login') {
-    const ip = getClientIP(req);
-    const rateLimit = await checkRateLimit(ip, 'login');
-    if (!rateLimit.allowed) return res.status(429).json({ error: 'Too many login attempts. Please try again later.' });
-    const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
-    const { data, error } = await db.auth.signInWithPassword({ email, password });
-    if (error) return res.status(401).json({ error: 'Invalid credentials' });
-    const { data: profile } = await db.from('profiles').select('*').eq('id', data.user.id).single();
-    db.from('leads').update({ last_login_at: new Date().toISOString() }).eq('email', data.user.email).catch(e => console.error('Lead login update failed:', e));
-    return res.status(200).json({ success: true, session: data.session, user: { ...profile, email: data.user.email } });
+    try {
+      const ip = getClientIP(req);
+      const rateLimit = await checkRateLimit(ip, 'login');
+      if (!rateLimit.allowed) return res.status(429).json({ error: 'Too many login attempts. Please try again later.' });
+      const { email, password } = req.body;
+      if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) {
+        const msg = error.status === 429 ? 'Too many requests. Please try again later.' : 'Invalid credentials';
+        return res.status(error.status || 401).json({ error: msg });
+      }
+      if (!data?.user?.id) return res.status(500).json({ error: 'Authentication service error' });
+      const { data: profile } = await db.from('profiles').select('*').eq('id', data.user.id).single();
+      (async () => { try { await db.from('leads').update({ last_login_at: new Date().toISOString() }).eq('email', data.user.email); } catch (e) { console.error('Lead login update failed:', e); } })();
+      return res.status(200).json({ success: true, session: data.session, user: { ...profile, email: data.user.email } });
+    } catch (err) {
+      console.error('Login error:', err);
+      return res.status(502).json({ error: 'Authentication service unavailable' });
+    }
   }
 
   if (req.method === 'POST' && path === 'logout') {
@@ -840,8 +864,18 @@ async function handleAdmin(req, res, path, url) {
   const db = getAdminDB();
 
   if (req.method === 'GET' && path === 'dashboard') {
+    const fromParam = url.searchParams.get('from');
+    const toParam = url.searchParams.get('to');
+    let dateFrom, dateTo;
+    if (fromParam) dateFrom = new Date(fromParam + 'T00:00:00Z');
+    if (toParam) dateTo = new Date(toParam + 'T23:59:59Z');
+    if (!dateTo) dateTo = new Date();
+    if (!dateFrom) { dateFrom = new Date(); dateFrom.setDate(dateFrom.getDate() - 30); }
+
+    const applyDateFilter = (q) => q.gte('created_at', dateFrom.toISOString()).lte('created_at', dateTo.toISOString());
+
     const [ordersResult, productsResult] = await Promise.all([
-      db.from('orders').select('id', { count: 'exact', head: true }),
+      applyDateFilter(db.from('orders')).select('id', { count: 'exact', head: true }),
       db.from('products').select('id', { count: 'exact', head: true })
     ]);
     // Count total users matching customers page logic: auth users + orphan profiles
@@ -857,8 +891,7 @@ async function handleAdmin(req, res, path, url) {
       const { count } = await db.from('profiles').select('id', { count: 'exact', head: true });
       totalUsers = count || 0;
     }
-    const thirtyDaysAgo = new Date(); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const { data: recentOrders } = await db.from('orders').select('total, status, created_at').gte('created_at', thirtyDaysAgo.toISOString()).neq('status', 'cancelled');
+    const { data: recentOrders } = await applyDateFilter(db.from('orders').select('total, status, created_at')).neq('status', 'cancelled');
     const revenue = (recentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
     const { data: recentOrdersList } = await db.from('orders').select('id, order_number, total, status, created_at, shipping_address').order('created_at', { ascending: false }).limit(10);
     const { data: lowStock } = await db.from('products').select('id, name, stock').lte('stock', 5).order('stock', { ascending: true });
@@ -991,6 +1024,15 @@ async function handleAdmin(req, res, path, url) {
     const offset = (page - 1) * limit;
     const paginatedCustomers = customers.slice(offset, offset + limit);
     return res.status(200).json({ success: true, data: paginatedCustomers, pagination: { page, limit, total } });
+  }
+
+  if (req.method === 'PUT' && path === 'customers') {
+    const { id, role } = req.body;
+    if (!id || !role) return res.status(400).json({ error: 'User ID and role required' });
+    const updates = { is_admin: role === 'admin', is_partner: role === 'partner' };
+    const { error: updateErr } = await db.from('profiles').update(updates).eq('id', id);
+    if (updateErr) return res.status(500).json({ error: 'Failed to update role: ' + updateErr.message });
+    return res.status(200).json({ success: true, message: 'Role updated' });
   }
 
   if (req.method === 'PUT' && path === 'orders') {

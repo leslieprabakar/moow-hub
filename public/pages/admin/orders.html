@@ -80,7 +80,7 @@
         <div class="admin-logo">
           <a href="dashboard.html">
             <span class="admin-logo-icon">🌿</span>
-            <h2>Moow<span>.</span>Hub</h2>
+            <h2>Moow<span>.</span>Hub®</h2>
           </a>
           <p style="font-size:0.8rem;opacity:0.7;margin:0.25rem 0 0;">Admin Panel</p>
         </div>
@@ -216,9 +216,14 @@
         return;
       }
 
+      var PAYMENT_LABELS = { cod:'Cash on Delivery', razorpay:'Razorpay', stripe:'Stripe', upi:'UPI', card:'Credit/Debit Card', netbanking:'Net Banking', paypal:'PayPal' };
+      var STATUS_LABELS = { pending:'Pending', confirmed:'Confirmed', processing:'Processing', shipped:'Shipped', delivered:'Delivered', cancelled:'Cancelled' };
+
       tbody.innerHTML = orders.map(order => {
         const date = new Date(order.created_at).toLocaleDateString();
+        const statusLabel = STATUS_LABELS[order.status] || order.status;
         const statusClass = 'status-' + order.status;
+        const paymentLabel = PAYMENT_LABELS[order.payment_method] || order.payment_method || '-';
 
         return `
           <tr>
@@ -226,8 +231,8 @@
             <td>${order.customer}</td>
             <td>${order.items_count}</td>
             <td>${order.currency} ${Number(order.total).toFixed(2)}</td>
-            <td>${order.payment_method || '-'}</td>
-            <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+            <td>${paymentLabel}</td>
+            <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
             <td>${date}</td>
             <td>
               <select onchange="updateOrderStatus('${order.id}', this.value)" style="padding:0.3rem;font-size:0.8rem;">
