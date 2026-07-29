@@ -927,6 +927,7 @@ p {
   gap: 1.25rem;
   padding: 0 1.5rem;
   white-space: nowrap;
+  flex-shrink: 0;
   font-family: var(--font-serif);
   font-size: 1.15rem;
   font-weight: 500;
@@ -2566,10 +2567,7 @@ p {
 
   .menu-toggle {
     display: flex;
-    padding: 5px 0 5px 1rem;
-  }
-  .nav-container {
-    padding: 0 1.25rem;
+    margin-left: auto;
   }
 
   .nav-dropdown-icon .nav-dropdown-trigger {
@@ -3684,6 +3682,7 @@ p {
   background: var(--bg);
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid var(--border-light);
 }
 .newsletter-section::before {
   content: '';
@@ -3962,6 +3961,7 @@ p {
   background: var(--white);
   position: relative;
   overflow: hidden;
+  border-top: 1px solid var(--border-light);
 }
 .partner-section::before {
   content: '';
