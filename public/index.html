@@ -317,15 +317,60 @@
       background: rgba(212, 115, 94, 0.08);
       color: var(--primary);
     }
+    .pwd-row { position: relative; }
     .landing-form .password-hints {
-      margin-top: 0.35rem;
-      font-size: 0.75rem;
-      color: var(--text-light);
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.73rem;
       list-style: none;
-      padding: 0;
+      padding: 0.65rem 0.85rem;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+      transform: translateX(-50%) translateY(4px);
+      pointer-events: none;
+      margin: 0;
     }
-    .landing-form .password-hints li { margin-bottom: 0.15rem; }
-    .landing-form .password-hints li.valid { color: #28a745; }
+    .landing-form .password-hints::before {
+      content: '';
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid var(--navy);
+    }
+    .landing-form .password-hints.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+    .landing-form .password-hints li {
+      margin-bottom: 0.2rem;
+      padding-left: 1rem;
+      position: relative;
+      line-height: 1.5;
+    }
+    .landing-form .password-hints li::before {
+      content: '\\2713';
+      position: absolute;
+      left: 0;
+      color: #555;
+      font-size: 0.65rem;
+      transition: color 0.2s;
+    }
+    .landing-form .password-hints li.valid::before { color: #4caf50; }
+    .landing-form .password-hints li.valid { color: #4caf50; }
+    .landing-form .password-hints li:last-child { margin-bottom: 0; }
 
     /* ── Password wrapper with eye toggle ── */
     .pwd-wrapper {
@@ -673,19 +718,12 @@
                 </div>
               </div>
 
-              <div class="form-row">
+              <div class="form-row pwd-row">
                 <div class="form-group">
                   <label for="regPassword">Password</label>
                   <div class="pwd-wrapper">
                     <input type="password" id="regPassword" name="password" required autocomplete="new-password" placeholder="Create a strong password">
                   </div>
-                  <ul class="password-hints" id="passwordHints">
-                    <li id="hint-length">At least 8 characters</li>
-                    <li id="hint-upper">One uppercase letter</li>
-                    <li id="hint-lower">One lowercase letter</li>
-                    <li id="hint-number">One number</li>
-                    <li id="hint-special">One special character</li>
-                  </ul>
                 </div>
                 <div class="form-group">
                   <label for="regConfirmPassword">Confirm Password</label>
@@ -696,6 +734,13 @@
                     </button>
                   </div>
                 </div>
+                <ul class="password-hints" id="passwordHints">
+                  <li id="hint-length">At least 8 characters</li>
+                  <li id="hint-upper">One uppercase letter</li>
+                  <li id="hint-lower">One lowercase letter</li>
+                  <li id="hint-number">One number</li>
+                  <li id="hint-special">One special character</li>
+                </ul>
               </div>
               <button type="submit" class="btn-primary" id="regSubmitBtn">Create Free Account</button>
               <p class="auth-footer">Already have an account? <a href="#" id="switchToLogin">Sign in</a></p>
@@ -989,8 +1034,24 @@
         btn.textContent = 'Sign In';
       });
 
-      // ── Password hints ──
+      // ── Password hints tooltip (hover / focus) ──
       var pwdInput = document.getElementById('regPassword');
+      var confirmPwdInput = document.getElementById('regConfirmPassword');
+      var hintsEl = document.getElementById('passwordHints');
+      var hintShowTimer = null;
+      var hintHideTimer = null;
+
+      function showHints() {
+        if (hintHideTimer) { clearTimeout(hintHideTimer); hintHideTimer = null; }
+        if (!hintsEl.classList.contains('visible')) {
+          hintShowTimer = setTimeout(function() { hintsEl.classList.add('visible'); }, 200);
+        }
+      }
+      function hideHints() {
+        if (hintShowTimer) { clearTimeout(hintShowTimer); hintShowTimer = null; }
+        hintHideTimer = setTimeout(function() { hintsEl.classList.remove('visible'); }, 150);
+      }
+
       if (pwdInput) {
         pwdInput.addEventListener('input', function() {
           var val = pwdInput.value;
@@ -1000,6 +1061,16 @@
           document.getElementById('hint-number').className = /\d/.test(val) ? 'valid' : '';
           document.getElementById('hint-special').className = /[!@#$%^&*(),.?":{}|<>]/.test(val) ? 'valid' : '';
         });
+        pwdInput.addEventListener('mouseenter', showHints);
+        pwdInput.addEventListener('focus', showHints);
+        pwdInput.addEventListener('mouseleave', hideHints);
+        pwdInput.addEventListener('blur', hideHints);
+      }
+      if (confirmPwdInput) {
+        confirmPwdInput.addEventListener('mouseenter', showHints);
+        confirmPwdInput.addEventListener('focus', showHints);
+        confirmPwdInput.addEventListener('mouseleave', hideHints);
+        confirmPwdInput.addEventListener('blur', hideHints);
       }
     })();
   </script>
