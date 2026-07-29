@@ -874,10 +874,12 @@ async function handleAdmin(req, res, path, url) {
     const fromISO = dateFrom.toISOString();
     const toISO = dateTo.toISOString();
 
-    const [ordersResult, productsResult] = await Promise.all([
-      db.from('orders').select('id', { count: 'exact', head: true }).gte('created_at', fromISO).lte('created_at', toISO),
-      db.from('products').select('id', { count: 'exact', head: true })
-    ]);
+    let totalOrdersCount = 0;
+    try {
+      const { count } = await db.from('orders').select('id', { count: 'exact', head: true }).gte('created_at', fromISO).lte('created_at', toISO);
+      totalOrdersCount = count || 0;
+    } catch (e) { console.error('Order count error:', e.message); }
+    const productsCount = (await db.from('products').select('id', { count: 'exact', head: true })).count || 0;
     // Count total users matching customers page logic: auth users + orphan profiles
     let totalUsers = 0;
     try {
@@ -891,12 +893,15 @@ async function handleAdmin(req, res, path, url) {
       const { count } = await db.from('profiles').select('id', { count: 'exact', head: true });
       totalUsers = count || 0;
     }
-    const { data: recentOrders } = await db.from('orders').select('total, status, created_at').gte('created_at', fromISO).lte('created_at', toISO).neq('status', 'cancelled');
-    const revenue = (recentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
+    let revenue = 0;
+    try {
+      const { data: recentOrders } = await db.from('orders').select('total, status, created_at').gte('created_at', fromISO).lte('created_at', toISO).neq('status', 'cancelled');
+      revenue = (recentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
+    } catch (e) { console.error('Revenue query error:', e.message); }
     const { data: recentOrdersList } = await db.from('orders').select('id, order_number, total, status, created_at, shipping_address').order('created_at', { ascending: false }).limit(10);
     const { data: lowStock } = await db.from('products').select('id, name, stock').lte('stock', 5).order('stock', { ascending: true });
     return res.status(200).json({ success: true, data: {
-      stats: { totalOrders: ordersResult.count || 0, totalProducts: productsResult.count || 0, totalUsers, revenue30Days: Math.round(revenue * 100) / 100 },
+      stats: { totalOrders: totalOrdersCount, totalProducts: productsCount, totalUsers, revenue30Days: Math.round(revenue * 100) / 100 },
       recentOrders: (recentOrdersList || []).map(o => ({ id: o.id, order_number: o.order_number, total: o.total, status: o.status, created_at: o.created_at, customer: typeof o.shipping_address === 'string' ? JSON.parse(o.shipping_address)?.full_name : o.shipping_address?.full_name })),
       lowStockProducts: lowStock || []
     }});

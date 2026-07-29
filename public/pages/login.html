@@ -471,13 +471,7 @@
         try {
           var user = await Auth.login(email, password);
           var actualRole = user && user.is_admin ? 'admin' : user && user.is_partner ? 'partner' : 'user';
-          var meta = ROLE_META[selectedRole];
-          if (selectedRole !== actualRole) {
-            showAlert('Access denied: you are not a' + (selectedRole === 'admin' ? 'n ' : ' ') + selectedRole + '.', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = ROLE_META[actualRole].btn;
-            return;
-          }
+          var meta = ROLE_META[actualRole] || ROLE_META.user;
           showAlert('Login successful! Redirecting...', 'success');
           setTimeout(function() {
             window.location.href = meta.redirect;
