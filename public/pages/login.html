@@ -177,116 +177,7 @@
     .forgot-link a:hover {
       color: var(--primary);
     }
-    .role-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
-      perspective: 800px;
-    }
-    .role-tab {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.75rem 0.4rem;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--white);
-      cursor: pointer;
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      transform-style: preserve-3d;
-      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-      will-change: transform;
-    }
-    .role-tab:hover {
-      border-color: var(--primary);
-      color: var(--navy);
-      transform: rotateX(6deg) translateZ(10px);
-      box-shadow: 0 8px 28px rgba(212, 115, 94, 0.18);
-    }
-    .role-tab.active {
-      border-color: var(--primary);
-      background: rgba(212, 115, 94, 0.06);
-      color: var(--navy);
-      box-shadow: 0 6px 32px rgba(212, 115, 94, 0.22);
-      transform: rotateX(0deg) translateZ(14px);
-    }
-    .role-tab:active {
-      transform: rotateX(3deg) scale(0.95);
-    }
-    .role-tab-glow {
-      position: absolute;
-      inset: -50%;
-      width: 200%;
-      height: 200%;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 50%, rgba(212,115,94,0.12), transparent 60%);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s;
-      z-index: 0;
-    }
-    .role-tab:hover .role-tab-glow { opacity: 1; }
-    .role-tab.active .role-tab-glow {
-      opacity: 1;
-      background: radial-gradient(circle at 50% 50%, rgba(212,115,94,0.18), transparent 60%);
-      animation: role-glow-pulse 2s ease-in-out infinite;
-    }
-    @keyframes role-glow-pulse {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.1); }
-    }
-    .role-tab-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: var(--bg);
-      transition: background 0.3s, transform 0.3s;
-      transform-style: preserve-3d;
-      position: relative;
-      z-index: 1;
-    }
-    .role-tab.active .role-tab-icon {
-      background: rgba(212, 115, 94, 0.15);
-      transform: scale(1.08);
-    }
-    .role-tab-icon svg {
-      width: 20px;
-      height: 20px;
-      color: var(--text-muted);
-      transition: color 0.3s, transform 0.3s;
-      display: block;
-      will-change: transform;
-    }
-    .role-tab.active .role-tab-icon svg,
-    .role-tab:hover .role-tab-icon svg {
-      color: var(--primary);
-    }
-    .role-tab:hover .role-tab-icon svg {
-      animation: role-icon-float 0.8s ease-in-out infinite alternate;
-    }
-    .role-tab.active .role-tab-icon svg {
-      animation: role-icon-float 1.2s ease-in-out infinite alternate;
-    }
-    @keyframes role-icon-float {
-      0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(-3px) scale(1.1); }
-    }
-    .role-tab-label {
-      display: block;
-      line-height: 1.2;
-      position: relative;
-      z-index: 1;
-    }
+
 
     .password-wrapper { position: relative; }
     .password-wrapper input { padding-right: 2.5rem; }
@@ -300,12 +191,7 @@
       .auth-logo a { font-size: 1.5rem; }
       .auth-title { font-size: 1.3rem; }
       .auth-subtitle { font-size: 0.9rem; margin-bottom: 1.5rem; }
-      .role-tabs { gap: 0.35rem; }
-      .role-tab { font-size: 0.75rem; padding: 0.55rem 0.25rem; gap: 0.25rem; }
-      .role-tab-icon { width: 30px; height: 30px; }
-      .role-tab-icon svg { width: 15px; height: 15px; }
     }
-
     @media (max-width: 480px) {
       .auth-page { padding: 1rem 0.75rem; }
       .auth-card { padding: 1.25rem; border-radius: calc(var(--radius) - 2px); }
@@ -319,10 +205,6 @@
       .btn-primary { font-size: 0.9rem; padding: 0.75rem; }
       .auth-footer { font-size: 0.85rem; }
       .forgot-link a { font-size: 0.8rem; }
-      .role-tabs { gap: 0.25rem; }
-      .role-tab { font-size: 0.65rem; padding: 0.45rem 0.15rem; gap: 0.2rem; }
-      .role-tab-icon { width: 24px; height: 24px; }
-      .role-tab-icon svg { width: 12px; height: 12px; }
     }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
@@ -335,40 +217,22 @@
           <a href="/">Moow<span class="dot">.</span>Hub®</a>
         </div>
 
-        <div class="role-tabs" role="tablist">
-          <button type="button" class="role-tab active" data-role="user" role="tab" aria-selected="true">
-            <span class="role-tab-glow"></span>
-            <span class="role-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-            <span class="role-tab-label">User</span>
-          </button>
-          <button type="button" class="role-tab" data-role="partner" role="tab" aria-selected="false">
-            <span class="role-tab-glow"></span>
-            <span class="role-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-            <span class="role-tab-label">Partner</span>
-          </button>
-          <button type="button" class="role-tab" data-role="admin" role="tab" aria-selected="false">
-            <span class="role-tab-glow"></span>
-            <span class="role-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
-            <span class="role-tab-label">Admin</span>
-          </button>
-        </div>
-
-        <h1 class="auth-title" id="authTitle">Welcome back</h1>
-        <p class="auth-subtitle" id="authSubtitle">Sign in to your account</p>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Sign in to your account</p>
 
         <div id="alert" class="alert"></div>
 
         <form id="loginForm" novalidate>
           <div class="form-group">
             <label for="email">Email address</label>
-            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            <input type="email" id="email" name="email" required autocomplete="email" placeholder="">
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
             <label for="password">Password</label>
             <div class="password-wrapper">
-              <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+              <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="">
               <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password', this)" aria-label="Show password" tabindex="-1">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
@@ -406,44 +270,20 @@
     }
 
     (function() {
-      var ROLE_META = {
-        user:    { title: 'Welcome back', subtitle: 'Sign in to your account', redirect: '/home', btn: 'Sign In', placeholder: 'you@example.com' },
-        partner: { title: 'Partner Portal', subtitle: 'Sign in to your partner dashboard', redirect: '/home', btn: 'Partner Sign In', placeholder: 'partner@example.com' },
-        admin:   { title: 'Admin Panel', subtitle: 'Sign in to manage the store', redirect: '../pages/admin/dashboard.html', btn: 'Admin Sign In', placeholder: 'admin@example.com' }
-      };
-
       if (Auth.isAuthenticated()) {
         window.location.href = '/home';
         return;
       }
 
-      var selectedRole = 'user';
       var form = document.getElementById('loginForm');
       var alertEl = document.getElementById('alert');
       var submitBtn = document.getElementById('submitBtn');
       var emailInput = document.getElementById('email');
-      var titleEl = document.getElementById('authTitle');
-      var subtitleEl = document.getElementById('authSubtitle');
-      var tabs = document.querySelectorAll('.role-tab');
 
       if (!form || !alertEl || !submitBtn) {
         console.error('Moow: login form elements missing');
         return;
       }
-
-      tabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-          tabs.forEach(function(t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-          tab.classList.add('active');
-          tab.setAttribute('aria-selected', 'true');
-          selectedRole = tab.dataset.role;
-          var meta = ROLE_META[selectedRole];
-          titleEl.textContent = meta.title;
-          subtitleEl.textContent = meta.subtitle;
-          submitBtn.textContent = meta.btn;
-          emailInput.placeholder = meta.placeholder;
-        });
-      });
 
       function showAlert(msg, type) {
         var el = document.getElementById('alert');
@@ -470,16 +310,12 @@
 
         try {
           var user = await Auth.login(email, password);
-          var actualRole = user && user.is_admin ? 'admin' : user && user.is_partner ? 'partner' : 'user';
-          var meta = ROLE_META[actualRole] || ROLE_META.user;
-          showAlert('Login successful! Redirecting...', 'success');
-          window.location.href = meta.redirect;
+          var redirect = user && user.is_admin ? '/pages/admin/dashboard.html' : '/home';
+          window.location.href = redirect;
         } catch (error) {
           console.error('Login failed:', error);
-          showAlert(error && error.message || 'Invalid credentials', 'error');
           submitBtn.disabled = false;
-          var meta = ROLE_META[selectedRole];
-          submitBtn.textContent = meta.btn;
+          submitBtn.textContent = 'Sign In';
         }
       });
     })();
