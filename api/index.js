@@ -244,7 +244,7 @@ async function handleAuth(req, res, path) {
         return res.status(500).json({ error: 'Failed to create account', details: authError.message });
       }
       const verificationToken = crypto.randomBytes(32).toString('hex');
-      const { error: profileError } = await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken });
+      const { error: profileError } = await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken, is_admin: false, is_partner: false });
       if (profileError) {
         console.error('Profile insert error:', profileError.message);
         try { await db.auth.admin.deleteUser(authUser.user.id); } catch (e) { console.error('Failed to rollback user:', e.message); }
