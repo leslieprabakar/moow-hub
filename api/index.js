@@ -871,16 +871,29 @@ async function handleAdmin(req, res, path, url) {
     if (toParam) dateTo = new Date(toParam + 'T23:59:59Z');
     if (!dateTo) dateTo = new Date();
     if (!dateFrom) { dateFrom = new Date(); dateFrom.setDate(dateFrom.getDate() - 30); }
-    const fromISO = dateFrom.toISOString();
-    const toISO = dateTo.toISOString();
+    const fromISO = encodeURIComponent(dateFrom.toISOString());
+    const toISO = encodeURIComponent(dateTo.toISOString());
+    const apiKey = config.SUPABASE_SERVICE_KEY;
+    const restUrl = config.SUPABASE_URL;
 
     let totalOrdersCount = 0;
     try {
-      const { count } = await db.from('orders').select('id', { count: 'exact', head: true }).gte('created_at', fromISO).lte('created_at', toISO);
-      totalOrdersCount = count || 0;
+      const resp = await fetch(`${restUrl}/rest/v1/orders?select=id&created_at=gte.${fromISO}&created_at=lte.${toISO}&limit=0`, {
+        headers: { 'apikey': apiKey, 'Authorization': `Bearer ${apiKey}`, 'Prefer': 'count=exact' }
+      });
+      const range = resp.headers.get('content-range');
+      totalOrdersCount = range ? parseInt(range.split('/')[1], 10) || 0 : 0;
     } catch (e) { console.error('Order count error:', e.message); }
-    const productsCount = (await db.from('products').select('id', { count: 'exact', head: true })).count || 0;
-    // Count total users matching customers page logic: auth users + orphan profiles
+
+    let productsCount = 0;
+    try {
+      const resp = await fetch(`${restUrl}/rest/v1/products?select=id&limit=0`, {
+        headers: { 'apikey': apiKey, 'Authorization': `Bearer ${apiKey}`, 'Prefer': 'count=exact' }
+      });
+      const range = resp.headers.get('content-range');
+      productsCount = range ? parseInt(range.split('/')[1], 10) || 0 : 0;
+    } catch (e) { console.error('Products count error:', e.message); }
+
     let totalUsers = 0;
     try {
       const { data: authData } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
@@ -893,11 +906,16 @@ async function handleAdmin(req, res, path, url) {
       const { count } = await db.from('profiles').select('id', { count: 'exact', head: true });
       totalUsers = count || 0;
     }
+
     let revenue = 0;
     try {
-      const { data: recentOrders } = await db.from('orders').select('total, status, created_at').gte('created_at', fromISO).lte('created_at', toISO).neq('status', 'cancelled');
-      revenue = (recentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
-    } catch (e) { console.error('Revenue query error:', e.message); }
+      const resp = await fetch(`${restUrl}/rest/v1/orders?created_at=gte.${fromISO}&created_at=lte.${toISO}&status=neq.cancelled&select=total`, {
+        headers: { 'apikey': apiKey, 'Authorization': `Bearer ${apiKey}` }
+      });
+      const orders = await resp.json();
+      revenue = (orders || []).reduce((sum, o) => sum + Number(o.total), 0);
+    } catch (e) { console.error('Revenue error:', e.message); }
+
     const { data: recentOrdersList } = await db.from('orders').select('id, order_number, total, status, created_at, shipping_address').order('created_at', { ascending: false }).limit(10);
     const { data: lowStock } = await db.from('products').select('id, name, stock').lte('stock', 5).order('stock', { ascending: true });
     return res.status(200).json({ success: true, data: {

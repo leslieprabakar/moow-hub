@@ -287,6 +287,10 @@
 
       } catch (error) {
         console.error('Dashboard load error:', error);
+        document.getElementById('statOrders').textContent = 'Error';
+        document.getElementById('statProducts').textContent = 'Error';
+        document.getElementById('statUsers').textContent = 'Error';
+        document.getElementById('statRevenue').textContent = 'Error';
       }
     }
   </script>

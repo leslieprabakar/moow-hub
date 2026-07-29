@@ -188,13 +188,13 @@
               <td>${c.created_at ? new Date(c.created_at).toLocaleDateString() : '-'}</td>
               <td style="white-space:nowrap;">
                 <label style="display:inline-flex;align-items:center;gap:0.25rem;margin-right:0.5rem;font-size:0.8rem;cursor:pointer;">
-                  <input type="checkbox" onchange="updateCustomerRole('${c.id}', this)" ${c.is_admin ? 'checked' : ''} value="admin"> Admin
+                  <input type="checkbox" onclick="updateCustomerRole('${c.id}', this)" ${c.is_admin ? 'checked' : ''} value="admin"> Admin
                 </label>
                 <label style="display:inline-flex;align-items:center;gap:0.25rem;margin-right:0.5rem;font-size:0.8rem;cursor:pointer;">
-                  <input type="checkbox" onchange="updateCustomerRole('${c.id}', this)" ${c.is_partner ? 'checked' : ''} value="partner"> Partner
+                  <input type="checkbox" onclick="updateCustomerRole('${c.id}', this)" ${c.is_partner ? 'checked' : ''} value="partner"> Partner
                 </label>
                 <label style="display:inline-flex;align-items:center;gap:0.25rem;font-size:0.8rem;cursor:pointer;color:var(--text-muted);">
-                  <input type="checkbox" onchange="updateCustomerRole('${c.id}', this)" ${!c.is_admin && !c.is_partner ? 'checked' : ''} value="user"> User
+                  <input type="checkbox" onclick="updateCustomerRole('${c.id}', this)" ${!c.is_admin && !c.is_partner ? 'checked' : ''} value="user"> User
                 </label>
               </td>
             </tr>
