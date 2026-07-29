@@ -164,20 +164,44 @@
       align-items: center;
       flex-wrap: wrap;
     }
-    .landing-partner-logos img {
-      height: 32px;
-      max-width: 110px;
-      object-fit: contain;
-      border-radius: 4px;
+    .partner-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       background: var(--white);
-      padding: 0.3rem 0.6rem;
+      padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+      border-radius: var(--radius-pill);
       border: 1px solid var(--border);
-      filter: none;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .landing-partner-logos img:hover {
+    .partner-item:hover {
       transform: translateY(-1px);
       box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    }
+    .partner-item img {
+      height: 26px;
+      width: auto;
+      border-radius: 3px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .partner-item .partner-name {
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+    .landing-features-heading {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      color: var(--navy);
+      margin: 1.5rem 0 0.75rem;
+      text-align: center;
+    }
+    .landing-features-heading em {
+      color: var(--gold);
+      font-style: italic;
     }
     .landing-card {
       background: var(--white);
@@ -641,29 +665,30 @@
           <div class="landing-partner-marquee">
             <p>Trusted by organizations worldwide</p>
             <div class="landing-partner-logos">
-              <img src="images/Rotary International Logo.webp" alt="Rotary International" loading="lazy">
-              <img src="images/Ministry of AYUSH.webp" alt="Ministry of AYUSH" loading="lazy">
-              <img src="images/Lions Clubs International logo.webp" alt="Lions Clubs International" loading="lazy">
-              <img src="images/advaita-yoga-academy.webp" alt="Advaita Yoga Academy" loading="lazy">
-              <img src="images/Relax Kerala Ayurveda logo.webp" alt="Relax Kerala Ayurveda" loading="lazy">
+              <span class="partner-item"><img src="images/Rotary International Logo.webp" alt="" loading="lazy"><span class="partner-name">Rotary International</span></span>
+              <span class="partner-item"><img src="images/Ministry of AYUSH.webp" alt="" loading="lazy"><span class="partner-name">Ministry of AYUSH</span></span>
+              <span class="partner-item"><img src="images/Lions Clubs International logo.webp" alt="" loading="lazy"><span class="partner-name">Lions Clubs International</span></span>
+              <span class="partner-item"><img src="images/advaita-yoga-academy.webp" alt="" loading="lazy"><span class="partner-name">Advaita Yoga Academy</span></span>
+              <span class="partner-item"><img src="images/Relax Kerala Ayurveda logo.webp" alt="" loading="lazy"><span class="partner-name">Relax Kerala Ayurveda</span></span>
             </div>
-            <div class="landing-features">
-              <div class="landing-feature-card">
-                <img src="images/Vrikshasana (Tree).webp" alt="Pose Library" loading="lazy">
-                <span class="feature-label">Pose Library</span>
-              </div>
-              <div class="landing-feature-card">
-                <img src="images/digital-ecosystem.webp" alt="Wellness AI" loading="lazy">
-                <span class="feature-label">Wellness AI</span>
-              </div>
-              <div class="landing-feature-card">
-                <img src="images/wellness-kit.webp" alt="Shop Products" loading="lazy">
-                <span class="feature-label">Shop Products</span>
-              </div>
-              <div class="landing-feature-card">
-                <img src="images/yoga-group-park.webp" alt="Community" loading="lazy">
-                <span class="feature-label">Community</span>
-              </div>
+          </div>
+          <div class="landing-features-heading"><em>More to explore</em> when you join &rarr;</div>
+          <div class="landing-features">
+            <div class="landing-feature-card">
+              <img src="images/Vrikshasana (Tree).webp" alt="Pose Library" loading="lazy">
+              <span class="feature-label">Pose Library</span>
+            </div>
+            <div class="landing-feature-card">
+              <img src="images/digital-ecosystem.webp" alt="Wellness AI" loading="lazy">
+              <span class="feature-label">Wellness AI</span>
+            </div>
+            <div class="landing-feature-card">
+              <img src="images/wellness-kit.webp" alt="Shop Products" loading="lazy">
+              <span class="feature-label">Shop Products</span>
+            </div>
+            <div class="landing-feature-card">
+              <img src="images/yoga-group-park.webp" alt="Community" loading="lazy">
+              <span class="feature-label">Community</span>
             </div>
           </div>
         </div>
