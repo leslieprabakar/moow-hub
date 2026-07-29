@@ -998,8 +998,7 @@
           }
 
           if (result && result.success) {
-            showAlert('Account created! Redirecting...', 'success');
-            setTimeout(function() { window.location.href = '/pages/login.html'; }, 2000);
+            window.location.href = '/pages/login.html';
           } else {
             showAlert((result && result.error) || 'Registration failed', 'error');
           }
@@ -1052,14 +1051,13 @@
 
           var actualRole = user && user.is_admin ? 'admin' : user && user.is_partner ? 'partner' : 'user';
 
-          showAlert('Login successful! Redirecting...', 'success');
-          setTimeout(function() { window.location.href = LOGIN_ROLE_MAP[actualRole] ? LOGIN_ROLE_MAP[actualRole].redirect : '/home'; }, 1000);
+          window.location.href = LOGIN_ROLE_MAP[actualRole] ? LOGIN_ROLE_MAP[actualRole].redirect : '/home';
         } catch (err) {
+          console.error('Login failed:', err);
           showAlert((err && err.message) || 'Invalid credentials', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
         }
-
-        btn.disabled = false;
-        btn.textContent = 'Sign In';
       });
 
       var pwdInput = document.getElementById('regPassword');

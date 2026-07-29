@@ -473,10 +473,9 @@
           var actualRole = user && user.is_admin ? 'admin' : user && user.is_partner ? 'partner' : 'user';
           var meta = ROLE_META[actualRole] || ROLE_META.user;
           showAlert('Login successful! Redirecting...', 'success');
-          setTimeout(function() {
-            window.location.href = meta.redirect;
-          }, 1000);
+          window.location.href = meta.redirect;
         } catch (error) {
+          console.error('Login failed:', error);
           showAlert(error && error.message || 'Invalid credentials', 'error');
           submitBtn.disabled = false;
           var meta = ROLE_META[selectedRole];

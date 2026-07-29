@@ -48,11 +48,9 @@ const Auth = {
     localStorage.setItem('moow_user', JSON.stringify(data.user));
 
     this.updateUI(data.user);
-    if (typeof SessionManager !== 'undefined') SessionManager.reset();
+    try { if (typeof SessionManager !== 'undefined') SessionManager.reset(); } catch (e) { console.warn('Session reset failed:', e); }
 
-    if (typeof Cart !== 'undefined') {
-      await Cart.mergeGuestCart();
-    }
+    try { if (typeof Cart !== 'undefined') await Cart.mergeGuestCart(); } catch (e) { console.warn('Cart merge failed:', e); }
 
     return data.user;
   },
