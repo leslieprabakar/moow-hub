@@ -105,7 +105,20 @@ async function sendEmail(to, subject, htmlBody, options = {}) {
       await dbLogEmail(to, subject, 'failed', null, options.orderId, options.emailType);
       return { success: false, error: 'Email service not configured' };
     }
-    const result = await r.emails.send({ from: config.EMAIL_FROM, to: [to], subject, html: htmlBody });
+    const textBody = htmlBody.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+    const payload = {
+      from: config.EMAIL_FROM,
+      to: [to],
+      subject,
+      html: htmlBody,
+      text: textBody,
+      headers: {
+        'List-Unsubscribe': `<mailto:unsubscribe@rhythmreny.com?subject=unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Entity-Ref-ID': options.orderId || `${Date.now()}`
+      }
+    };
+    const result = await r.emails.send(payload);
     await dbLogEmail(to, subject, 'sent', result.data?.id, options.orderId, options.emailType);
     return { success: true, id: result.data?.id };
   } catch (error) { console.error('Email send failed:', error); await dbLogEmail(to, subject, 'failed', null, options.orderId, options.emailType); return { success: false, error: error.message }; }
@@ -115,7 +128,7 @@ async function dbLogEmail(recipient, subject, status, resendId = null, orderId =
 }
 function emailTemplate(content) {
   const year = new Date().getFullYear();
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;font-family:Inter,sans-serif;background:#f5f0eb;"><div style="max-width:600px;margin:0 auto;padding:40px 20px;"><div style="text-align:center;margin-bottom:30px;"><h1 style="font-family:Playfair Display,serif;color:#1a2744;margin:0;">Moow<span style="color:#d4735e;">.</span>Hub<sup>&reg;</sup></h1></div><div style="background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">${content}</div><div style="text-align:center;margin-top:30px;color:#666;font-size:14px;"><p>Wear a pose. Awaken an ecosystem.</p><p>&copy; ${year} Moow.Hub<sup>&reg;</sup>. All rights reserved.</p></div></div></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;font-family:Inter,sans-serif;background:#f5f0eb;"><div style="max-width:600px;margin:0 auto;padding:40px 20px;"><div style="text-align:center;margin-bottom:30px;"><h1 style="font-family:Playfair Display,serif;color:#1a2744;margin:0;">Moow<span style="color:#d4735e;">.</span>Hub</h1></div><div style="background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">${content}</div><div style="text-align:center;margin-top:30px;color:#666;font-size:14px;"><p style="margin:0 0 4px;">Wear a pose. Awaken an ecosystem.</p><p style="margin:4px 0;font-size:12px;">Moow Hub Inc, 3rd Cross Rd, Hosakerehalli Layout, Bengaluru, Karnataka 560085, India</p><p style="margin:4px 0 0;">&copy; ${year} Moow.Hub. All rights reserved.</p></div></div></body></html>`;
 }
 async function sendWelcomeEmail(user, verificationToken) {
   const url = `${config.SITE_URL}/api/auth/verify?token=${verificationToken}`;
