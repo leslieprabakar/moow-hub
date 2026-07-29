@@ -250,7 +250,7 @@ async function handleAuth(req, res, path) {
         try { await db.auth.admin.deleteUser(authUser.user.id); } catch (e) { console.error('Failed to rollback user:', e.message); }
         return res.status(500).json({ error: 'Failed to create profile', details: profileError.message });
       }
-      db.from('leads').insert({ email: email.toLowerCase(), full_name: sanitizeString(full_name), phone: phone || null, interest_areas: interest_areas || null, referral_source: referral_source || null, source_page: source_page || 'landing' }).catch(e => console.error('Lead capture failed:', e));
+      (async () => { try { await db.from('leads').insert({ email: email.toLowerCase(), full_name: sanitizeString(full_name), phone: phone || null, interest_areas: interest_areas || null, referral_source: referral_source || null, source_page: source_page || 'landing' }); } catch (e) { console.error('Lead capture failed:', e); } })();
       sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(e => console.error('Welcome email failed:', e));
       return res.status(201).json({ success: true, message: 'Account created', user: { id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) } });
     } catch (err) {
