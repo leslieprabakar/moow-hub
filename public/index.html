@@ -164,16 +164,20 @@
       align-items: center;
       flex-wrap: wrap;
     }
-    .landing-partner-logos span {
-      font-family: var(--font-ui);
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--text-light);
-      white-space: nowrap;
+    .landing-partner-logos img {
+      height: 32px;
+      max-width: 110px;
+      object-fit: contain;
+      border-radius: 4px;
       background: var(--white);
-      padding: 0.3rem 0.75rem;
-      border-radius: var(--radius-pill);
+      padding: 0.3rem 0.6rem;
       border: 1px solid var(--border);
+      filter: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .landing-partner-logos img:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.06);
     }
     .landing-card {
       background: var(--white);
@@ -637,11 +641,11 @@
           <div class="landing-partner-marquee">
             <p>Trusted by organizations worldwide</p>
             <div class="landing-partner-logos">
-              <span>Rotary International</span>
-              <span>Ministry of AYUSH</span>
-              <span>Lions Clubs International</span>
-              <span>Advaita Yoga Academy</span>
-              <span>Relax Kerala Ayurveda</span>
+              <img src="images/Rotary International Logo.webp" alt="Rotary International" loading="lazy">
+              <img src="images/Ministry of AYUSH.webp" alt="Ministry of AYUSH" loading="lazy">
+              <img src="images/Lions Clubs International logo.webp" alt="Lions Clubs International" loading="lazy">
+              <img src="images/advaita-yoga-academy.webp" alt="Advaita Yoga Academy" loading="lazy">
+              <img src="images/Relax Kerala Ayurveda logo.webp" alt="Relax Kerala Ayurveda" loading="lazy">
             </div>
             <div class="landing-features">
               <div class="landing-feature-card">
@@ -1066,12 +1070,6 @@
         pwdInput.addEventListener('focus', showHints);
         pwdInput.addEventListener('mouseleave', hideHints);
         pwdInput.addEventListener('blur', hideHints);
-      }
-      if (confirmPwdInput) {
-        confirmPwdInput.addEventListener('mouseenter', showHints);
-        confirmPwdInput.addEventListener('focus', showHints);
-        confirmPwdInput.addEventListener('mouseleave', hideHints);
-        confirmPwdInput.addEventListener('blur', hideHints);
       }
     })();
   </script>
