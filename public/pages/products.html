@@ -308,6 +308,10 @@
   let products = [];
 
   document.addEventListener('DOMContentLoaded', async () => {
+    if (!Auth.isAuthenticated()) {
+      window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+      return;
+    }
     const loadingEl = document.getElementById('productsLoading');
     const errorEl = document.getElementById('productsError');
     const contentEl = document.getElementById('productsContent');

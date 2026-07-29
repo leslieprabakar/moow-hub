@@ -396,6 +396,14 @@
   </main>
 
   <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+    });
+  </script>
   <script defer src="../js/main.js"></script>
 </body>
 </html>

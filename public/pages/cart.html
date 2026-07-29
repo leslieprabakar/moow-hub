@@ -230,6 +230,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
       const items = await loadCart();
       if (items.length > 0) await loadSuggestions(items);
     });
