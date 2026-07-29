@@ -305,6 +305,8 @@
     'linear-gradient(135deg, #d0c8d8, #b8b0c8)'
   ];
 
+  let products = [];
+
   document.addEventListener('DOMContentLoaded', async () => {
     const loadingEl = document.getElementById('productsLoading');
     const errorEl = document.getElementById('productsError');
@@ -315,7 +317,7 @@
       const body = await res.json();
       if (!body.success) throw new Error(body.error || 'Failed to load products');
 
-      const products = body.data || [];
+      products = body.data || [];
       if (products.length === 0) {
         loadingEl.style.display = 'none';
         errorEl.style.display = 'block';
@@ -383,6 +385,32 @@
           });
         }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
         observer.observe(el);
+      });
+
+      // Delegate "Add to Cart" clicks
+      contentEl.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.btn-add-cart');
+        if (!btn || btn.disabled) return;
+
+        const slug = btn.dataset.productSlug;
+        const product = products.find(p => p.slug === slug);
+        if (!product) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Adding…';
+
+        const result = await Cart.addItem(product.id, 1);
+        if (result.success) {
+          btn.textContent = 'Added!';
+          setTimeout(() => {
+            btn.textContent = 'Add to Cart';
+            btn.disabled = false;
+          }, 2000);
+        } else {
+          btn.textContent = 'Add to Cart';
+          btn.disabled = false;
+          alert(result.error || 'Failed to add item');
+        }
       });
     } catch (e) {
       loadingEl.style.display = 'none';
