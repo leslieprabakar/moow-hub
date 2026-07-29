@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customers — Moow.Hub Admin</title>
-  <meta name="description" content="Manage Moow.Hub customer accounts.">
+  <title>Partner Signatures — Moow.Hub Admin</title>
+  <meta name="description" content="View digitally signed partner signatures.">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,20 +43,27 @@
     .admin-header h1 { font-family: var(--font-serif); color: var(--navy); margin: 0; }
     .admin-table { background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
     .admin-table > div { overflow-x: auto; }
-    .admin-table table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    .admin-table table { width: 100%; border-collapse: collapse; min-width: 700px; }
     .admin-table th { background: var(--bg); padding: 1rem; text-align: left; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
     .admin-table td { padding: 1rem; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
     .admin-table tr:hover td { background: var(--bg); }
-    .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: var(--radius-pill); font-size: 0.7rem; font-weight: 600; }
-    .badge-admin { background: #dc3545; color: white; }
-    .badge-partner { background: #ffc107; color: #333; }
     .search-bar { display: flex; gap: 0.5rem; align-items: center; }
-    .search-bar input { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem; width: 250px; }
+    .search-bar input { padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem; width: 280px; }
     .search-bar button { padding: 0.5rem 1rem; background: var(--navy); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; }
     .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
     .pagination button { padding: 0.4rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; }
     .pagination button.active { background: var(--primary); color: white; border-color: var(--primary); }
     .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .sig-thumb { width: 60px; height: 30px; object-fit: contain; cursor: pointer; border: 1px solid var(--border); border-radius: 4px; background: #fff; display: block; }
+    .sig-thumb:hover { border-color: var(--primary); }
+    .sig-modal { display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; padding: 2rem; }
+    .sig-modal.open { display: flex; }
+    .sig-modal-content { background: var(--white); border-radius: var(--radius); padding: 1.5rem; max-width: 600px; width: 100%; text-align: center; position: relative; }
+    .sig-modal-content img { max-width: 100%; max-height: 300px; object-fit: contain; }
+    .sig-modal-close { position: absolute; top: 0.5rem; right: 1rem; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); background: none; border: none; padding: 0; line-height: 1; }
+    .sig-modal-close:hover { color: var(--navy); }
+    .action-btn { padding: 0.4rem 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.8rem; transition: var(--transition); display: inline-block; text-decoration: none; }
+    .action-btn-primary { background: var(--primary); color: white; }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -87,12 +94,12 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           Products
         </a>
-        <a href="customers.html" class="admin-nav-item active">
+        <a href="customers.html" class="admin-nav-item">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           Customers
         </a>
-        <a href="partners.html" class="admin-nav-item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <a href="partners.html" class="admin-nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 7l-3-3-3 3M9 17l3 3 3-3M12 4v16"/><path d="M5 12h14"/></svg>
           Partners
         </a>
         <a href="../products.html" class="admin-nav-item" target="_blank">
@@ -111,99 +118,117 @@
       <div class="admin-header">
         <div style="display:flex;align-items:center;gap:0.75rem;">
           <button class="admin-toggle" onclick="toggleSidebar()" aria-label="Open menu" style="color:var(--navy);">&#9776;</button>
-          <h1>Customers</h1>
+          <h1>Partner Signatures</h1>
         </div>
         <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="Search by name..." onkeydown="if(event.key==='Enter')loadCustomers(1)">
-          <button onclick="loadCustomers(1)">Search</button>
+          <input type="text" id="searchInput" placeholder="Search name, email, organisation, location..." onkeydown="if(event.key==='Enter')loadPartners(1)">
+          <button onclick="loadPartners(1)">Search</button>
         </div>
       </div>
 
       <div class="admin-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Role</th>
-              <th>Joined</th>
-            </tr>
-          </thead>
-          <tbody id="customersTable">
-            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
-          </tbody>
-        </table>
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Organisation</th>
+                <th>Location</th>
+                <th>Org Type</th>
+                <th>Signed</th>
+                <th>Signature</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="partnersTable">
+              <tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class="pagination" id="pagination"></div>
     </main>
   </div>
 
+  <div class="sig-modal" id="sigModal" onclick="if(event.target===this)closeSigModal()">
+    <div class="sig-modal-content">
+      <button class="sig-modal-close" onclick="closeSigModal()">&times;</button>
+      <h3 style="font-family:var(--font-serif);color:var(--navy);margin:0 0 1rem;">Signature</h3>
+      <img id="sigFullImage" src="" alt="Signature">
+    </div>
+  </div>
+
   <script>
     function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('open'); document.querySelector('.admin-overlay').classList.toggle('show'); }
+    function openSigModal(src) { document.getElementById('sigFullImage').src = src; document.getElementById('sigModal').classList.add('open'); }
+    function closeSigModal() { document.getElementById('sigModal').classList.remove('open'); }
   </script>
   <script defer src="../../js/auth.js"></script>
   <script>
     let currentPage = 1;
 
     document.addEventListener('DOMContentLoaded', () => {
-      if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
-        window.location.href = '/pages/login.html';
-        return;
-      }
-      loadCustomers(1);
+      loadPartners(1);
     });
 
-    async function loadCustomers(page) {
+    async function loadPartners(page) {
       currentPage = page;
-      const tbody = document.getElementById('customersTable');
+      const tbody = document.getElementById('partnersTable');
       const search = document.getElementById('searchInput').value.trim();
 
       try {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">' + (search ? 'Searching...' : 'Loading...') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">' + (search ? 'Searching...' : 'Loading...') + '</td></tr>';
         const params = new URLSearchParams({ page, limit: 20 });
         if (search) params.set('search', search);
-        const response = await Auth.authenticatedFetch('/api/admin/customers?' + params.toString());
+        const response = await Auth.authenticatedFetch('/api/admin/partners?' + params.toString());
         if (!response || !response.ok) {
           const errText = response ? await response.text().catch(() => '') : 'Not authenticated';
           throw new Error(errText || ('HTTP ' + response?.status));
         }
 
         const body = await response.json();
-        const customers = body.data || [];
+        const partners = body.data || [];
         const total = body.pagination?.total || 0;
         const totalPages = Math.ceil(total / 20);
-        console.log('Customers API:', { count: customers.length, total, page, body });
 
-        if (customers.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No customers found</td></tr>';
+        if (partners.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No partner signatures found</td></tr>';
         } else {
-          tbody.innerHTML = customers.map(c => `
-            <tr>
-              <td><strong>${c.full_name}</strong></td>
-              <td>${c.email || '-'}</td>
-              <td>${c.phone || '-'}</td>
-              <td>${c.is_admin ? '<span class="badge badge-admin">Admin</span>' : ''} ${c.is_partner ? '<span class="badge badge-partner">Partner</span>' : ''} ${!c.is_admin && !c.is_partner ? '<span style="color:var(--text-muted);font-size:0.85rem;">User</span>' : ''}</td>
-              <td>${c.created_at ? new Date(c.created_at).toLocaleDateString() : '-'}</td>
-            </tr>
-          `).join('');
+          tbody.innerHTML = partners.map(p => {
+            const name = (p.first_name || '') + ' ' + (p.last_name || '');
+            const date = p.signed_at ? new Date(p.signed_at).toLocaleDateString() : '-';
+            const sigSrc = p.signature_data || '';
+            return `
+              <tr>
+                <td><strong>${name.trim() || '-'}</strong></td>
+                <td>${p.email || '-'}</td>
+                <td>${p.organisation || '-'}</td>
+                <td>${p.location || '-'}</td>
+                <td>${p.org_type || '-'}</td>
+                <td>${date}</td>
+                <td>${sigSrc ? '<img class="sig-thumb" src="' + sigSrc + '" alt="Signature" onclick="openSigModal(\'' + sigSrc.replace(/'/g, "\\'") + '\')">' : '-'}</td>
+                <td><button class="action-btn action-btn-primary" onclick="openSigModal('${sigSrc ? "'" + sigSrc.replace(/'/g, "\\'") + "'" : "''"}')">View</button></td>
+              </tr>
+            `;
+          }).join('');
         }
 
         renderPagination(totalPages);
       } catch (error) {
-        console.error('Load customers error:', error);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#dc3545;">Failed to load customers: ' + error.message + '</td></tr>';
+        console.error('Load partners error:', error);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#dc3545;">Failed to load partners: ' + error.message + '</td></tr>';
       }
     }
 
     function renderPagination(totalPages) {
       const el = document.getElementById('pagination');
       if (totalPages <= 1) { el.innerHTML = ''; return; }
-      let html = '<button onclick="loadCustomers(1)"' + (currentPage === 1 ? ' disabled' : '') + '>&laquo;</button>';
+      let html = '<button onclick="loadPartners(1)"' + (currentPage === 1 ? ' disabled' : '') + '>&laquo;</button>';
       for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
-        html += '<button onclick="loadCustomers(' + i + ')"' + (i === currentPage ? ' class="active"' : '') + '>' + i + '</button>';
+        html += '<button onclick="loadPartners(' + i + ')"' + (i === currentPage ? ' class="active"' : '') + '>' + i + '</button>';
       }
-      html += '<button onclick="loadCustomers(' + totalPages + ')"' + (currentPage === totalPages ? ' disabled' : '') + '>&raquo;</button>';
+      html += '<button onclick="loadPartners(' + totalPages + ')"' + (currentPage === totalPages ? ' disabled' : '') + '>&raquo;</button>';
       el.innerHTML = html;
     }
   </script>

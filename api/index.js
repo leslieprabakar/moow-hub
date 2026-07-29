@@ -694,9 +694,64 @@ async function handleWishlist(req, res, path) {
 
 // ─── PARTNER HANDLER ─────────────────────────────────────────────────────────
 async function handlePartner(req, res, path) {
+  const db = getAdminDB();
+
+  // Public digital signature endpoint (no auth required)
+  if (req.method === 'POST' && path === 'digisign') {
+    const { first_name, last_name, email, phone, organisation, location, org_type, signature_data } = req.body;
+    const missing = validateRequired(req.body, ['first_name', 'last_name', 'email', 'organisation', 'location', 'signature_data']);
+    if (missing.length > 0) return res.status(400).json({ error: 'Missing required fields', fields: missing });
+    if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
+
+    const { data: sig, error } = await db.from('partner_signatures').insert({
+      first_name: sanitizeString(first_name),
+      last_name: sanitizeString(last_name),
+      email: email.toLowerCase(),
+      phone: phone || null,
+      organisation: sanitizeString(organisation),
+      location: sanitizeString(location),
+      org_type: org_type || null,
+      signature_data
+    }).select().single();
+
+    if (error) return res.status(500).json({ error: 'Failed to submit', details: error.message });
+
+    const signedDate = new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+    const adminEmail = config.ADMIN_EMAIL || 'leslieprabakar@gmail.com';
+    sendEmail(adminEmail, `New Digitally Signed Partnership — ${first_name} ${last_name}`, emailTemplate(`
+      <h1 style="color:#1a2744;margin-bottom:20px;">New Digitally Signed Partnership</h1>
+      <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Date Signed</td><td style="padding:8px;border-bottom:1px solid #eee;">${signedDate}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${sanitizeString(first_name)} ${sanitizeString(last_name)}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${email.toLowerCase()}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Phone</td><td style="padding:8px;border-bottom:1px solid #eee;">${phone || '—'}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Organisation</td><td style="padding:8px;border-bottom:1px solid #eee;">${sanitizeString(organisation)}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Location</td><td style="padding:8px;border-bottom:1px solid #eee;">${sanitizeString(location)}</td></tr>
+        <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;color:#1a2744;">Org Type</td><td style="padding:8px;border-bottom:1px solid #eee;">${org_type || '—'}</td></tr>
+      </table>
+      <p style="margin-top:20px;">Signature captured digitally. <a href="${config.SITE_URL}/pages/admin/partners.html" style="color:#d4735e;">View in admin panel &rarr;</a></p>
+    `), { emailType: 'welcome' }).catch(e => console.error('Digisign admin email failed:', e));
+
+    sendEmail(email.toLowerCase(), 'Thank You — Your Digital Signature', emailTemplate(`
+      <h1 style="color:#1a2744;margin-bottom:20px;">Thank You, ${sanitizeString(first_name)}!</h1>
+      <p>Your partnership agreement has been received and digitally signed.</p>
+      <p>Our team will review your submission and get back to you within 2-3 business days with next steps, including access to partner pricing, brand assets, and your dedicated onboarding session.</p>
+      <p>In the meantime, feel free to <a href="${config.SITE_URL}/pages/agreement.html" style="color:#d4735e;">review the full agreement</a> and explore partner resources.</p>
+      <p><strong>What happens next:</strong></p>
+      <ol style="color:#666;line-height:1.8;">
+        <li>Our partnerships team reviews your application</li>
+        <li>You receive a welcome email with partner credentials</li>
+        <li>Schedule your onboarding call</li>
+        <li>Start building your wellness ecosystem</li>
+      </ol>
+      <p>Best,<br>The Moow.Hub Partnerships Team</p>
+    `), { emailType: 'welcome' }).catch(e => console.error('Digisign confirmation email failed:', e));
+
+    return res.status(201).json({ success: true, message: 'Agreement signed successfully! Our team will reach out within 2-3 business days.' });
+  }
+
   const user = await requireAuth(req, res);
   if (!user) return true;
-  const db = getAdminDB();
 
   if (req.method === 'GET' && path === 'status') {
     return res.status(200).json({ success: true, data: { is_partner: user.is_partner === true } });
@@ -933,6 +988,19 @@ async function handleAdmin(req, res, path, url) {
     return res.status(200).json({ success: true, data: order });
   }
 
+  if (req.method === 'GET' && path === 'partners') {
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const search = url.searchParams.get('search') || '';
+    const offset = (page - 1) * limit;
+    let query = db.from('partner_signatures').select('*', { count: 'exact' }).order('signed_at', { ascending: false });
+    if (search) {
+      query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,organisation.ilike.%${search}%,location.ilike.%${search}%`);
+    }
+    const { data: partners, count } = await query.range(offset, offset + limit - 1);
+    return res.status(200).json({ success: true, data: partners || [], pagination: { page, limit, total: count || 0 } });
+  }
+
   return false;
 }
 
@@ -1019,6 +1087,35 @@ async function handleWebhooks(req, res, path) {
   return null;
 }
 
+// ─── SUBSCRIPTION HANDLER (public, no auth required) ──────────────────────────
+async function handleSubscriptions(req, res, path) {
+  if (req.method === 'POST' && path === 'subscribe') {
+    const { email, full_name } = req.body;
+    if (!email || !validateEmail(email)) return res.status(400).json({ error: 'Valid email is required' });
+
+    const db = getAdminDB();
+    const { data: existing } = await db.from('newsletter_subscriptions').select('id, is_active').eq('email', email.toLowerCase()).maybeSingle();
+
+    if (existing) {
+      if (!existing.is_active) {
+        await db.from('newsletter_subscriptions').update({ is_active: true, unsubscribed_at: null }).eq('id', existing.id);
+      }
+      return res.status(200).json({ success: true, message: 'You are already subscribed!' });
+    }
+
+    const { error } = await db.from('newsletter_subscriptions').insert({
+      email: email.toLowerCase(),
+      full_name: full_name ? sanitizeString(full_name) : null
+    });
+
+    if (error) return res.status(500).json({ error: 'Failed to subscribe', details: error.message });
+
+    return res.status(201).json({ success: true, message: 'Subscribed successfully!' });
+  }
+
+  return false;
+}
+
 // ─── AGREEMENT HANDLER ────────────────────────────────────────────────────────
 async function handleAgreement(req, res, subPath) {
   if (req.method === 'GET' && subPath === 'download-pdf') {
@@ -1093,6 +1190,9 @@ module.exports = async function handler(req, res) {
         break;
       case 'admin':
         handled = await handleAdmin(req, res, subPath, url);
+        break;
+      case 'subscriptions':
+        handled = await handleSubscriptions(req, res, subPath);
         break;
       case 'agreement':
         handled = await handleAgreement(req, res, subPath);

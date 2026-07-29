@@ -260,9 +260,45 @@ CREATE TABLE IF NOT EXISTS partner_inquiries (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- --------------------------------------------------------
+-- Newsletter Subscriptions Table (public, no auth required)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS newsletter_subscriptions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    full_name VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    subscribed_at TIMESTAMPTZ DEFAULT NOW(),
+    unsubscribed_at TIMESTAMPTZ
+);
+
+ALTER TABLE newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can subscribe to newsletter" ON newsletter_subscriptions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view subscriptions" ON newsletter_subscriptions FOR SELECT USING (auth.role() = 'service_role');
+
 -- Currency rates: Anyone can read
 ALTER TABLE currency_rates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Currency rates are viewable by everyone" ON currency_rates FOR SELECT USING (true);
+
+-- --------------------------------------------------------
+-- Partner Digital Signatures Table
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS partner_signatures (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    organisation VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    org_type VARCHAR(50),
+    signature_data TEXT NOT NULL,
+    signed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE partner_signatures ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can submit partner signature" ON partner_signatures FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view partner signatures" ON partner_signatures FOR SELECT USING (auth.role() = 'service_role');
 
 -- Partner inquiries: Anyone can insert, only admins can view
 ALTER TABLE partner_inquiries ENABLE ROW LEVEL SECURITY;

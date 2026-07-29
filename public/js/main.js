@@ -361,6 +361,255 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Newsletter Subscribe Form ---
+  const subscribeForm = document.getElementById('subscribeForm');
+  const subscribeMessage = document.getElementById('subscribeMessage');
+
+  if (subscribeForm) {
+    subscribeForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = subscribeForm.querySelector('input[name="email"]').value.trim();
+      const full_name = subscribeForm.querySelector('input[name="full_name"]').value.trim();
+      const btn = subscribeForm.querySelector('.newsletter-submit');
+      const originalHtml = btn.innerHTML;
+
+      btn.innerHTML = 'Subscribing...';
+      btn.disabled = true;
+      subscribeMessage.textContent = '';
+      subscribeMessage.className = 'newsletter-message';
+
+      try {
+        const res = await fetch('/api/subscriptions/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, full_name: full_name || undefined })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          subscribeMessage.textContent = 'You\'re in! Welcome to the Moow.Hub community.';
+          subscribeMessage.className = 'newsletter-message success';
+          subscribeForm.reset();
+        } else {
+          subscribeMessage.textContent = data.error || 'Something went wrong.';
+          subscribeMessage.className = 'newsletter-message error';
+        }
+      } catch {
+        subscribeMessage.textContent = 'Connection error. Please try again.';
+        subscribeMessage.className = 'newsletter-message error';
+      }
+
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+    });
+  }
+
+  // --- Draw Signature Canvas ---
+  const sigCanvas = document.getElementById('signaturePad');
+  const sigClear = document.getElementById('signatureClear');
+  const sigData = document.getElementById('signatureData');
+  const sigPlaceholder = document.getElementById('signaturePlaceholder');
+  let hasDrawn = false;
+  let sigCtx = null;
+
+  if (sigCanvas) {
+    sigCtx = sigCanvas.getContext('2d');
+    let drawing = false;
+
+    function resizeCanvas() {
+      const rect = sigCanvas.parentElement.getBoundingClientRect();
+      sigCanvas.width = rect.width;
+      sigCanvas.height = 160;
+      sigCtx.lineWidth = 2.5;
+      sigCtx.lineCap = 'round';
+      sigCtx.lineJoin = 'round';
+      sigCtx.strokeStyle = '#1a2744';
+    }
+
+    function getPos(e) {
+      const rect = sigCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      drawing = true;
+      const pos = getPos(e);
+      sigCtx.beginPath();
+      sigCtx.moveTo(pos.x, pos.y);
+      sigCanvas.parentElement.classList.add('active');
+    }
+
+    function draw(e) {
+      e.preventDefault();
+      if (!drawing) return;
+      const pos = getPos(e);
+      sigCtx.lineTo(pos.x, pos.y);
+      sigCtx.stroke();
+      hasDrawn = true;
+      sigPlaceholder.classList.add('hidden');
+    }
+
+    function stopDraw(e) {
+      e.preventDefault();
+      drawing = false;
+    }
+
+    sigCanvas.addEventListener('mousedown', startDraw);
+    sigCanvas.addEventListener('mousemove', draw);
+    sigCanvas.addEventListener('mouseup', stopDraw);
+    sigCanvas.addEventListener('mouseleave', stopDraw);
+    sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+    sigCanvas.addEventListener('touchmove', draw, { passive: false });
+    sigCanvas.addEventListener('touchend', stopDraw, { passive: false });
+
+    sigClear.addEventListener('click', () => {
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+      hasDrawn = false;
+      sigPlaceholder.classList.remove('hidden');
+      sigCanvas.parentElement.classList.remove('active');
+      sigData.value = '';
+    });
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+  }
+
+  // --- Signature File Upload ---
+  const sigFileInput = document.getElementById('sigFileInput');
+  const sigUploadPreview = document.getElementById('sigUploadPreview');
+  const sigUploadedImg = document.getElementById('sigUploadedImg');
+  const sigUploadRemove = document.getElementById('sigUploadRemove');
+  const sigUploadHint = document.getElementById('sigUploadHint');
+  const sigSource = document.getElementById('sigSource');
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
+  let uploadedSigData = null;
+
+  if (sigFileInput) {
+    sigFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > MAX_FILE_SIZE) {
+        partnerMessage.textContent = 'File is too large. Maximum size is 2MB.';
+        partnerMessage.className = 'partner-message error';
+        sigFileInput.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        uploadedSigData = ev.target.result;
+        sigUploadedImg.src = uploadedSigData;
+        sigUploadPreview.style.display = 'flex';
+        sigUploadHint.textContent = file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+        sigSource.value = 'upload';
+        partnerMessage.textContent = '';
+        partnerMessage.className = 'partner-message';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    sigUploadRemove.addEventListener('click', () => {
+      uploadedSigData = null;
+      sigFileInput.value = '';
+      sigUploadPreview.style.display = 'none';
+      sigUploadedImg.src = '';
+      sigUploadHint.textContent = 'PNG or JPEG, max 2MB';
+      sigSource.value = '';
+      partnerMessage.textContent = '';
+      partnerMessage.className = 'partner-message';
+    });
+  }
+
+  // --- Partner Digital Signature Form ---
+  const partnerForm = document.getElementById('partnerForm');
+  const partnerMessage = document.getElementById('partnerMessage');
+  const partnerAgree = document.getElementById('partnerAgree');
+
+  if (partnerForm) {
+    partnerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('partnerSubmit');
+      const originalHtml = btn.innerHTML;
+
+      // Validate terms acceptance
+      if (!partnerAgree.checked) {
+        partnerMessage.textContent = 'Please accept the Partnership Agreement terms to continue.';
+        partnerMessage.className = 'partner-message error';
+        partnerAgree.parentElement.querySelector('.checkmark').style.borderColor = '#c0392b';
+        return;
+      }
+
+      // Validate signature: either drawn or uploaded
+      const hasDrawnSig = hasDrawn && sigCanvas && sigCanvas.toDataURL('image/png').length > 1000;
+      const hasUploadedSig = !!uploadedSigData;
+
+      if (!hasDrawnSig && !hasUploadedSig) {
+        partnerMessage.textContent = 'Please draw your signature or upload a signed image.';
+        partnerMessage.className = 'partner-message error';
+        return;
+      }
+
+      sigData.value = hasUploadedSig ? uploadedSigData : sigCanvas.toDataURL('image/png');
+
+      const formData = {
+        first_name: partnerForm.querySelector('input[name="first_name"]').value.trim(),
+        last_name: partnerForm.querySelector('input[name="last_name"]').value.trim(),
+        email: partnerForm.querySelector('input[name="email"]').value.trim(),
+        phone: partnerForm.querySelector('input[name="phone"]').value.trim(),
+        organisation: partnerForm.querySelector('input[name="organisation"]').value.trim(),
+        location: partnerForm.querySelector('input[name="location"]').value.trim(),
+        org_type: partnerForm.querySelector('select[name="org_type"]').value,
+        signature_data: sigData.value
+      };
+
+      btn.innerHTML = 'Submitting...';
+      btn.disabled = true;
+      partnerMessage.textContent = '';
+      partnerMessage.className = 'partner-message';
+
+      try {
+        const res = await fetch('/api/partner/digisign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          partnerMessage.innerHTML = '<strong>Agreement signed successfully!</strong><br>Thank you! Our partnerships team will reach out within 2-3 business days.';
+          partnerMessage.className = 'partner-message success';
+          partnerForm.reset();
+          if (sigCtx) {
+            sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+          }
+          hasDrawn = false;
+          if (sigPlaceholder) sigPlaceholder.classList.remove('hidden');
+          if (sigCanvas) sigCanvas.parentElement.classList.remove('active');
+          sigData.value = '';
+          uploadedSigData = null;
+          sigFileInput.value = '';
+          sigUploadPreview.style.display = 'none';
+          sigUploadedImg.src = '';
+          sigUploadHint.textContent = 'PNG or JPEG, max 2MB';
+          sigSource.value = '';
+        } else {
+          partnerMessage.textContent = data.error || 'Something went wrong. Please try again.';
+          partnerMessage.className = 'partner-message error';
+        }
+      } catch {
+        partnerMessage.textContent = 'Connection error. Please check your internet and try again.';
+        partnerMessage.className = 'partner-message error';
+      }
+
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
+    });
+  }
+
   // --- Initialize Cart badge ---
   if (typeof Cart !== 'undefined') {
     Cart.updateBadge();
