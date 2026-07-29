@@ -94,21 +94,29 @@
       padding: 2rem;
     }
     .landing-hero-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
       max-width: var(--max-width);
       width: 100%;
-      align-items: center;
     }
-    .landing-left h1 {
+    .landing-auth-wrap {
+      width: 100%;
+      max-width: 440px;
+    }
+    .landing-hero-inner > .landing-partner-marquee {
+      width: 100%;
+    }
+    .landing-hero-headline h1 {
       font-family: var(--font-serif);
       font-size: 2.5rem;
       line-height: 1.25;
       color: var(--navy);
       margin-bottom: 1rem;
+      text-align: center;
     }
-    .landing-left h1 .italic-gold {
+    .landing-hero-headline h1 .italic-gold {
       font-style: italic;
       color: var(--gold);
     }
@@ -118,12 +126,14 @@
       line-height: 1.7;
       color: var(--text-light);
       margin-bottom: 1.75rem;
+      text-align: center;
     }
     .landing-badges {
       display: flex;
       flex-wrap: wrap;
       gap: 0.6rem;
       margin-bottom: 2rem;
+      justify-content: center;
     }
     .landing-badge {
       display: flex;
@@ -468,7 +478,7 @@
     /* ── Feature images on left ── */
     .landing-features {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(6, 1fr);
       gap: 0.6rem;
       margin-top: 1.5rem;
     }
@@ -476,7 +486,7 @@
       position: relative;
       border-radius: var(--radius-sm);
       overflow: hidden;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 1 / 1;
       background: var(--bg);
       border: 1px solid var(--border-light);
       transition: transform 0.3s, box-shadow 0.3s;
@@ -500,22 +510,24 @@
       background: linear-gradient(transparent, rgba(0,0,0,0.55));
       color: #fff;
       font-family: var(--font-ui);
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       font-weight: 500;
       letter-spacing: 0.02em;
     }
     @media (max-width: 768px) {
       .landing-features { grid-template-columns: repeat(3, 1fr); }
-      .landing-feature-card { aspect-ratio: 3 / 2; }
     }
     @media (max-width: 480px) {
-      .landing-features { grid-template-columns: repeat(2, 1fr); }
+      .landing-features { grid-template-columns: repeat(3, 1fr); }
     }
 
     .landing-login-role-tabs {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 1.25rem;
+    }
+    .landing-login-role-tabs {
+      perspective: 600px;
     }
     .landing-login-role-tabs .landing-tab {
       flex: 1;
@@ -528,83 +540,75 @@
       border-radius: var(--radius);
       background: var(--white);
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       font-family: var(--font-ui);
       font-size: 0.8rem;
       font-weight: 500;
       color: var(--text-muted);
-      perspective: 200px;
       transform-style: preserve-3d;
-    }
-    .landing-login-role-tabs .landing-tab:hover {
-      border-color: var(--primary);
-      color: var(--navy);
-      transform: rotateX(4deg) translateZ(4px);
-      box-shadow: 0 4px 16px rgba(212, 115, 94, 0.15);
+      transition: box-shadow 0.3s, border-color 0.3s, background 0.3s;
+      position: relative;
+      overflow: hidden;
+      will-change: transform;
     }
     .landing-login-role-tabs .landing-tab.active {
       border-color: var(--primary);
       background: rgba(212, 115, 94, 0.06);
       color: var(--navy);
       box-shadow: 0 4px 20px rgba(212, 115, 94, 0.2);
-      transform: rotateX(0deg) translateZ(8px);
     }
     .landing-login-role-tabs .landing-tab:active {
-      transform: rotateX(2deg) scale(0.96);
+      transform: scale(0.96);
+    }
+    .landing-login-role-tabs .tab-glow {
+      position: absolute;
+      inset: -50%;
+      width: 200%;
+      height: 200%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, rgba(212,115,94,0.15), transparent 60%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 0;
+    }
+    .landing-login-role-tabs .landing-tab:hover .tab-glow { opacity: 1; }
+    .landing-login-role-tabs .landing-tab.active .tab-glow {
+      background: radial-gradient(circle at 50% 50%, rgba(212,115,94,0.2), transparent 60%);
     }
     .landing-login-role-tabs .tab-icon {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: 50%;
       background: var(--bg);
-      transition: all 0.3s;
+      transition: background 0.3s;
       transform-style: preserve-3d;
+      position: relative;
+      z-index: 1;
     }
     .landing-login-role-tabs .landing-tab.active .tab-icon {
-      background: rgba(212, 115, 94, 0.12);
+      background: rgba(212, 115, 94, 0.15);
     }
     .landing-login-role-tabs .tab-icon svg {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       color: var(--text-muted);
-      transition: color 0.3s, transform 0.3s;
+      transition: color 0.3s;
+      display: block;
+      will-change: transform;
     }
     .landing-login-role-tabs .landing-tab.active .tab-icon svg {
       color: var(--primary);
-      transform: scale(1.1);
-    }
-    .landing-login-role-tabs .landing-tab:hover .tab-icon svg {
-      animation: tab-icon-float 0.6s ease-in-out infinite alternate;
-    }
-    @keyframes tab-icon-float {
-      0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(-2px) scale(1.05); }
     }
     .landing-login-role-tabs .tab-label {
       display: block;
       line-height: 1.2;
+      position: relative;
+      z-index: 1;
     }
-    .landing-guest {
-      text-align: center;
-      margin-top: 0.75rem;
-    }
-    .landing-guest a {
-      font-family: var(--font-ui);
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-    .landing-guest a:hover { color: var(--primary); }
-    .landing-guest a svg {
-      width: 12px;
-      height: 12px;
-      margin-left: 0.3rem;
-      vertical-align: middle;
-    }
+
     .landing-footer {
       text-align: center;
       padding: 1.5rem 2rem;
@@ -619,8 +623,12 @@
       html { scroll-behavior: auto; }
       .landing-nav { padding: 1rem 1.25rem; }
       .landing-hero { padding: 1.5rem 1.25rem; }
-      .landing-hero-inner { grid-template-columns: 1fr; gap: 2rem; }
-      .landing-left h1 { font-size: 1.8rem; margin-bottom: 0.75rem; }
+      .landing-hero-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .landing-hero-headline h1 { font-size: 1.8rem; margin-bottom: 0.75rem; }
       .landing-desc { font-size: 0.95rem; }
       .landing-badges { gap: 0.45rem; margin-bottom: 1.25rem; }
       .landing-badge { font-size: 0.72rem; padding: 0.3rem 0.7rem; }
@@ -631,8 +639,8 @@
       .partner-item .partner-name { font-size: 0.68rem; }
       .landing-features-heading { font-size: 0.85rem; margin: 1.25rem 0 0.65rem; }
       .landing-features { gap: 0.5rem; margin-top: 1rem; }
-      .landing-feature-card { aspect-ratio: 3 / 2; border-radius: 6px; }
-      .landing-feature-card .feature-label { font-size: 0.65rem; padding: 0.3rem 0.5rem; }
+      .landing-feature-card { border-radius: 6px; }
+      .landing-feature-card .feature-label { font-size: 0.6rem; padding: 0.3rem 0.5rem; }
       .landing-card { padding: 1.5rem; }
       .landing-form .form-row { grid-template-columns: 1fr; }
       .landing-form .interest-grid { grid-template-columns: 1fr 1fr; }
@@ -644,14 +652,12 @@
       .landing-login-role-tabs .landing-tab { padding: 0.6rem 0.3rem; font-size: 0.75rem; }
       .landing-login-role-tabs .tab-icon { width: 28px; height: 28px; }
       .landing-login-role-tabs .tab-icon svg { width: 15px; height: 15px; }
-      .landing-guest { margin-top: 0.5rem; }
-      .landing-guest a { font-size: 0.78rem; }
     }
     @media (max-width: 480px) {
       .landing-hero-inner { gap: 1.25rem; }
       .landing-nav { padding: 0.7rem 0.85rem; }
       .landing-hero { padding: 0.75rem 0.85rem; }
-      .landing-left h1 { font-size: 1.35rem; }
+      .landing-hero-headline h1 { font-size: 1.35rem; }
       .landing-desc { font-size: 0.88rem; line-height: 1.55; margin-bottom: 1.25rem; }
       .landing-badges { gap: 0.35rem; margin-bottom: 1rem; }
       .landing-badge { font-size: 0.65rem; padding: 0.25rem 0.55rem; gap: 0.3rem; }
@@ -663,9 +669,8 @@
       .partner-item img { height: 16px; }
       .partner-item .partner-name { font-size: 0.6rem; }
       .landing-features-heading { font-size: 0.8rem; margin: 1rem 0 0.5rem; }
-      .landing-features { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; margin-top: 0.75rem; }
-      .landing-feature-card { aspect-ratio: 4 / 3; }
-      .landing-feature-card .feature-label { font-size: 0.6rem; padding: 0.25rem 0.4rem; }
+      .landing-features { gap: 0.4rem; margin-top: 0.75rem; }
+      .landing-feature-card .feature-label { font-size: 0.55rem; padding: 0.25rem 0.4rem; }
       .landing-card { padding: 1rem; }
       .landing-tabs { padding: 2px; }
       .landing-tab { font-size: 0.78rem; padding: 0.5rem 0.3rem; }
@@ -687,8 +692,6 @@
       .landing-login-role-tabs .landing-tab { padding: 0.45rem 0.15rem; font-size: 0.65rem; gap: 0.2rem; }
       .landing-login-role-tabs .tab-icon { width: 22px; height: 22px; }
       .landing-login-role-tabs .tab-icon svg { width: 12px; height: 12px; }
-      .landing-guest { margin-top: 0.35rem; }
-      .landing-guest a { font-size: 0.75rem; }
       .landing-footer { padding: 1rem; font-size: 0.7rem; }
     }
   </style>
@@ -703,7 +706,7 @@
 
     <main class="landing-hero">
       <div class="landing-hero-inner">
-        <div class="landing-left">
+        <div class="landing-hero-headline">
           <h1>Join the global <span class="italic-gold">wellness</span> movement</h1>
           <p class="landing-desc">Create your Moow.Hub account and access yoga pose libraries, wellness programs, partner resources, and a community transforming preventive healthcare across 23+ countries.</p>
           <div class="landing-badges">
@@ -712,38 +715,9 @@
             <div class="landing-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Partner Network</div>
             <div class="landing-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Products</div>
           </div>
-          <div class="landing-partner-marquee">
-            <p>Trusted by organizations worldwide</p>
-            <div class="landing-partner-logos">
-              <span class="partner-item"><img src="images/Rotary International Logo.webp" alt="" loading="lazy"><span class="partner-name">Rotary International</span></span>
-              <span class="partner-item"><img src="images/Ministry of AYUSH.webp" alt="" loading="lazy"><span class="partner-name">Ministry of AYUSH</span></span>
-              <span class="partner-item"><img src="images/Lions Clubs International logo.webp" alt="" loading="lazy"><span class="partner-name">Lions Clubs International</span></span>
-              <span class="partner-item"><img src="images/advaita-yoga-academy.webp" alt="" loading="lazy"><span class="partner-name">Advaita Yoga Academy</span></span>
-              <span class="partner-item"><img src="images/Relax Kerala Ayurveda logo.webp" alt="" loading="lazy"><span class="partner-name">Relax Kerala Ayurveda</span></span>
-            </div>
-          </div>
-          <div class="landing-features-heading"><em>More to explore</em> when you join &rarr;</div>
-          <div class="landing-features">
-            <div class="landing-feature-card">
-              <img src="images/Vrikshasana (Tree).webp" alt="Pose Library" loading="lazy">
-              <span class="feature-label">Pose Library</span>
-            </div>
-            <div class="landing-feature-card">
-              <img src="images/digital-ecosystem.webp" alt="Wellness AI" loading="lazy">
-              <span class="feature-label">Wellness AI</span>
-            </div>
-            <div class="landing-feature-card">
-              <img src="images/wellness-kit.webp" alt="Shop Products" loading="lazy">
-              <span class="feature-label">Shop Products</span>
-            </div>
-            <div class="landing-feature-card">
-              <img src="images/yoga-group-park.webp" alt="Community" loading="lazy">
-              <span class="feature-label">Community</span>
-            </div>
-          </div>
         </div>
 
-        <div class="landing-right">
+        <div class="landing-auth-wrap">
           <div class="landing-card">
             <div class="landing-tabs" role="tablist">
               <button class="landing-tab active" data-tab="register" role="tab" aria-selected="true">Create Account</button>
@@ -858,9 +832,46 @@
               <p class="auth-footer">Don't have an account? <a href="#" id="switchToRegister">Create one</a></p>
             </form>
 
-            <div class="landing-guest">
-              <a href="/home">Explore Moow.Hub as guest <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg></a>
-            </div>
+          </div>
+        </div>
+
+        <div class="landing-partner-marquee">
+          <p>Trusted by organizations worldwide</p>
+          <div class="landing-partner-logos">
+            <span class="partner-item"><img src="images/Rotary International Logo.webp" alt="" loading="lazy"><span class="partner-name">Rotary International</span></span>
+            <span class="partner-item"><img src="images/Ministry of AYUSH.webp" alt="" loading="lazy"><span class="partner-name">Ministry of AYUSH</span></span>
+            <span class="partner-item"><img src="images/Lions Clubs International logo.webp" alt="" loading="lazy"><span class="partner-name">Lions Clubs International</span></span>
+            <span class="partner-item"><img src="images/advaita-yoga-academy.webp" alt="" loading="lazy"><span class="partner-name">Advaita Yoga Academy</span></span>
+            <span class="partner-item"><img src="images/Relax Kerala Ayurveda logo.webp" alt="" loading="lazy"><span class="partner-name">Relax Kerala Ayurveda</span></span>
+            <span class="partner-item"><img src="images/IN_ambafrance.webp" alt="" loading="lazy"><span class="partner-name">Ambafrance India</span></span>
+          </div>
+        </div>
+
+        <div class="landing-features-heading"><em>More to explore</em> when you join &rarr;</div>
+        <div class="landing-features">
+          <div class="landing-feature-card">
+            <img src="images/Vrikshasana (Tree).webp" alt="Pose Library" loading="lazy">
+            <span class="feature-label">Pose Library</span>
+          </div>
+          <div class="landing-feature-card">
+            <img src="images/digital-ecosystem.webp" alt="Wellness AI" loading="lazy">
+            <span class="feature-label">Wellness AI</span>
+          </div>
+          <div class="landing-feature-card">
+            <img src="images/wellness-kit.webp" alt="Shop Products" loading="lazy">
+            <span class="feature-label">Shop Products</span>
+          </div>
+          <div class="landing-feature-card">
+            <img src="images/yoga-group-park.webp" alt="Community" loading="lazy">
+            <span class="feature-label">Community</span>
+          </div>
+          <div class="landing-feature-card">
+            <img src="images/healthcare-wellness.webp" alt="Partners" loading="lazy">
+            <span class="feature-label">Partners</span>
+          </div>
+          <div class="landing-feature-card">
+            <img src="images/handbook.webp" alt="Products" loading="lazy">
+            <span class="feature-label">Products</span>
           </div>
         </div>
       </div>
