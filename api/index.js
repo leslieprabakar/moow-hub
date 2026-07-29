@@ -55,13 +55,8 @@ function getAdminDB() {
 // ─── SECURITY ──────────────────────────────────────────────────────────────────
 function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 function validatePassword(password) {
-  const e = [];
-  if (password.length < 8) e.push('Password must be at least 8 characters');
-  if (!/[A-Z]/.test(password)) e.push('Password must contain at least one uppercase letter');
-  if (!/[a-z]/.test(password)) e.push('Password must contain at least one lowercase letter');
-  if (!/[0-9]/.test(password)) e.push('Password must contain at least one number');
-  if (!/[^A-Za-z0-9]/.test(password)) e.push('Password must contain at least one special character');
-  return e;
+  if (!password || password.length < 1) return ['Password is required'];
+  return [];
 }
 function sanitizeString(s) { return typeof s !== 'string' ? s : s.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#x27;' })[c]); }
 function validateRequired(data, fields) { return fields.filter(f => !data[f] || (typeof data[f] === 'string' && !data[f].trim())); }

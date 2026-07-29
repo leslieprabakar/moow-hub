@@ -154,18 +154,6 @@
       color: #28a745;
       border: 1px solid #cec;
     }
-    .password-hints {
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      color: var(--text-light);
-    }
-    .password-hints li {
-      margin-bottom: 0.25rem;
-    }
-    .password-hints li.valid {
-      color: #28a745;
-    }
-
     @media (max-width: 768px) {
       .auth-page { padding: 1.5rem 1rem; }
       .auth-card { padding: 1.5rem; }
@@ -187,7 +175,6 @@
       .form-group input { font-size: 0.9rem; padding: 0.65rem 0.85rem; }
       .btn-primary { font-size: 0.9rem; padding: 0.75rem; }
       .auth-footer { font-size: 0.85rem; }
-      .password-hints { font-size: 0.75rem; }
     }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
@@ -226,15 +213,8 @@
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Create a strong password">
+            <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Choose a password">
             <div class="error-message"></div>
-            <ul class="password-hints" id="passwordHints">
-              <li id="hint-length">At least 8 characters</li>
-              <li id="hint-upper">One uppercase letter</li>
-              <li id="hint-lower">One lowercase letter</li>
-              <li id="hint-number">One number</li>
-              <li id="hint-special">One special character</li>
-            </ul>
           </div>
 
           <div class="form-group">
@@ -264,21 +244,11 @@
       var form = document.getElementById('registerForm');
       var alertEl = document.getElementById('alert');
       var submitBtn = document.getElementById('submitBtn');
-      var passwordInput = document.getElementById('password');
 
       if (!form || !alertEl || !submitBtn) {
         console.error('Moow: register form elements missing');
         return;
       }
-
-      passwordInput.addEventListener('input', function(e) {
-        var pwd = e.target.value;
-        document.getElementById('hint-length').className = pwd.length >= 8 ? 'valid' : '';
-        document.getElementById('hint-upper').className = /[A-Z]/.test(pwd) ? 'valid' : '';
-        document.getElementById('hint-lower').className = /[a-z]/.test(pwd) ? 'valid' : '';
-        document.getElementById('hint-number').className = /[0-9]/.test(pwd) ? 'valid' : '';
-        document.getElementById('hint-special').className = /[^A-Za-z0-9]/.test(pwd) ? 'valid' : '';
-      });
 
       function showAlert(msg, type) {
         var el = document.getElementById('alert');
@@ -306,16 +276,6 @@
 
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           showAlert('Please enter a valid email address', 'error');
-          return;
-        }
-
-        if (password.length < 8) {
-          showAlert('Password must be at least 8 characters', 'error');
-          return;
-        }
-
-        if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
-          showAlert('Password must include uppercase, lowercase, number, and special character', 'error');
           return;
         }
 

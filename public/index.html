@@ -357,61 +357,6 @@
       color: var(--primary);
     }
     .pwd-row { position: relative; }
-    .landing-form .password-hints {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      background: var(--navy);
-      color: #fff;
-      font-size: 0.73rem;
-      list-style: none;
-      padding: 0.65rem 0.85rem;
-      border-radius: var(--radius-sm);
-      box-shadow: 0 6px 24px rgba(0,0,0,0.18);
-      white-space: nowrap;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
-      transform: translateX(-50%) translateY(4px);
-      pointer-events: none;
-      margin: 0;
-    }
-    .landing-form .password-hints::before {
-      content: '';
-      position: absolute;
-      top: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 5px solid var(--navy);
-    }
-    .landing-form .password-hints.visible {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-    .landing-form .password-hints li {
-      margin-bottom: 0.2rem;
-      padding-left: 1rem;
-      position: relative;
-      line-height: 1.5;
-    }
-    .landing-form .password-hints li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: #555;
-      font-size: 0.7rem;
-      font-weight: 700;
-      transition: color 0.2s;
-    }
-    .landing-form .password-hints li.valid::before { color: #4caf50; }
-    .landing-form .password-hints li.valid { color: #4caf50; }
-    .landing-form .password-hints li:last-child { margin-bottom: 0; }
-
     /* ── Password wrapper with eye toggle ── */
     .pwd-wrapper {
       position: relative;
@@ -646,7 +591,6 @@
       .landing-form .interest-grid { grid-template-columns: 1fr 1fr; }
       .landing-form .form-group label { font-size: 0.78rem; }
       .landing-form .form-group input, .landing-form .form-group select { font-size: 0.88rem; padding: 0.55rem 0.75rem; }
-      .landing-form .password-hints { white-space: normal; min-width: 200px; }
       .optional-toggle { font-size: 0.75rem; padding: 0.4rem 0.6rem; }
       .landing-login-role-tabs { gap: 0.35rem; margin-bottom: 1rem; }
       .landing-login-role-tabs .landing-tab { padding: 0.6rem 0.3rem; font-size: 0.75rem; }
@@ -682,7 +626,6 @@
       .landing-form .btn-primary { font-size: 0.88rem; padding: 0.65rem; }
       .landing-form .auth-footer { font-size: 0.8rem; }
       .landing-form .forgot-link { margin-top: -0.35rem; }
-      .landing-form .password-hints { min-width: 180px; font-size: 0.68rem; padding: 0.5rem 0.7rem; }
       .optional-toggle { font-size: 0.72rem; padding: 0.35rem 0.55rem; gap: 0.3rem; }
       .optional-toggle svg { width: 12px; height: 12px; }
       .pwd-wrapper input { padding-right: 2rem !important; }
@@ -776,7 +719,7 @@
                   <div class="form-group">
                   <label for="regPassword">Password</label>
                   <div class="pwd-wrapper">
-                    <input type="password" id="regPassword" name="password" required autocomplete="new-password" placeholder="Create a strong password">
+                    <input type="password" id="regPassword" name="password" required autocomplete="new-password" placeholder="Choose a password">
                   </div>
                 </div>
                 <div class="form-group">
@@ -789,13 +732,6 @@
                   </div>
                   <span id="confirmMatchMsg" style="font-size:0.7rem;min-height:1em;display:block;margin-top:0.2rem;transition:color 0.2s;"></span>
                 </div>
-                <ul class="password-hints" id="passwordHints">
-                  <li id="hint-length">At least 8 characters</li>
-                  <li id="hint-upper">One uppercase letter</li>
-                  <li id="hint-lower">One lowercase letter</li>
-                  <li id="hint-number">One number</li>
-                  <li id="hint-special">One special character</li>
-                </ul>
               </div>
               <button type="submit" class="btn-primary" id="regSubmitBtn">Create Free Account</button>
               <p class="auth-footer">Already have an account? <a href="#" id="switchToLogin">Sign in</a></p>
@@ -1126,23 +1062,8 @@
         btn.textContent = 'Sign In';
       });
 
-      // ── Password hints tooltip (hover / focus) ──
       var pwdInput = document.getElementById('regPassword');
       var confirmPwdInput = document.getElementById('regConfirmPassword');
-      var hintsEl = document.getElementById('passwordHints');
-      var hintShowTimer = null;
-      var hintHideTimer = null;
-
-      function showHints() {
-        if (hintHideTimer) { clearTimeout(hintHideTimer); hintHideTimer = null; }
-        if (!hintsEl.classList.contains('visible')) {
-          hintShowTimer = setTimeout(function() { hintsEl.classList.add('visible'); }, 200);
-        }
-      }
-      function hideHints() {
-        if (hintShowTimer) { clearTimeout(hintShowTimer); hintShowTimer = null; }
-        hintHideTimer = setTimeout(function() { hintsEl.classList.remove('visible'); }, 150);
-      }
 
       function checkMatch() {
         var msg = document.getElementById('confirmMatchMsg');
@@ -1155,19 +1076,7 @@
       }
 
       if (pwdInput) {
-        pwdInput.addEventListener('input', function() {
-          var val = pwdInput.value;
-          document.getElementById('hint-length').className = val.length >= 8 ? 'valid' : '';
-          document.getElementById('hint-upper').className = /[A-Z]/.test(val) ? 'valid' : '';
-          document.getElementById('hint-lower').className = /[a-z]/.test(val) ? 'valid' : '';
-          document.getElementById('hint-number').className = /\d/.test(val) ? 'valid' : '';
-          document.getElementById('hint-special').className = /[!@#$%^&*(),.?":{}|<>]/.test(val) ? 'valid' : '';
-          checkMatch();
-        });
-        pwdInput.addEventListener('mouseenter', showHints);
-        pwdInput.addEventListener('focus', showHints);
-        pwdInput.addEventListener('mouseleave', hideHints);
-        pwdInput.addEventListener('blur', hideHints);
+        pwdInput.addEventListener('input', checkMatch);
       }
       if (confirmPwdInput) {
         confirmPwdInput.addEventListener('input', checkMatch);
