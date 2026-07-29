@@ -54,10 +54,6 @@ function getAdminDB() {
 
 // ─── SECURITY ──────────────────────────────────────────────────────────────────
 function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-function validatePassword(password) {
-  if (!password || password.length < 1) return ['Password is required'];
-  return [];
-}
 function sanitizeString(s) { return typeof s !== 'string' ? s : s.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#x27;' })[c]); }
 function validateRequired(data, fields) { return fields.filter(f => !data[f] || (typeof data[f] === 'string' && !data[f].trim())); }
 function getClientIP(req) { for (const h of ['x-forwarded-for', 'x-real-ip', 'cf-connecting-ip']) { const v = req.headers[h]; if (v) return v.split(',')[0].trim(); } return req.socket?.remoteAddress || '0.0.0.0'; }
@@ -237,8 +233,6 @@ async function handleAuth(req, res, path) {
     const missing = validateRequired(req.body, ['email', 'password', 'full_name']);
     if (missing.length > 0) return res.status(400).json({ error: 'Missing fields', fields: missing });
     if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
-    const passwordErrors = validatePassword(password);
-    if (passwordErrors.length > 0) return res.status(400).json({ error: 'Weak password', details: passwordErrors });
     const { data: authUser, error: authError } = await db.auth.admin.createUser({ email: email.toLowerCase(), password, email_confirm: true });
     if (authError) {
       if (authError.message?.includes('already') || authError.message?.includes('exists')) return res.status(409).json({ error: 'Email already registered' });
@@ -316,8 +310,6 @@ async function handleAuth(req, res, path) {
     if (!user) return true;
     const { password } = req.body;
     if (!password) return res.status(400).json({ error: 'Password required' });
-    const passwordErrors = validatePassword(password);
-    if (passwordErrors.length > 0) return res.status(400).json({ error: 'Weak password', details: passwordErrors });
     const { error: updateError } = await db.auth.admin.updateUserById(user.id, { password });
     if (updateError) return res.status(500).json({ error: 'Failed to update password' });
     return res.status(200).json({ success: true, message: 'Password updated successfully' });
@@ -395,8 +387,6 @@ async function handleAuth(req, res, path) {
   if (req.method === 'POST' && path === 'password-reset-confirm') {
     const { token, password } = req.body;
     if (!token || !password) return res.status(400).json({ error: 'Token and password required' });
-    const passwordErrors = validatePassword(password);
-    if (passwordErrors.length > 0) return res.status(400).json({ error: 'Weak password', details: passwordErrors });
     const { data: profile } = await db.from('profiles').select('id, reset_token_expires').eq('reset_token', token).single();
     if (!profile) return res.status(400).json({ error: 'Invalid or expired reset token' });
     if (new Date(profile.reset_token_expires) < new Date()) return res.status(400).json({ error: 'Reset token has expired' });
