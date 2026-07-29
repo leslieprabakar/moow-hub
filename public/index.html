@@ -326,6 +326,117 @@
     }
     .landing-form .password-hints li { margin-bottom: 0.15rem; }
     .landing-form .password-hints li.valid { color: #28a745; }
+
+    /* ── Password wrapper with eye toggle ── */
+    .pwd-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pwd-wrapper input { padding-right: 2.4rem !important; }
+    .pwd-toggle {
+      position: absolute;
+      right: 0.4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.3rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .pwd-toggle:hover { color: var(--navy); background: var(--bg); }
+    .pwd-toggle svg { width: 18px; height: 18px; display: block; }
+
+    /* ── Collapsible optional section ── */
+    .optional-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem;
+      width: 100%;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      text-align: left;
+    }
+    .optional-toggle:hover {
+      border-color: var(--primary);
+      color: var(--navy);
+      background: rgba(212, 115, 94, 0.03);
+    }
+    .optional-toggle svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.25s;
+      color: currentColor;
+      flex-shrink: 0;
+    }
+    .optional-toggle.open svg { transform: rotate(90deg); }
+    .optional-fields {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .optional-fields.open { display: flex; }
+
+    /* ── Feature images on left ── */
+    .landing-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+    .landing-feature-card {
+      position: relative;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      background: var(--bg);
+      border: 1px solid var(--border-light);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .landing-feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    .landing-feature-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .landing-feature-card .feature-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.4rem 0.6rem;
+      background: linear-gradient(transparent, rgba(0,0,0,0.55));
+      color: #fff;
+      font-family: var(--font-ui);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    @media (max-width: 768px) {
+      .landing-features { grid-template-columns: repeat(3, 1fr); }
+      .landing-feature-card { aspect-ratio: 3 / 2; }
+    }
+    @media (max-width: 480px) {
+      .landing-features { grid-template-columns: repeat(2, 1fr); }
+    }
+
     .landing-login-role-tabs {
       display: flex;
       gap: 0.5rem;
@@ -486,6 +597,24 @@
               <span>Advaita Yoga Academy</span>
               <span>Relax Kerala Ayurveda</span>
             </div>
+            <div class="landing-features">
+              <div class="landing-feature-card">
+                <img src="images/Vrikshasana (Tree).webp" alt="Pose Library" loading="lazy">
+                <span class="feature-label">Pose Library</span>
+              </div>
+              <div class="landing-feature-card">
+                <img src="images/digital-ecosystem.webp" alt="Wellness AI" loading="lazy">
+                <span class="feature-label">Wellness AI</span>
+              </div>
+              <div class="landing-feature-card">
+                <img src="images/wellness-kit.webp" alt="Shop Products" loading="lazy">
+                <span class="feature-label">Shop Products</span>
+              </div>
+              <div class="landing-feature-card">
+                <img src="images/yoga-group-park.webp" alt="Community" loading="lazy">
+                <span class="feature-label">Community</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -508,43 +637,65 @@
                 <label for="regEmail">Email address</label>
                 <input type="email" id="regEmail" name="email" required autocomplete="email" placeholder="you@example.com">
               </div>
+
+              <!-- Collapsible optional fields -->
+              <button type="button" class="optional-toggle" id="optionalToggle" aria-expanded="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                More about you (optional)
+              </button>
+              <div class="optional-fields" id="optionalFields">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="regPhone">Phone</label>
+                    <input type="tel" id="regPhone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
+                  </div>
+                  <div class="form-group">
+                    <label for="regSource">How did you hear?</label>
+                    <select id="regSource" name="referral_source">
+                      <option value="">Select</option>
+                      <option value="social">Social Media</option>
+                      <option value="friend">Friend / Word of Mouth</option>
+                      <option value="search">Search Engine</option>
+                      <option value="event">Event / Workshop</option>
+                      <option value="partner">Partner Organization</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>What interests you?</label>
+                  <div class="interest-grid" id="interestGrid">
+                    <label class="interest-chip" data-value="yoga">Yoga Practice</label>
+                    <label class="interest-chip" data-value="wellness">Wellness Products</label>
+                    <label class="interest-chip" data-value="partnership">Partnership</label>
+                    <label class="interest-chip" data-value="corporate">Corporate Wellness</label>
+                  </div>
+                </div>
+              </div>
+
               <div class="form-row">
                 <div class="form-group">
-                  <label for="regPhone">Phone (optional)</label>
-                  <input type="tel" id="regPhone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
+                  <label for="regPassword">Password</label>
+                  <div class="pwd-wrapper">
+                    <input type="password" id="regPassword" name="password" required autocomplete="new-password" placeholder="Create a strong password">
+                  </div>
+                  <ul class="password-hints" id="passwordHints">
+                    <li id="hint-length">At least 8 characters</li>
+                    <li id="hint-upper">One uppercase letter</li>
+                    <li id="hint-lower">One lowercase letter</li>
+                    <li id="hint-number">One number</li>
+                    <li id="hint-special">One special character</li>
+                  </ul>
                 </div>
                 <div class="form-group">
-                  <label for="regSource">How did you hear? (optional)</label>
-                  <select id="regSource" name="referral_source">
-                    <option value="">Select</option>
-                    <option value="social">Social Media</option>
-                    <option value="friend">Friend / Word of Mouth</option>
-                    <option value="search">Search Engine</option>
-                    <option value="event">Event / Workshop</option>
-                    <option value="partner">Partner Organization</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <label for="regConfirmPassword">Confirm Password</label>
+                  <div class="pwd-wrapper">
+                    <input type="password" id="regConfirmPassword" required placeholder="Re-enter password">
+                    <button type="button" class="pwd-toggle" id="confirmPwdToggle" title="Show password" aria-label="Show password">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" id="confirmPwdEye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div class="form-group">
-                <label>What interests you? (optional)</label>
-                <div class="interest-grid" id="interestGrid">
-                  <label class="interest-chip" data-value="yoga">Yoga Practice</label>
-                  <label class="interest-chip" data-value="wellness">Wellness Products</label>
-                  <label class="interest-chip" data-value="partnership">Partnership</label>
-                  <label class="interest-chip" data-value="corporate">Corporate Wellness</label>
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="regPassword">Password</label>
-                <input type="password" id="regPassword" name="password" required autocomplete="new-password" placeholder="Create a strong password">
-                <ul class="password-hints" id="passwordHints">
-                  <li id="hint-length">At least 8 characters</li>
-                  <li id="hint-upper">One uppercase letter</li>
-                  <li id="hint-lower">One lowercase letter</li>
-                  <li id="hint-number">One number</li>
-                  <li id="hint-special">One special character</li>
-                </ul>
               </div>
               <button type="submit" class="btn-primary" id="regSubmitBtn">Create Free Account</button>
               <p class="auth-footer">Already have an account? <a href="#" id="switchToLogin">Sign in</a></p>
@@ -667,6 +818,33 @@
         });
       });
 
+      // ── Collapsible optional fields ──
+      var optionalToggle = document.getElementById('optionalToggle');
+      var optionalFields = document.getElementById('optionalFields');
+      if (optionalToggle && optionalFields) {
+        optionalToggle.addEventListener('click', function() {
+          var open = optionalFields.classList.toggle('open');
+          optionalToggle.classList.toggle('open');
+          optionalToggle.setAttribute('aria-expanded', open);
+        });
+      }
+
+      // ── Eye toggle for Confirm Password ──
+      var confirmPwdToggle = document.getElementById('confirmPwdToggle');
+      var confirmPwdInput = document.getElementById('regConfirmPassword');
+      var confirmPwdEye = document.getElementById('confirmPwdEye');
+      if (confirmPwdToggle && confirmPwdInput && confirmPwdEye) {
+        confirmPwdToggle.addEventListener('click', function() {
+          var isPassword = confirmPwdInput.type === 'password';
+          confirmPwdInput.type = isPassword ? 'text' : 'password';
+          confirmPwdEye.innerHTML = isPassword
+            ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+            : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+          confirmPwdToggle.setAttribute('title', isPassword ? 'Hide password' : 'Show password');
+          confirmPwdToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        });
+      }
+
       function showAlert(msg, type) {
         var el = document.getElementById('alert');
         if (!el) { console.error('Moow: alert element missing'); return; }
@@ -700,10 +878,16 @@
         var email = document.getElementById('regEmail').value.trim();
         var phone = document.getElementById('regPhone').value.trim();
         var password = document.getElementById('regPassword').value;
+        var confirmPassword = document.getElementById('regConfirmPassword').value;
         var referral_source = document.getElementById('regSource').value;
 
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !confirmPassword) {
           showAlert('Please fill in all required fields', 'error');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showAlert('Passwords do not match', 'error');
           return;
         }
 
