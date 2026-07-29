@@ -150,7 +150,7 @@
         <input type="date" id="dateFrom">
         <label for="dateTo">To:</label>
         <input type="date" id="dateTo">
-        <button class="date-btn" onclick="applyDateFilter()">Apply</button>
+        <button class="date-btn" id="applyDateBtn">Apply</button>
       </div>
 
       <!-- Stats -->
@@ -205,18 +205,6 @@
   </script>
   <script src="../../js/auth.js"></script>
   <script>
-    function setDefaultDates() {
-      var today = new Date();
-      var thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
-      document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-    }
-
-    function applyDateFilter() {
-      loadDashboard();
-    }
-
     (async function() {
       if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
         window.location.href = '/pages/login.html';
@@ -227,7 +215,16 @@
       var nameEl = document.getElementById('adminUser');
       if (nameEl) nameEl.textContent = user && (user.full_name || user.email);
 
-      setDefaultDates();
+      var today = new Date();
+      var thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+      document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+
+      document.getElementById('applyDateBtn').addEventListener('click', function() {
+        loadDashboard();
+      });
+
       await loadDashboard();
     })();
 

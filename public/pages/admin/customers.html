@@ -211,9 +211,11 @@
     async function updateCustomerRole(userId, checkbox) {
       if (!userId || !checkbox) return;
       var tr = checkbox.closest('tr');
+      if (!tr) { console.error('updateCustomerRole: no parent row'); return; }
       var adminBox = tr.querySelector('input[value="admin"]');
       var partnerBox = tr.querySelector('input[value="partner"]');
       var userBox = tr.querySelector('input[value="user"]');
+      if (!adminBox || !partnerBox || !userBox) { console.error('updateCustomerRole: missing checkboxes'); return; }
 
       if (checkbox.value === 'admin' && checkbox.checked) {
         userBox.checked = false;
@@ -235,13 +237,17 @@
           body: JSON.stringify({ id: userId, is_admin: adminBox.checked, is_partner: partnerBox.checked })
         });
         if (!response || !response.ok) {
-          const err = response ? await response.json().catch(() => ({})) : {};
-          alert(err.error || 'Failed to update role');
+          if (response) {
+            const text = await response.text().catch(() => '');
+            console.error('updateCustomerRole API error:', response.status, text);
+          }
+          loadCustomers(currentPage);
           return;
         }
         loadCustomers(currentPage);
       } catch (error) {
-        alert('Failed to update role');
+        console.error('updateCustomerRole error:', error);
+        loadCustomers(currentPage);
       }
     }
 

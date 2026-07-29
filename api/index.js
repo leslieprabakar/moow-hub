@@ -866,35 +866,20 @@ async function handleAdmin(req, res, path, url) {
   if (req.method === 'GET' && path === 'dashboard') {
     const fromParam = url.searchParams.get('from');
     const toParam = url.searchParams.get('to');
-    let dateFrom, dateTo;
-    if (fromParam) dateFrom = new Date(fromParam + 'T00:00:00Z');
-    if (toParam) dateTo = new Date(toParam + 'T23:59:59Z');
-    if (!dateTo) dateTo = new Date();
-    if (!dateFrom) { dateFrom = new Date(); dateFrom.setDate(dateFrom.getDate() - 30); }
-    const fromISO = encodeURIComponent(dateFrom.toISOString());
-    const toISO = encodeURIComponent(dateTo.toISOString());
-    const apiKey = config.SUPABASE_SERVICE_KEY;
-    const restUrl = config.SUPABASE_URL;
+    const dateFrom = fromParam ? new Date(fromParam + 'T00:00:00Z') : (() => { const d = new Date(); d.setDate(d.getDate() - 30); return d; })();
+    const dateTo = toParam ? new Date(toParam + 'T23:59:59Z') : new Date();
+    const fromStr = dateFrom.toISOString();
+    const toStr = dateTo.toISOString();
 
-    let totalOrdersCount = 0;
+    let totalOrdersCount = 0, productsCount = 0, totalUsers = 0, revenue = 0;
     try {
-      const resp = await fetch(`${restUrl}/rest/v1/orders?select=id&created_at=gte.${fromISO}&created_at=lte.${toISO}&limit=0`, {
-        headers: { 'apikey': apiKey, 'Authorization': `Bearer ${apiKey}`, 'Prefer': 'count=exact' }
-      });
-      const range = resp.headers.get('content-range');
-      totalOrdersCount = range ? parseInt(range.split('/')[1], 10) || 0 : 0;
+      const { data: ids } = await db.from('orders').select('id').gte('created_at', fromStr).lte('created_at', toStr);
+      totalOrdersCount = ids ? ids.length : 0;
     } catch (e) { console.error('Order count error:', e.message); }
-
-    let productsCount = 0;
     try {
-      const resp = await fetch(`${restUrl}/rest/v1/products?select=id&limit=0`, {
-        headers: { 'apikey': apiKey, 'Authorization': `Bearer ${apiKey}`, 'Prefer': 'count=exact' }
-      });
-      const range = resp.headers.get('content-range');
-      productsCount = range ? parseInt(range.split('/')[1], 10) || 0 : 0;
+      const { data: ids, count } = await db.from('products').select('id', { count: 'exact', head: true });
+      productsCount = count || (ids ? ids.length : 0);
     } catch (e) { console.error('Products count error:', e.message); }
-
-    let totalUsers = 0;
     try {
       const { data: authData } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
       const authUsers = authData?.users || [];
@@ -906,16 +891,10 @@ async function handleAdmin(req, res, path, url) {
       const { count } = await db.from('profiles').select('id', { count: 'exact', head: true });
       totalUsers = count || 0;
     }
-
-    let revenue = 0;
     try {
-      const resp = await fetch(`${restUrl}/rest/v1/orders?created_at=gte.${fromISO}&created_at=lte.${toISO}&status=neq.cancelled&select=total`, {
-        headers: { 'apikey': apiKey, 'Authorization': `Bearer ${apiKey}` }
-      });
-      const orders = await resp.json();
+      const { data: orders } = await db.from('orders').select('total, status, created_at').gte('created_at', fromStr).lte('created_at', toStr).neq('status', 'cancelled');
       revenue = (orders || []).reduce((sum, o) => sum + Number(o.total), 0);
     } catch (e) { console.error('Revenue error:', e.message); }
-
     const { data: recentOrdersList } = await db.from('orders').select('id, order_number, total, status, created_at, shipping_address').order('created_at', { ascending: false }).limit(10);
     const { data: lowStock } = await db.from('products').select('id, name, stock').lte('stock', 5).order('stock', { ascending: true });
     return res.status(200).json({ success: true, data: {
