@@ -32,8 +32,8 @@ const config = {
   ORDER_PREFIX: 'MOOW',
   CANCELLATION_WINDOW_HOURS: 24,
   SUPPORTED_CURRENCIES: ['USD', 'INR', 'EUR', 'GBP', 'AED', 'SGD'],
-  RATE_LIMIT_MAX_ATTEMPTS: 5,
-  RATE_LIMIT_WINDOW_MINUTES: 15
+   RATE_LIMIT_MAX_ATTEMPTS: 50,
+  RATE_LIMIT_WINDOW_MINUTES: 1
 };
 
 // ─── DATABASE ──────────────────────────────────────────────────────────────────
