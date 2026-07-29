@@ -226,28 +226,37 @@ async function handleAuth(req, res, path) {
   const db = getAdminDB();
 
   if (req.method === 'POST' && path === 'register') {
-    const ip = getClientIP(req);
-    const rateLimit = await checkRateLimit(ip, 'register');
-    if (!rateLimit.allowed) return res.status(429).json({ error: 'Too many attempts' });
-    const { email, password, full_name, phone, interest_areas, referral_source, source_page } = req.body;
-    const missing = validateRequired(req.body, ['email', 'password', 'full_name']);
-    if (missing.length > 0) return res.status(400).json({ error: 'Missing fields', fields: missing });
-    if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
-    const { data: authUser, error: authError } = await db.auth.admin.createUser({ email: email.toLowerCase(), password, email_confirm: true });
-    if (authError) {
-      if (authError.message?.includes('already') || authError.message?.includes('exists')) return res.status(409).json({ error: 'Email already registered' });
-      return res.status(500).json({ error: 'Failed to create account', details: authError.message });
+    try {
+      const ip = getClientIP(req);
+      const rateLimit = await checkRateLimit(ip, 'register');
+      if (!rateLimit.allowed) return res.status(429).json({ error: 'Too many attempts' });
+      const { email, password, full_name, phone, interest_areas, referral_source, source_page } = req.body;
+      const missing = validateRequired(req.body, ['email', 'password', 'full_name']);
+      if (missing.length > 0) return res.status(400).json({ error: 'Missing fields', fields: missing });
+      if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
+      if (typeof db.auth.admin === 'undefined' || typeof db.auth.admin.createUser !== 'function') {
+        console.error('Register: db.auth.admin.createUser is not available');
+        return res.status(500).json({ error: 'Auth service not configured' });
+      }
+      const { data: authUser, error: authError } = await db.auth.admin.createUser({ email: email.toLowerCase(), password, email_confirm: true });
+      if (authError) {
+        if (authError.message?.includes('already') || authError.message?.includes('exists')) return res.status(409).json({ error: 'Email already registered' });
+        return res.status(500).json({ error: 'Failed to create account', details: authError.message });
+      }
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const { error: profileError } = await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken });
+      if (profileError) {
+        console.error('Profile insert error:', profileError.message);
+        try { await db.auth.admin.deleteUser(authUser.user.id); } catch (e) { console.error('Failed to rollback user:', e.message); }
+        return res.status(500).json({ error: 'Failed to create profile', details: profileError.message });
+      }
+      db.from('leads').insert({ email: email.toLowerCase(), full_name: sanitizeString(full_name), phone: phone || null, interest_areas: interest_areas || null, referral_source: referral_source || null, source_page: source_page || 'landing' }).catch(e => console.error('Lead capture failed:', e));
+      sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(e => console.error('Welcome email failed:', e));
+      return res.status(201).json({ success: true, message: 'Account created', user: { id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) } });
+    } catch (err) {
+      console.error('Register error:', err);
+      return res.status(500).json({ error: 'Registration failed', details: err.message });
     }
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const { error: profileError } = await db.from('profiles').insert({ id: authUser.user.id, full_name: sanitizeString(full_name), phone: phone || null, verification_token: verificationToken });
-    if (profileError) {
-      console.error('Profile insert error:', profileError.message);
-      try { await db.auth.admin.deleteUser(authUser.user.id); } catch (e) { console.error('Failed to rollback user:', e.message); }
-      return res.status(500).json({ error: 'Failed to create profile', details: profileError.message });
-    }
-    db.from('leads').insert({ email: email.toLowerCase(), full_name: sanitizeString(full_name), phone: phone || null, interest_areas: interest_areas || null, referral_source: referral_source || null, source_page: source_page || 'landing' }).catch(e => console.error('Lead capture failed:', e));
-    sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(e => console.error('Welcome email failed:', e));
-    return res.status(201).json({ success: true, message: 'Account created', user: { id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) } });
   }
 
   if (req.method === 'POST' && path === 'login') {
