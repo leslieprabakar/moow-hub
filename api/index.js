@@ -871,11 +871,11 @@ async function handleAdmin(req, res, path, url) {
     if (toParam) dateTo = new Date(toParam + 'T23:59:59Z');
     if (!dateTo) dateTo = new Date();
     if (!dateFrom) { dateFrom = new Date(); dateFrom.setDate(dateFrom.getDate() - 30); }
-
-    const applyDateFilter = (q) => q.gte('created_at', dateFrom.toISOString()).lte('created_at', dateTo.toISOString());
+    const fromISO = dateFrom.toISOString();
+    const toISO = dateTo.toISOString();
 
     const [ordersResult, productsResult] = await Promise.all([
-      applyDateFilter(db.from('orders')).select('id', { count: 'exact', head: true }),
+      db.from('orders').select('id', { count: 'exact', head: true }).gte('created_at', fromISO).lte('created_at', toISO),
       db.from('products').select('id', { count: 'exact', head: true })
     ]);
     // Count total users matching customers page logic: auth users + orphan profiles
@@ -891,7 +891,7 @@ async function handleAdmin(req, res, path, url) {
       const { count } = await db.from('profiles').select('id', { count: 'exact', head: true });
       totalUsers = count || 0;
     }
-    const { data: recentOrders } = await applyDateFilter(db.from('orders').select('total, status, created_at')).neq('status', 'cancelled');
+    const { data: recentOrders } = await db.from('orders').select('total, status, created_at').gte('created_at', fromISO).lte('created_at', toISO).neq('status', 'cancelled');
     const revenue = (recentOrders || []).reduce((sum, o) => sum + Number(o.total), 0);
     const { data: recentOrdersList } = await db.from('orders').select('id, order_number, total, status, created_at, shipping_address').order('created_at', { ascending: false }).limit(10);
     const { data: lowStock } = await db.from('products').select('id, name, stock').lte('stock', 5).order('stock', { ascending: true });
@@ -1027,9 +1027,11 @@ async function handleAdmin(req, res, path, url) {
   }
 
   if (req.method === 'PUT' && path === 'customers') {
-    const { id, role } = req.body;
-    if (!id || !role) return res.status(400).json({ error: 'User ID and role required' });
-    const updates = { is_admin: role === 'admin', is_partner: role === 'partner' };
+    const { id, is_admin, is_partner } = req.body;
+    if (!id) return res.status(400).json({ error: 'User ID required' });
+    const updates = {};
+    if (typeof is_admin === 'boolean') updates.is_admin = is_admin;
+    if (typeof is_partner === 'boolean') updates.is_partner = is_partner;
     const { error: updateErr } = await db.from('profiles').update(updates).eq('id', id);
     if (updateErr) return res.status(500).json({ error: 'Failed to update role: ' + updateErr.message });
     return res.status(200).json({ success: true, message: 'Role updated' });

@@ -179,7 +179,6 @@
           tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No customers found</td></tr>';
         } else {
           tbody.innerHTML = customers.map(c => {
-            var currentRole = c.is_admin ? 'admin' : c.is_partner ? 'partner' : 'user';
             return `
             <tr>
               <td><strong>${c.full_name}</strong></td>
@@ -187,12 +186,16 @@
               <td>${c.phone || '-'}</td>
               <td>${c.is_admin ? '<span class="badge badge-admin">Admin</span>' : ''} ${c.is_partner ? '<span class="badge badge-partner">Partner</span>' : ''} ${!c.is_admin && !c.is_partner ? '<span style="color:var(--text-muted);font-size:0.85rem;">User</span>' : ''}</td>
               <td>${c.created_at ? new Date(c.created_at).toLocaleDateString() : '-'}</td>
-              <td>
-                <select onchange="updateCustomerRole('${c.id}', this.value)" style="padding:0.3rem;font-size:0.8rem;border:1px solid var(--border);border-radius:var(--radius-sm);">
-                  <option value="user" ${currentRole === 'user' ? 'selected' : ''}>User</option>
-                  <option value="partner" ${currentRole === 'partner' ? 'selected' : ''}>Partner</option>
-                  <option value="admin" ${currentRole === 'admin' ? 'selected' : ''}>Admin</option>
-                </select>
+              <td style="white-space:nowrap;">
+                <label style="display:inline-flex;align-items:center;gap:0.25rem;margin-right:0.5rem;font-size:0.8rem;cursor:pointer;">
+                  <input type="checkbox" onchange="updateCustomerRole('${c.id}', this)" ${c.is_admin ? 'checked' : ''} value="admin"> Admin
+                </label>
+                <label style="display:inline-flex;align-items:center;gap:0.25rem;margin-right:0.5rem;font-size:0.8rem;cursor:pointer;">
+                  <input type="checkbox" onchange="updateCustomerRole('${c.id}', this)" ${c.is_partner ? 'checked' : ''} value="partner"> Partner
+                </label>
+                <label style="display:inline-flex;align-items:center;gap:0.25rem;font-size:0.8rem;cursor:pointer;color:var(--text-muted);">
+                  <input type="checkbox" onchange="updateCustomerRole('${c.id}', this)" ${!c.is_admin && !c.is_partner ? 'checked' : ''} value="user"> User
+                </label>
               </td>
             </tr>
           `}).join('');
@@ -205,12 +208,31 @@
       }
     }
 
-    async function updateCustomerRole(userId, newRole) {
-      if (!userId || !newRole) return;
+    async function updateCustomerRole(userId, checkbox) {
+      if (!userId || !checkbox) return;
+      var tr = checkbox.closest('tr');
+      var adminBox = tr.querySelector('input[value="admin"]');
+      var partnerBox = tr.querySelector('input[value="partner"]');
+      var userBox = tr.querySelector('input[value="user"]');
+
+      if (checkbox.value === 'admin' && checkbox.checked) {
+        userBox.checked = false;
+      }
+      if (checkbox.value === 'partner' && checkbox.checked) {
+        userBox.checked = false;
+      }
+      if (checkbox.value === 'user' && checkbox.checked) {
+        adminBox.checked = false;
+        partnerBox.checked = false;
+      }
+      if (!adminBox.checked && !partnerBox.checked) {
+        userBox.checked = true;
+      }
+
       try {
         const response = await Auth.authenticatedFetch('/api/admin/customers', {
           method: 'PUT',
-          body: JSON.stringify({ id: userId, role: newRole })
+          body: JSON.stringify({ id: userId, is_admin: adminBox.checked, is_partner: partnerBox.checked })
         });
         if (!response || !response.ok) {
           const err = response ? await response.json().catch(() => ({})) : {};
