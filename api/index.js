@@ -936,6 +936,14 @@ async function handleAdmin(req, res, path, url) {
   return false;
 }
 
+async function handleCategories(req, res, subPath) {
+  if (req.method !== 'GET' || subPath !== 'list') return null;
+  const db = getAdminDB();
+  const { data, error } = await db.from('categories').select('*').order('created_at', { ascending: true });
+  if (error) return res.status(500).json({ error: 'Failed to fetch categories' });
+  return res.status(200).json({ success: true, data: data || [] });
+}
+
 async function handleCurrency(req, res) {
   if (req.method !== 'GET') return null;
   const db = getAdminDB();
@@ -1088,6 +1096,9 @@ module.exports = async function handler(req, res) {
         break;
       case 'agreement':
         handled = await handleAgreement(req, res, subPath);
+        break;
+      case 'categories':
+        handled = await handleCategories(req, res, subPath);
         break;
       case 'currency':
         handled = await handleCurrency(req, res);
