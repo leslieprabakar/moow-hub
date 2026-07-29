@@ -2566,6 +2566,10 @@ p {
 
   .menu-toggle {
     display: flex;
+    padding: 5px 0 5px 1rem;
+  }
+  .nav-container {
+    padding: 0 1.25rem;
   }
 
   .nav-dropdown-icon .nav-dropdown-trigger {
@@ -3892,6 +3896,9 @@ p {
 }
 
 @media (max-width: 768px) {
+  .newsletter-section {
+    padding: 3rem 0;
+  }
   .newsletter-inner {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -3899,8 +3906,53 @@ p {
   .newsletter-content h2 {
     font-size: 1.6rem;
   }
+  .newsletter-desc {
+    max-width: 100%;
+    font-size: 0.92rem;
+  }
+  .newsletter-benefits {
+    gap: 0.7rem;
+  }
   .newsletter-input-row {
     grid-template-columns: 1fr;
+  }
+  .newsletter-card {
+    padding: 1.5rem;
+  }
+  .newsletter-testimonial {
+    padding: 1.25rem;
+  }
+  .newsletter-testimonial p {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .newsletter-section {
+    padding: 2rem 0;
+  }
+  .newsletter-content h2 {
+    font-size: 1.35rem;
+  }
+  .newsletter-card {
+    padding: 1.1rem;
+  }
+  .newsletter-card-header {
+    font-size: 0.85rem;
+  }
+  .newsletter-input {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.85rem;
+  }
+  .newsletter-submit {
+    font-size: 0.85rem;
+    padding: 0.7rem 1rem;
+  }
+  .newsletter-benefit {
+    font-size: 0.82rem;
+  }
+  .newsletter-trust {
+    font-size: 0.72rem;
   }
 }
 
