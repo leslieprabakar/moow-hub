@@ -281,6 +281,26 @@ ALTER TABLE currency_rates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Currency rates are viewable by everyone" ON currency_rates FOR SELECT USING (true);
 
 -- --------------------------------------------------------
+-- --------------------------------------------------------
+-- Leads Table (CRM)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS leads (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    full_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    interest_areas TEXT[],
+    referral_source VARCHAR(255),
+    registered_at TIMESTAMPTZ DEFAULT NOW(),
+    last_login_at TIMESTAMPTZ,
+    source_page VARCHAR(255) DEFAULT 'landing'
+);
+
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert leads" ON leads FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view leads" ON leads FOR SELECT USING (auth.role() = 'service_role');
+
+-- --------------------------------------------------------
 -- Partner Digital Signatures Table
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS partner_signatures (

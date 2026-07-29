@@ -60,7 +60,7 @@ const Auth = {
   /**
    * Register new user
    */
-  async register(email, password, fullName, phone) {
+  async register(email, password, fullName, phone, extras = {}) {
     const response = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -68,7 +68,10 @@ const Auth = {
         email, 
         password, 
         full_name: fullName,
-        phone: phone || undefined
+        phone: phone || undefined,
+        interest_areas: extras.interest_areas || undefined,
+        referral_source: extras.referral_source || undefined,
+        source_page: extras.source_page || 'landing'
       })
     });
 

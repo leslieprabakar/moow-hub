@@ -210,7 +210,7 @@ async function handleAuth(req, res, path) {
     const ip = getClientIP(req);
     const rateLimit = await checkRateLimit(ip, 'register');
     if (!rateLimit.allowed) return res.status(429).json({ error: 'Too many attempts' });
-    const { email, password, full_name, phone } = req.body;
+    const { email, password, full_name, phone, interest_areas, referral_source, source_page } = req.body;
     const missing = validateRequired(req.body, ['email', 'password', 'full_name']);
     if (missing.length > 0) return res.status(400).json({ error: 'Missing fields', fields: missing });
     if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
@@ -228,6 +228,7 @@ async function handleAuth(req, res, path) {
       try { await db.auth.admin.deleteUser(authUser.user.id); } catch (e) { console.error('Failed to rollback user:', e.message); }
       return res.status(500).json({ error: 'Failed to create profile', details: profileError.message });
     }
+    db.from('leads').insert({ email: email.toLowerCase(), full_name: sanitizeString(full_name), phone: phone || null, interest_areas: interest_areas || null, referral_source: referral_source || null, source_page: source_page || 'landing' }).catch(e => console.error('Lead capture failed:', e));
     sendWelcomeEmail({ id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) }, verificationToken).catch(e => console.error('Welcome email failed:', e));
     return res.status(201).json({ success: true, message: 'Account created', user: { id: authUser.user.id, email: email.toLowerCase(), full_name: sanitizeString(full_name) } });
   }
@@ -241,6 +242,7 @@ async function handleAuth(req, res, path) {
     const { data, error } = await db.auth.signInWithPassword({ email, password });
     if (error) return res.status(401).json({ error: 'Invalid credentials' });
     const { data: profile } = await db.from('profiles').select('*').eq('id', data.user.id).single();
+    db.from('leads').update({ last_login_at: new Date().toISOString() }).eq('email', data.user.email).catch(e => console.error('Lead login update failed:', e));
     return res.status(200).json({ success: true, session: data.session, user: { ...profile, email: data.user.email } });
   }
 
@@ -999,6 +1001,19 @@ async function handleAdmin(req, res, path, url) {
     }
     const { data: partners, count } = await query.range(offset, offset + limit - 1);
     return res.status(200).json({ success: true, data: partners || [], pagination: { page, limit, total: count || 0 } });
+  }
+
+  if (req.method === 'GET' && path === 'leads') {
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const search = url.searchParams.get('search') || '';
+    const offset = (page - 1) * limit;
+    let query = db.from('leads').select('*', { count: 'exact' }).order('registered_at', { ascending: false });
+    if (search) {
+      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);
+    }
+    const { data: leads, count } = await query.range(offset, offset + limit - 1);
+    return res.status(200).json({ success: true, data: leads || [], pagination: { page, limit, total: count || 0 } });
   }
 
   return false;

@@ -197,7 +197,7 @@
     <div class="auth-container">
       <div class="auth-card">
         <div class="auth-logo">
-          <a href="../index.html">Moow<span class="dot">.</span>Hub®</a>
+          <a href="/">Moow<span class="dot">.</span>Hub®</a>
         </div>
 
         <h1 class="auth-title">Join Moow.Hub</h1>
@@ -253,23 +253,26 @@
     </div>
   </div>
 
-  <script defer src="../js/auth.js"></script>
+  <script src="../js/auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Redirect if already logged in
+    (function() {
       if (Auth.isAuthenticated()) {
-        window.location.href = '../index.html';
+        window.location.href = '/home';
         return;
       }
 
-      const form = document.getElementById('registerForm');
-      const alert = document.getElementById('alert');
-      const submitBtn = document.getElementById('submitBtn');
-      const passwordInput = document.getElementById('password');
+      var form = document.getElementById('registerForm');
+      var alertEl = document.getElementById('alert');
+      var submitBtn = document.getElementById('submitBtn');
+      var passwordInput = document.getElementById('password');
 
-      // Password strength hints
-      passwordInput.addEventListener('input', (e) => {
-        const pwd = e.target.value;
+      if (!form || !alertEl || !submitBtn) {
+        console.error('Moow: register form elements missing');
+        return;
+      }
+
+      passwordInput.addEventListener('input', function(e) {
+        var pwd = e.target.value;
         document.getElementById('hint-length').className = pwd.length >= 8 ? 'valid' : '';
         document.getElementById('hint-upper').className = /[A-Z]/.test(pwd) ? 'valid' : '';
         document.getElementById('hint-lower').className = /[a-z]/.test(pwd) ? 'valid' : '';
@@ -277,17 +280,25 @@
         document.getElementById('hint-special').className = /[^A-Za-z0-9]/.test(pwd) ? 'valid' : '';
       });
 
-      form.addEventListener('submit', async (e) => {
+      function showAlert(msg, type) {
+        var el = document.getElementById('alert');
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'alert alert-' + type;
+        el.style.display = 'block';
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        alert.style.display = 'none';
+        alertEl.style.display = 'none';
 
-        const fullName = document.getElementById('fullName').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        var fullName = document.getElementById('fullName').value.trim();
+        var email = document.getElementById('email').value.trim();
+        var phone = document.getElementById('phone').value.trim();
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
 
-        // Validate
         if (!fullName || fullName.length < 2) {
           showAlert('Please enter your full name', 'error');
           return;
@@ -317,26 +328,23 @@
         submitBtn.textContent = 'Creating account...';
 
         try {
-          await Auth.register(email, password, fullName, phone || undefined);
+          await Auth.register(email, password, fullName, phone || undefined, {
+            interest_areas: null,
+            referral_source: null,
+            source_page: 'register-page'
+          });
           showAlert('Account created! Please check your email to verify your account.', 'success');
           form.reset();
-          setTimeout(() => {
+          setTimeout(function() {
             window.location.href = 'login.html';
           }, 3000);
         } catch (error) {
-          showAlert(error.message, 'error');
+          showAlert(error && error.message || 'Registration failed', 'error');
           submitBtn.disabled = false;
           submitBtn.textContent = 'Create Account';
         }
       });
-
-      function showAlert(message, type) {
-        alert.textContent = message;
-        alert.className = 'alert alert-' + type;
-        alert.style.display = 'block';
-        alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    });
+    })();
   </script>
 </body>
 </html>

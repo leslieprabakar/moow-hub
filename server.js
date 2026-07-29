@@ -87,6 +87,7 @@ const server = http.createServer(async (req, res) => {
 
   // Clean URL rewrites: /about -> /pages/about.html
   const cleanUrlMap = {
+    '/home': '/home.html',
     '/about': '/pages/about.html',
     '/pose-library': '/pages/pose-library.html',
     '/wellness-ai': '/pages/wellness-ai.html',

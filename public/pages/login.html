@@ -239,7 +239,7 @@
     <div class="auth-container">
       <div class="auth-card">
         <div class="auth-logo">
-          <a href="../index.html">Moow<span class="dot">.</span>Hub®</a>
+          <a href="/">Moow<span class="dot">.</span>Hub®</a>
         </div>
 
         <div class="role-tabs" role="tablist">
@@ -288,36 +288,41 @@
     </div>
   </div>
 
-  <script defer src="../js/auth.js"></script>
+  <script src="../js/auth.js"></script>
   <script>
-    const ROLE_META = {
-      user:    { title: 'Welcome back', subtitle: 'Sign in to your account', redirect: '../index.html', btn: 'Sign In', placeholder: 'you@example.com' },
-      partner: { title: 'Partner Portal', subtitle: 'Sign in to your partner dashboard', redirect: '../index.html', btn: 'Partner Sign In', placeholder: 'partner@example.com' },
-      admin:   { title: 'Admin Panel', subtitle: 'Sign in to manage the store', redirect: '../pages/admin/dashboard.html', btn: 'Admin Sign In', placeholder: 'admin@example.com' }
-    };
+    (function() {
+      var ROLE_META = {
+        user:    { title: 'Welcome back', subtitle: 'Sign in to your account', redirect: '/home', btn: 'Sign In', placeholder: 'you@example.com' },
+        partner: { title: 'Partner Portal', subtitle: 'Sign in to your partner dashboard', redirect: '/home', btn: 'Partner Sign In', placeholder: 'partner@example.com' },
+        admin:   { title: 'Admin Panel', subtitle: 'Sign in to manage the store', redirect: '../pages/admin/dashboard.html', btn: 'Admin Sign In', placeholder: 'admin@example.com' }
+      };
 
-    document.addEventListener('DOMContentLoaded', () => {
       if (Auth.isAuthenticated()) {
-        window.location.href = '../index.html';
+        window.location.href = '/home';
         return;
       }
 
-      let selectedRole = 'user';
-      const form = document.getElementById('loginForm');
-      const alert = document.getElementById('alert');
-      const submitBtn = document.getElementById('submitBtn');
-      const emailInput = document.getElementById('email');
-      const titleEl = document.getElementById('authTitle');
-      const subtitleEl = document.getElementById('authSubtitle');
-      const tabs = document.querySelectorAll('.role-tab');
+      var selectedRole = 'user';
+      var form = document.getElementById('loginForm');
+      var alertEl = document.getElementById('alert');
+      var submitBtn = document.getElementById('submitBtn');
+      var emailInput = document.getElementById('email');
+      var titleEl = document.getElementById('authTitle');
+      var subtitleEl = document.getElementById('authSubtitle');
+      var tabs = document.querySelectorAll('.role-tab');
 
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      if (!form || !alertEl || !submitBtn) {
+        console.error('Moow: login form elements missing');
+        return;
+      }
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
           tab.classList.add('active');
           tab.setAttribute('aria-selected', 'true');
           selectedRole = tab.dataset.role;
-          const meta = ROLE_META[selectedRole];
+          var meta = ROLE_META[selectedRole];
           titleEl.textContent = meta.title;
           subtitleEl.textContent = meta.subtitle;
           submitBtn.textContent = meta.btn;
@@ -325,12 +330,20 @@
         });
       });
 
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        alert.style.display = 'none';
+      function showAlert(msg, type) {
+        var el = document.getElementById('alert');
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'alert alert-' + type;
+        el.style.display = 'block';
+      }
 
-        const email = emailInput.value.trim();
-        const password = document.getElementById('password').value;
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        alertEl.style.display = 'none';
+
+        var email = emailInput.value.trim();
+        var password = document.getElementById('password').value;
 
         if (!email || !password) {
           showAlert('Please fill in all fields', 'error');
@@ -341,26 +354,27 @@
         submitBtn.textContent = 'Signing in...';
 
         try {
-          const user = await Auth.login(email, password);
-          const meta = ROLE_META[selectedRole];
+          var user = await Auth.login(email, password);
+          var actualRole = user && user.is_admin ? 'admin' : user && user.is_partner ? 'partner' : 'user';
+          var meta = ROLE_META[selectedRole];
+          if (selectedRole !== actualRole) {
+            showAlert('Access denied: you are not a' + (selectedRole === 'admin' ? 'n ' : ' ') + selectedRole + '.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = ROLE_META[actualRole].btn;
+            return;
+          }
           showAlert('Login successful! Redirecting...', 'success');
-          setTimeout(() => {
+          setTimeout(function() {
             window.location.href = meta.redirect;
           }, 1000);
         } catch (error) {
-          showAlert(error.message, 'error');
+          showAlert(error && error.message || 'Invalid credentials', 'error');
           submitBtn.disabled = false;
-          const meta = ROLE_META[selectedRole];
+          var meta = ROLE_META[selectedRole];
           submitBtn.textContent = meta.btn;
         }
       });
-
-      function showAlert(message, type) {
-        alert.textContent = message;
-        alert.className = 'alert alert-' + type;
-        alert.style.display = 'block';
-      }
-    });
+    })();
   </script>
 </body>
 </html>

@@ -167,19 +167,18 @@
   <script>
     function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('open'); document.querySelector('.admin-overlay').classList.toggle('show'); }
   </script>
-  <script defer src="../../js/auth.js"></script>
+  <script src="../../js/auth.js"></script>
   <script>
-    let currentPage = 1;
-
-    document.addEventListener('DOMContentLoaded', () => {
+    (function() {
       if (!Auth.isAuthenticated() || !Auth.isAdmin()) {
         window.location.href = '/pages/login.html';
         return;
       }
-      document.getElementById('statusFilter').addEventListener('change', () => loadOrders());
-      document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadOrders(); });
-      loadOrders();
-    });
+      var currentPage = 1;
+      document.getElementById('statusFilter').addEventListener('change', function() { loadOrders(); });
+      document.getElementById('searchInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') loadOrders(); });
+      loadOrders(1);
+    })();
 
     async function loadOrders(page = 1) {
       currentPage = page;
