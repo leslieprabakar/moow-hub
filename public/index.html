@@ -745,12 +745,6 @@
       // Auth guard: define stub if Auth not loaded
       var AuthAPI = (typeof Auth !== 'undefined') ? Auth : null;
 
-      // Check auth and redirect if logged in
-      if (AuthAPI && AuthAPI.isAuthenticated()) {
-        window.location.href = '/home';
-        return;
-      }
-
       // ── Tab switching ──
       var tabs = document.querySelectorAll('.landing-tab');
       tabs.forEach(function(tab) {

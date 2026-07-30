@@ -338,11 +338,12 @@ const SessionManager = {
     if (!Auth.isAuthenticated()) return;
     if (this.isAuthPage()) return;
 
-    this.initialized = true;
     this.lastActivity = this.loadActivity();
     if (Date.now() - this.lastActivity > this.TIMEOUT) {
-      this.lastActivity = Date.now();
+      this.expire();
+      return;
     }
+    this.initialized = true;
     this.persist();
     this.buildUI();
     this.track();

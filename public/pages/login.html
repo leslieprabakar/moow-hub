@@ -314,6 +314,7 @@
           window.location.href = redirect;
         } catch (error) {
           console.error('Login failed:', error);
+          showAlert(error.message || 'Invalid credentials', 'error');
           submitBtn.disabled = false;
           submitBtn.textContent = 'Sign In';
         }
