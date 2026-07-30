@@ -75,53 +75,20 @@
       margin-bottom: 2rem;
       font-size: 0.95rem;
     }
-    .auth-input-wrap {
-      position: relative;
-    }
-    .auth-input-wrap .auth-input-icon {
-      position: absolute;
-      left: 0.85rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      color: var(--text-muted);
-      pointer-events: none;
-      transition: color 0.2s;
-      z-index: 1;
-    }
-    .auth-input-wrap:focus-within .auth-input-icon {
-      color: var(--primary);
-    }
-    .password-wrapper .auth-input-icon {
-      position: absolute;
-      left: 0.85rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      color: var(--text-muted);
-      pointer-events: none;
-      transition: color 0.2s;
-      z-index: 1;
-    }
-    .password-wrapper:focus-within .auth-input-icon {
-      color: var(--primary);
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
     .form-group label {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
       font-weight: 500;
       margin-bottom: 0.5rem;
       color: var(--navy);
       font-size: 0.9rem;
     }
-    .auth-input-wrap input,
-    .password-wrapper input {
-      padding-left: 2.5rem;
+    .label-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--primary);
+      flex-shrink: 0;
     }
     .form-group input {
       width: 100%;
@@ -222,10 +189,6 @@
       .auth-title { font-size: 1.3rem; }
       .auth-subtitle { font-size: 0.9rem; margin-bottom: 1.5rem; }
       .form-row { grid-template-columns: 1fr; }
-      .auth-input-wrap .auth-input-icon,
-      .password-wrapper .auth-input-icon { width: 16px; height: 16px; left: 0.7rem; }
-      .auth-input-wrap input,
-      .password-wrapper input { padding-left: 2.2rem; }
     }
 
     @media (max-width: 480px) {
@@ -241,10 +204,6 @@
       .form-group input { font-size: 0.9rem; padding: 0.65rem 0.85rem; }
       .btn-primary { font-size: 0.9rem; padding: 0.75rem; }
       .auth-footer { font-size: 0.85rem; }
-      .auth-input-wrap .auth-input-icon,
-      .password-wrapper .auth-input-icon { width: 14px; height: 14px; left: 0.6rem; }
-      .auth-input-wrap input,
-      .password-wrapper input { padding-left: 1.9rem; }
     }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
@@ -264,47 +223,47 @@
 
         <form id="registerForm" novalidate>
           <div class="form-group">
-            <label for="fullName">Full name</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" id="fullName" name="full_name" required autocomplete="name" placeholder="Your full name">
-            </div>
+            <label for="fullName">
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Full name
+            </label>
+            <input type="text" id="fullName" name="full_name" required autocomplete="name" placeholder="Your full name">
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
-            <label for="email">Email address</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
-            </div>
+            <label for="email">
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Email address
+            </label>
+            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
-            <label for="phone">Phone (optional)</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
-              <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
-            </div>
+            <label for="phone">
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+              Phone (optional)
+            </label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Choose a password">
-            </div>
+            <label for="password">
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Password
+            </label>
+            <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Choose a password">
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Confirm password</label>
-            <div class="auth-input-wrap">
-              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <input type="password" id="confirmPassword" name="confirm_password" required autocomplete="new-password" placeholder="Confirm your password">
-            </div>
+            <label for="confirmPassword">
+              <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Confirm password
+            </label>
+            <input type="password" id="confirmPassword" name="confirm_password" required autocomplete="new-password" placeholder="Confirm your password">
             <div class="error-message"></div>
           </div>
 
