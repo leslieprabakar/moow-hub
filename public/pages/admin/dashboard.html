@@ -243,16 +243,19 @@
           return;
         }
 
+        var STATUS_LABELS = { pending:'Pending', confirmed:'Confirmed', processing:'Processing', shipped:'Shipped', delivered:'Delivered', cancelled:'Cancelled' };
+
         tbody.innerHTML = recentOrders.map(order => {
           const date = new Date(order.created_at).toLocaleDateString();
           const statusClass = 'status-' + order.status;
+          const statusLabel = STATUS_LABELS[order.status] || order.status;
           
           return `
             <tr>
               <td><strong>${order.order_number}</strong></td>
               <td>${order.customer || 'Unknown'}</td>
               <td>$${Number(order.total).toFixed(2)}</td>
-              <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+              <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
               <td>${date}</td>
               <td><a href="../order-detail.html?id=${order.id}" class="action-btn action-btn-primary">View</a></td>
             </tr>

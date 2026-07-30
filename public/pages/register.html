@@ -12,12 +12,17 @@
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <style>
+    @keyframes authFadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .auth-page {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--bg);
+      background: radial-gradient(ellipse at 50% 0%, var(--bg-warm) 0%, var(--bg) 70%);
       padding: 2rem 1rem;
     }
     .auth-container {
@@ -25,10 +30,23 @@
       max-width: 440px;
     }
     .auth-card {
+      position: relative;
+      overflow: hidden;
       background: var(--white);
       border-radius: var(--radius);
       padding: 2.5rem;
-      box-shadow: var(--shadow);
+      box-shadow: 0 4px 30px rgba(26, 39, 68, 0.08), 0 0 0 1px var(--border-light);
+      animation: authFadeIn 0.5s ease-out;
+    }
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--gold), var(--primary), var(--gold));
+      pointer-events: none;
     }
     .auth-logo {
       text-align: center;
@@ -57,6 +75,40 @@
       margin-bottom: 2rem;
       font-size: 0.95rem;
     }
+    .auth-input-wrap {
+      position: relative;
+    }
+    .auth-input-wrap .auth-input-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: color 0.2s;
+      z-index: 1;
+    }
+    .auth-input-wrap:focus-within .auth-input-icon {
+      color: var(--primary);
+    }
+    .password-wrapper .auth-input-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: color 0.2s;
+      z-index: 1;
+    }
+    .password-wrapper:focus-within .auth-input-icon {
+      color: var(--primary);
+    }
+
     .form-group {
       margin-bottom: 1.25rem;
     }
@@ -67,21 +119,26 @@
       color: var(--navy);
       font-size: 0.9rem;
     }
+    .auth-input-wrap input,
+    .password-wrapper input {
+      padding-left: 2.5rem;
+    }
     .form-group input {
       width: 100%;
       padding: 0.75rem 1rem;
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius);
       font-size: 1rem;
       font-family: var(--font-body);
       color: var(--text);
       background: var(--white);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
     .form-group input:focus {
       outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(212, 115, 94, 0.1);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.12), 0 1px 4px rgba(26, 39, 68, 0.04);
+      background: #fefcf9;
     }
     .form-group.error input {
       border-color: #dc3545;
@@ -103,24 +160,27 @@
     .btn-primary {
       width: 100%;
       padding: 0.875rem;
-      background: var(--primary);
+      background: linear-gradient(135deg, var(--primary) 0%, #c0634e 100%);
       color: white;
       border: none;
-      border-radius: var(--radius-sm);
+      border-radius: var(--radius);
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(212, 115, 94, 0.3);
       margin-top: 0.5rem;
     }
     .btn-primary:hover {
-      background: #c0634e;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(212, 115, 94, 0.35);
     }
     .btn-primary:active {
       transform: scale(0.98);
     }
     .btn-primary:disabled {
       background: #ccc;
+      box-shadow: none;
       cursor: not-allowed;
     }
     .auth-footer {
@@ -157,15 +217,21 @@
     @media (max-width: 768px) {
       .auth-page { padding: 1.5rem 1rem; }
       .auth-card { padding: 1.5rem; }
+      .auth-card::before { height: 3px; }
       .auth-logo a { font-size: 1.5rem; }
       .auth-title { font-size: 1.3rem; }
       .auth-subtitle { font-size: 0.9rem; margin-bottom: 1.5rem; }
       .form-row { grid-template-columns: 1fr; }
+      .auth-input-wrap .auth-input-icon,
+      .password-wrapper .auth-input-icon { width: 16px; height: 16px; left: 0.7rem; }
+      .auth-input-wrap input,
+      .password-wrapper input { padding-left: 2.2rem; }
     }
 
     @media (max-width: 480px) {
       .auth-page { padding: 1rem 0.75rem; }
       .auth-card { padding: 1.25rem; border-radius: calc(var(--radius) - 2px); }
+      .auth-card::before { height: 3px; }
       .auth-logo { margin-bottom: 1.5rem; }
       .auth-logo a { font-size: 1.35rem; }
       .auth-title { font-size: 1.15rem; }
@@ -175,6 +241,10 @@
       .form-group input { font-size: 0.9rem; padding: 0.65rem 0.85rem; }
       .btn-primary { font-size: 0.9rem; padding: 0.75rem; }
       .auth-footer { font-size: 0.85rem; }
+      .auth-input-wrap .auth-input-icon,
+      .password-wrapper .auth-input-icon { width: 14px; height: 14px; left: 0.6rem; }
+      .auth-input-wrap input,
+      .password-wrapper input { padding-left: 1.9rem; }
     }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
@@ -195,31 +265,46 @@
         <form id="registerForm" novalidate>
           <div class="form-group">
             <label for="fullName">Full name</label>
-            <input type="text" id="fullName" name="full_name" required autocomplete="name" placeholder="Your full name">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="fullName" name="full_name" required autocomplete="name" placeholder="Your full name">
+            </div>
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
             <label for="email">Email address</label>
-            <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+            </div>
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
             <label for="phone">Phone (optional)</label>
-            <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+              <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+1 234 567 890">
+            </div>
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Choose a password">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Choose a password">
+            </div>
             <div class="error-message"></div>
           </div>
 
           <div class="form-group">
             <label for="confirmPassword">Confirm password</label>
-            <input type="password" id="confirmPassword" name="confirm_password" required autocomplete="new-password" placeholder="Confirm your password">
+            <div class="auth-input-wrap">
+              <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <input type="password" id="confirmPassword" name="confirm_password" required autocomplete="new-password" placeholder="Confirm your password">
+            </div>
             <div class="error-message"></div>
           </div>
 

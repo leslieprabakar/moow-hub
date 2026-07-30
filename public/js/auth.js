@@ -259,6 +259,29 @@ const Auth = {
       el.textContent = user?.full_name || '';
     });
 
+    // Admin dashboard link in Account dropdown
+    const dropdownMenu = document.querySelector('.nav-dropdown-menu');
+    let adminLink = dropdownMenu ? dropdownMenu.querySelector('.nav-admin-dashboard') : null;
+    if (user?.is_admin) {
+      if (!adminLink && dropdownMenu) {
+        adminLink = document.createElement('a');
+        adminLink.href = '/pages/admin/dashboard.html';
+        adminLink.className = 'nav-dropdown-item nav-admin-dashboard';
+        adminLink.setAttribute('role', 'menuitem');
+        adminLink.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard';
+        const myAccountLink = dropdownMenu.querySelector('a[href*="account.html"]');
+        if (myAccountLink && myAccountLink.nextElementSibling) {
+          dropdownMenu.insertBefore(adminLink, myAccountLink.nextElementSibling);
+        } else {
+          const cartLink = dropdownMenu.querySelector('a[href*="cart.html"]');
+          dropdownMenu.insertBefore(adminLink, cartLink);
+        }
+      }
+      if (adminLink) adminLink.style.display = '';
+    } else if (adminLink) {
+      adminLink.style.display = 'none';
+    }
+
     // Update cart badge if exists
     this.updateCartBadge();
   },
