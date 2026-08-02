@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css?v=9">
+  <link rel="stylesheet" href="../css/styles.css?v=10">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <style>
     @keyframes authFadeIn {
@@ -212,6 +212,31 @@
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
+<div id="tp" class="closed tp-fixed" aria-label="Theme switcher">
+  <button class="tp-toggle" id="tp-toggle" type="button" aria-expanded="false" aria-controls="tp-panel" title="Theme">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <path d="M12 3a9 9 0 1 0 0 18h1.5a1.8 1.8 0 0 0 1.4-2.9 1.6 1.6 0 0 1 1.3-2.6H17A4 4 0 0 0 21 11.5C21 6.8 17 3 12 3z"/>
+      <circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/>
+    </svg>
+  </button>
+  <div class="tp-panel" id="tp-panel" role="group" aria-label="Choose a theme">
+    <div class="tp-head">
+      <div class="tp-title">Choose your ambience</div>
+      <div class="tp-sub">Eight walnut shades. Saved automatically.</div>
+    </div>
+    <div class="tp-list">
+      <button class="tp-opt" data-theme-btn="walnut-ivory" type="button" style="--sw:#F8F4EC"><span class="tp-swatch"></span><span class="tp-name">Ivory</span></button>
+      <button class="tp-opt" data-theme-btn="walnut-cream" type="button" style="--sw:#EDE6D8"><span class="tp-swatch"></span><span class="tp-name">Cream</span></button>
+      <button class="tp-opt active" data-theme-btn="walnut-latte" type="button" style="--sw:#D2C7AF"><span class="tp-swatch"></span><span class="tp-name">Latte</span></button>
+      <button class="tp-opt" data-theme-btn="walnut-sand" type="button" style="--sw:#B3A488"><span class="tp-swatch"></span><span class="tp-name">Sand</span></button>
+      <button class="tp-opt" data-theme-btn="walnut-tan" type="button" style="--sw:#665A46"><span class="tp-swatch"></span><span class="tp-name">Tan</span></button>
+      <button class="tp-opt" data-theme-btn="walnut-mid" type="button" style="--sw:#524736"><span class="tp-swatch"></span><span class="tp-name">Mid</span></button>
+      <button class="tp-opt" data-theme-btn="walnut-soft" type="button" style="--sw:#3F3629"><span class="tp-swatch"></span><span class="tp-name">Soft</span></button>
+      <button class="tp-opt" data-theme-btn="walnut" type="button" style="--sw:#2E261D"><span class="tp-swatch"></span><span class="tp-name">Walnut</span></button>
+    </div>
+    <div class="tp-foot">Your choice stays with this device.</div>
+  </div>
+</div>
   <div class="auth-page">
     <div class="auth-container">
       <div class="auth-card">
@@ -353,5 +378,6 @@
       });
     })();
   </script>
+  <script defer src="../js/main.js"></script>
 </body>
 </html>

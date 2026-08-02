@@ -3,15 +3,17 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- Navbar Scroll Effect ---
   const navbar = document.querySelector('.navbar');
-  const handleScroll = () => {
-    if (window.scrollY > 50) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
-    }
-  };
-  window.addEventListener('scroll', handleScroll);
-  handleScroll();
+  if (navbar) {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+  }
 
   // --- Mobile Menu Toggle ---
   const menuToggle = document.querySelector('.menu-toggle');
@@ -160,8 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Smooth Scroll for Anchor Links ---
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (!href || href === '#') return;
       e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
+      const target = document.querySelector(href);
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -855,3 +859,46 @@ function showNotification(message, type = 'success', actionText, actionUrl) {
 
   setTimeout(dismiss, 3500);
 }
+
+// ===== THEME PICKER — nav icon + dropdown (site-wide) =====
+(function () {
+  const panel = document.getElementById('tp');
+  if (!panel) return;
+  const toggle = document.getElementById('tp-toggle');
+  if (!toggle) return;
+
+  const setOpen = (open) => {
+    panel.classList.toggle('closed', !open);
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+
+  toggle.addEventListener('click', () => {
+    setOpen(panel.classList.contains('closed'));
+  });
+
+  const apply = (name) => {
+    document.documentElement.setAttribute('data-theme', name);
+    panel.querySelectorAll('[data-theme-btn]').forEach((b) => {
+      b.classList.toggle('active', b.getAttribute('data-theme-btn') === name);
+    });
+    try { localStorage.setItem('moow_theme_preview', name); } catch (e) {}
+  };
+
+  panel.querySelectorAll('[data-theme-btn]').forEach((b) => {
+    b.addEventListener('click', () => {
+      apply(b.getAttribute('data-theme-btn'));
+      setOpen(false);
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!panel.contains(e.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+
+  let saved = 'walnut-latte';
+  try { saved = localStorage.getItem('moow_theme_preview') || 'walnut-latte'; } catch (e) {}
+  apply(saved);
+})();
