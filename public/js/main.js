@@ -860,21 +860,22 @@ function showNotification(message, type = 'success', actionText, actionUrl) {
   setTimeout(dismiss, 3500);
 }
 
-// ===== THEME PICKER — nav icon + dropdown (site-wide) =====
+// ===== THEME PICKER — nav icon + dropdown / inline swatches (site-wide) =====
 (function () {
   const panel = document.getElementById('tp');
   if (!panel) return;
   const toggle = document.getElementById('tp-toggle');
-  if (!toggle) return;
 
   const setOpen = (open) => {
     panel.classList.toggle('closed', !open);
-    toggle.setAttribute('aria-expanded', String(open));
+    if (toggle) toggle.setAttribute('aria-expanded', String(open));
   };
 
-  toggle.addEventListener('click', () => {
-    setOpen(panel.classList.contains('closed'));
-  });
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      setOpen(panel.classList.contains('closed'));
+    });
+  }
 
   const apply = (name) => {
     document.documentElement.setAttribute('data-theme', name);
@@ -887,16 +888,18 @@ function showNotification(message, type = 'success', actionText, actionUrl) {
   panel.querySelectorAll('[data-theme-btn]').forEach((b) => {
     b.addEventListener('click', () => {
       apply(b.getAttribute('data-theme-btn'));
-      setOpen(false);
+      if (toggle) setOpen(false);
     });
   });
 
-  document.addEventListener('click', (e) => {
-    if (!panel.contains(e.target)) setOpen(false);
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') setOpen(false);
-  });
+  if (toggle) {
+    document.addEventListener('click', (e) => {
+      if (!panel.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  }
 
   let saved = 'walnut-latte';
   try { saved = localStorage.getItem('moow_theme_preview') || 'walnut-latte'; } catch (e) {}

@@ -414,6 +414,59 @@ p {
   justify-content: center;
 }
 
+/* Theme picker (inline swatches in Account dropdown) */
+.nav-theme-picker {
+  padding: 0.55rem 1.25rem 0.75rem;
+  border-top: 1px solid var(--border-light);
+  margin-top: 0.4rem;
+}
+
+.nav-theme-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.nav-theme-head svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.nav-theme-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.nav-theme-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--sw);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.nav-theme-swatch:hover {
+  transform: scale(1.15);
+}
+
+.nav-theme-swatch.active {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--primary);
+}
+
 /* Nav cart icon (always visible) */
 .nav-cart-icon {
   display: flex;
@@ -2709,7 +2762,7 @@ p {
   }
 
   .nav-dropdown.open .nav-dropdown-menu {
-    max-height: 300px;
+    max-height: 480px;
     padding: 0.25rem 0;
   }
 
@@ -2723,6 +2776,19 @@ p {
 
   .nav-dropdown-item:hover {
     background: var(--bg);
+  }
+
+  .nav-theme-picker {
+    padding: 0.55rem 0.5rem 0.75rem;
+    text-align: center;
+  }
+
+  .nav-theme-head {
+    justify-content: center;
+  }
+
+  .nav-theme-swatches {
+    justify-content: center;
   }
 
   .nav-cart-icon {
@@ -4947,7 +5013,7 @@ html[data-theme="walnut-ivory"] body {
 /* =====================================================
    THEME PICKER — nav icon + dropdown (site-wide)
    ===================================================== */
-#tp{position:relative;flex-shrink:0;z-index:1001;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin-left:.5rem}
+#tp:not(.nav-theme-picker){position:relative;flex-shrink:0;z-index:1001;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;margin-left:.5rem}
 .tp-toggle{width:42px;height:42px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:transparent;border:1.5px solid var(--border-light);color:var(--text-light);cursor:pointer;transition:var(--transition)}
 .tp-toggle:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
 .tp-toggle svg{width:22px;height:22px;flex-shrink:0}
@@ -4968,10 +5034,10 @@ html[data-theme="walnut-ivory"] body {
 .tp-opt.active .tp-name{color:#F3EBDD}
 .tp-foot{color:#8F8169;font-size:.62rem;margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(201,169,110,.16)}
 @media (max-width:768px){
-  #tp{margin-left:auto;margin-right:.5rem}
+  #tp:not(.nav-theme-picker){margin-left:auto;margin-right:.5rem}
   .menu-toggle{margin-left:0}
 }
 @media (max-width:640px){
-  #tp{margin-right:.35rem}
+  #tp:not(.nav-theme-picker){margin-right:.35rem}
   .tp-panel{width:210px}
 }
