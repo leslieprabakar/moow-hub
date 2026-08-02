@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="walnut-ivory">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/styles.css?v=7">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <script type="application/ld+json">
   {
@@ -36,8 +36,333 @@
   }
   </script>
 <style>
-  .partners-two-col { display: grid; grid-template-columns: 1fr; gap: 3rem; align-items: start; }
+  /* =====================================================
+     THEME PREVIEW — WALNUT LIGHTNESS VARIANTS
+     Same walnut/gold palette, backgrounds stepping from
+     dark to light. Cards/regions synced to each shade.
+     Font size: enlarged for readability.
+     ===================================================== */
+
+  html[data-theme] { font-size: 18px; }
+
+  html[data-theme] body,
+  html[data-theme] .navbar,
+  html[data-theme] .hero-eyebrow,
+  html[data-theme] .marquee-ribbon,
+  html[data-theme] .partner-card,
+  html[data-theme] .feature-card,
+  html[data-theme] .cta-ribbon,
+  html[data-theme] .footer { transition: background-color .45s ease, color .45s ease, border-color .45s ease, box-shadow .45s ease; }
+
+  html[data-theme] .partners-band { background: var(--bg) !important; }
+  html[data-theme] .benefits-band { background: var(--bg-warm) !important; }
+
+  /* ---------- 1. WALNUT (dark walnut) ---------- */
+  html[data-theme="walnut"] {
+    --bg: #2E261D; --bg-warm: #3C342A;
+    --primary: #D4B87F; --primary-hover: #C09E63;
+    --navy: #F0E8DA; --navy-light: #D9CDB9;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #E0C99E;
+    --dark: #221B13; --text: #E9DFCC; --text-light: #C9BCA5; --text-muted: #A89B83;
+    --white: #F3EBDD; --border: #4A3E2E; --border-light: #554836;
+    --gradient-sunset: linear-gradient(135deg, #4A3824 0%, #7A5A32 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #3C342A 0%, #6A6257 100%);
+    --gradient-teal: linear-gradient(135deg, #221B13 0%, #3C342A 100%);
+    --gradient-deep: linear-gradient(135deg, #1A140D 0%, #2E261D 55%, #7A5A32 100%);
+    --gradient-text: linear-gradient(120deg, #D4B87F 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(201,169,110,.22); --glow-gold: 0 6px 24px rgba(212,184,127,.25); --glow-teal: 0 6px 24px rgba(0,0,0,.30);
+    --shadow-sm: 0 1px 8px rgba(0,0,0,.30); --shadow: 0 2px 20px rgba(0,0,0,.38); --shadow-lg: 0 8px 40px rgba(0,0,0,.48);
+  }
+  html[data-theme="walnut"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.09) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(122,90,50,.10) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(0,0,0,.16) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+  html[data-theme="walnut"] .navbar { background: rgba(46,38,29,0.82); border-bottom-color: rgba(201,169,110,0.16); }
+  html[data-theme="walnut"] .navbar.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,.38); }
+  html[data-theme="walnut"] .nav-dropdown-menu { background: rgba(46,38,29,0.96); border-color: var(--border); }
+  html[data-theme="walnut"] .hero-eyebrow { background: rgba(46,38,29,0.72); border-color: rgba(201,169,110,0.28); }
+  html[data-theme="walnut"] .marquee-ribbon { background: var(--dark); }
+  html[data-theme="walnut"] .marquee-ribbon::before { background: linear-gradient(to right, var(--dark), transparent); }
+  html[data-theme="walnut"] .marquee-ribbon::after { background: linear-gradient(to left, var(--dark), transparent); }
+  html[data-theme="walnut"] .skip-link { background: var(--dark); }
+  html[data-theme="walnut"] .btn-outline { color: var(--white); border-color: var(--border); }
+  html[data-theme="walnut"] .btn-outline:hover { background: var(--dark); color: var(--white); }
+  html[data-theme="walnut"] .btn-white { background: var(--dark); color: var(--white); border: 1px solid var(--border); }
+  html[data-theme="walnut"] .btn-white:hover { background: #3C342A; color: var(--white); }
+  html[data-theme="walnut"] .btn-add-cart { background: var(--dark); }
+  html[data-theme="walnut"] .ai-powered-badge { background: var(--dark); }
+  html[data-theme="walnut"] .asana-tag { background: rgba(34,27,19,0.92); }
+  html[data-theme="walnut"] .partner-card,
+  html[data-theme="walnut"] .feature-card,
+  html[data-theme="walnut"] .stats-section,
+  html[data-theme="walnut"] .ecosystem-visual,
+  html[data-theme="walnut"] .product-card,
+  html[data-theme="walnut"] .service-card,
+  html[data-theme="walnut"] .testimonial-card,
+  html[data-theme="walnut"] .why-card,
+  html[data-theme="walnut"] .pricing-card,
+  html[data-theme="walnut"] .info-card { background: #4A4238 !important; border-color: var(--border) !important; }
+  html[data-theme="walnut"] .stats-section { border-top-color: var(--border-light); }
+  html[data-theme="walnut"] .benefits-band { background: var(--bg-warm) !important; }
+  html[data-theme="walnut"] ::-webkit-scrollbar-track { background: var(--bg); }
+  html[data-theme="walnut"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #7A5A32, #C9A96E); border: 2px solid var(--bg); }
+  html[data-theme="walnut"] ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #C9A96E, #7A5A32); }
+  html[data-theme="walnut"] { scrollbar-color: #7A5A32 var(--bg); }
+
+  /* ---------- 2. WALNUT-SOFT (dark walnut) ---------- */
+  html[data-theme="walnut-soft"] {
+    --bg: #3F3629; --bg-warm: #4C4336;
+    --primary: #D4B87F; --primary-hover: #C09E63;
+    --navy: #F0E8DA; --navy-light: #D9CDB9;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #E0C99E;
+    --dark: #221B13; --text: #E9DFCC; --text-light: #C9BCA5; --text-muted: #A89B83;
+    --white: #F3EBDD; --border: #4A3E2E; --border-light: #554836;
+    --gradient-sunset: linear-gradient(135deg, #4A3824 0%, #7A5A32 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #4C4336 0%, #766D60 100%);
+    --gradient-teal: linear-gradient(135deg, #221B13 0%, #4C4336 100%);
+    --gradient-deep: linear-gradient(135deg, #1A140D 0%, #3F3629 55%, #7A5A32 100%);
+    --gradient-text: linear-gradient(120deg, #D4B87F 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(201,169,110,.22); --glow-gold: 0 6px 24px rgba(212,184,127,.25); --glow-teal: 0 6px 24px rgba(0,0,0,.30);
+    --shadow-sm: 0 1px 8px rgba(0,0,0,.30); --shadow: 0 2px 20px rgba(0,0,0,.38); --shadow-lg: 0 8px 40px rgba(0,0,0,.48);
+  }
+  html[data-theme="walnut-soft"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.09) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(122,90,50,.10) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(0,0,0,.16) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+  html[data-theme="walnut-soft"] .navbar { background: rgba(63,54,41,0.82); border-bottom-color: rgba(201,169,110,0.16); }
+  html[data-theme="walnut-soft"] .navbar.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,.38); }
+  html[data-theme="walnut-soft"] .nav-dropdown-menu { background: rgba(63,54,41,0.96); border-color: var(--border); }
+  html[data-theme="walnut-soft"] .hero-eyebrow { background: rgba(63,54,41,0.72); border-color: rgba(201,169,110,0.28); }
+  html[data-theme="walnut-soft"] .marquee-ribbon { background: var(--dark); }
+  html[data-theme="walnut-soft"] .marquee-ribbon::before { background: linear-gradient(to right, var(--dark), transparent); }
+  html[data-theme="walnut-soft"] .marquee-ribbon::after { background: linear-gradient(to left, var(--dark), transparent); }
+  html[data-theme="walnut-soft"] .skip-link { background: var(--dark); }
+  html[data-theme="walnut-soft"] .btn-outline { color: var(--white); border-color: var(--border); }
+  html[data-theme="walnut-soft"] .btn-outline:hover { background: var(--dark); color: var(--white); }
+  html[data-theme="walnut-soft"] .btn-white { background: var(--dark); color: var(--white); border: 1px solid var(--border); }
+  html[data-theme="walnut-soft"] .btn-white:hover { background: #4C4336; color: var(--white); }
+  html[data-theme="walnut-soft"] .btn-add-cart { background: var(--dark); }
+  html[data-theme="walnut-soft"] .ai-powered-badge { background: var(--dark); }
+  html[data-theme="walnut-soft"] .asana-tag { background: rgba(34,27,19,0.92); }
+  html[data-theme="walnut-soft"] .partner-card,
+  html[data-theme="walnut-soft"] .feature-card,
+  html[data-theme="walnut-soft"] .stats-section,
+  html[data-theme="walnut-soft"] .ecosystem-visual,
+  html[data-theme="walnut-soft"] .product-card,
+  html[data-theme="walnut-soft"] .service-card,
+  html[data-theme="walnut-soft"] .testimonial-card,
+  html[data-theme="walnut-soft"] .why-card,
+  html[data-theme="walnut-soft"] .pricing-card,
+  html[data-theme="walnut-soft"] .info-card { background: #584F42 !important; border-color: var(--border) !important; }
+  html[data-theme="walnut-soft"] .stats-section { border-top-color: var(--border-light); }
+  html[data-theme="walnut-soft"] .benefits-band { background: var(--bg-warm) !important; }
+  html[data-theme="walnut-soft"] ::-webkit-scrollbar-track { background: var(--bg); }
+  html[data-theme="walnut-soft"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #7A5A32, #C9A96E); border: 2px solid var(--bg); }
+  html[data-theme="walnut-soft"] ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #C9A96E, #7A5A32); }
+  html[data-theme="walnut-soft"] { scrollbar-color: #7A5A32 var(--bg); }
+
+  /* ---------- 3. WALNUT-MID (dark walnut) ---------- */
+  html[data-theme="walnut-mid"] {
+    --bg: #524736; --bg-warm: #5D5242;
+    --primary: #D4B87F; --primary-hover: #C09E63;
+    --navy: #F0E8DA; --navy-light: #D9CDB9;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #E0C99E;
+    --dark: #221B13; --text: #E9DFCC; --text-light: #C9BCA5; --text-muted: #A89B83;
+    --white: #F3EBDD; --border: #4A3E2E; --border-light: #554836;
+    --gradient-sunset: linear-gradient(135deg, #4A3824 0%, #7A5A32 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #5D5242 0%, #837869 100%);
+    --gradient-teal: linear-gradient(135deg, #221B13 0%, #5D5242 100%);
+    --gradient-deep: linear-gradient(135deg, #1A140D 0%, #524736 55%, #7A5A32 100%);
+    --gradient-text: linear-gradient(120deg, #D4B87F 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(201,169,110,.22); --glow-gold: 0 6px 24px rgba(212,184,127,.25); --glow-teal: 0 6px 24px rgba(0,0,0,.30);
+    --shadow-sm: 0 1px 8px rgba(0,0,0,.30); --shadow: 0 2px 20px rgba(0,0,0,.38); --shadow-lg: 0 8px 40px rgba(0,0,0,.48);
+  }
+  html[data-theme="walnut-mid"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.09) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(122,90,50,.10) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(0,0,0,.16) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+  html[data-theme="walnut-mid"] .navbar { background: rgba(82,71,54,0.82); border-bottom-color: rgba(201,169,110,0.16); }
+  html[data-theme="walnut-mid"] .navbar.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,.38); }
+  html[data-theme="walnut-mid"] .nav-dropdown-menu { background: rgba(82,71,54,0.96); border-color: var(--border); }
+  html[data-theme="walnut-mid"] .hero-eyebrow { background: rgba(82,71,54,0.72); border-color: rgba(201,169,110,0.28); }
+  html[data-theme="walnut-mid"] .marquee-ribbon { background: var(--dark); }
+  html[data-theme="walnut-mid"] .marquee-ribbon::before { background: linear-gradient(to right, var(--dark), transparent); }
+  html[data-theme="walnut-mid"] .marquee-ribbon::after { background: linear-gradient(to left, var(--dark), transparent); }
+  html[data-theme="walnut-mid"] .skip-link { background: var(--dark); }
+  html[data-theme="walnut-mid"] .btn-outline { color: var(--white); border-color: var(--border); }
+  html[data-theme="walnut-mid"] .btn-outline:hover { background: var(--dark); color: var(--white); }
+  html[data-theme="walnut-mid"] .btn-white { background: var(--dark); color: var(--white); border: 1px solid var(--border); }
+  html[data-theme="walnut-mid"] .btn-white:hover { background: #5D5242; color: var(--white); }
+  html[data-theme="walnut-mid"] .btn-add-cart { background: var(--dark); }
+  html[data-theme="walnut-mid"] .ai-powered-badge { background: var(--dark); }
+  html[data-theme="walnut-mid"] .asana-tag { background: rgba(34,27,19,0.92); }
+  html[data-theme="walnut-mid"] .partner-card,
+  html[data-theme="walnut-mid"] .feature-card,
+  html[data-theme="walnut-mid"] .stats-section,
+  html[data-theme="walnut-mid"] .ecosystem-visual,
+  html[data-theme="walnut-mid"] .product-card,
+  html[data-theme="walnut-mid"] .service-card,
+  html[data-theme="walnut-mid"] .testimonial-card,
+  html[data-theme="walnut-mid"] .why-card,
+  html[data-theme="walnut-mid"] .pricing-card,
+  html[data-theme="walnut-mid"] .info-card { background: #695E4D !important; border-color: var(--border) !important; }
+  html[data-theme="walnut-mid"] .stats-section { border-top-color: var(--border-light); }
+  html[data-theme="walnut-mid"] .benefits-band { background: var(--bg-warm) !important; }
+  html[data-theme="walnut-mid"] ::-webkit-scrollbar-track { background: var(--bg); }
+  html[data-theme="walnut-mid"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #7A5A32, #C9A96E); border: 2px solid var(--bg); }
+  html[data-theme="walnut-mid"] ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #C9A96E, #7A5A32); }
+  html[data-theme="walnut-mid"] { scrollbar-color: #7A5A32 var(--bg); }
+
+  /* ---------- 4. WALNUT-TAN (dark walnut) ---------- */
+  html[data-theme="walnut-tan"] {
+    --bg: #665A46; --bg-warm: #706451;
+    --primary: #D4B87F; --primary-hover: #C09E63;
+    --navy: #F0E8DA; --navy-light: #D9CDB9;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #E0C99E;
+    --dark: #221B13; --text: #E9DFCC; --text-light: #C9BCA5; --text-muted: #A89B83;
+    --white: #F3EBDD; --border: #4A3E2E; --border-light: #554836;
+    --gradient-sunset: linear-gradient(135deg, #4A3824 0%, #7A5A32 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #706451 0%, #918674 100%);
+    --gradient-teal: linear-gradient(135deg, #221B13 0%, #706451 100%);
+    --gradient-deep: linear-gradient(135deg, #1A140D 0%, #665A46 55%, #7A5A32 100%);
+    --gradient-text: linear-gradient(120deg, #D4B87F 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(201,169,110,.22); --glow-gold: 0 6px 24px rgba(212,184,127,.25); --glow-teal: 0 6px 24px rgba(0,0,0,.30);
+    --shadow-sm: 0 1px 8px rgba(0,0,0,.30); --shadow: 0 2px 20px rgba(0,0,0,.38); --shadow-lg: 0 8px 40px rgba(0,0,0,.48);
+  }
+  html[data-theme="walnut-tan"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.09) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(122,90,50,.10) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(0,0,0,.16) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+  html[data-theme="walnut-tan"] .navbar { background: rgba(102,90,70,0.82); border-bottom-color: rgba(201,169,110,0.16); }
+  html[data-theme="walnut-tan"] .navbar.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,.38); }
+  html[data-theme="walnut-tan"] .nav-dropdown-menu { background: rgba(102,90,70,0.96); border-color: var(--border); }
+  html[data-theme="walnut-tan"] .hero-eyebrow { background: rgba(102,90,70,0.72); border-color: rgba(201,169,110,0.28); }
+  html[data-theme="walnut-tan"] .marquee-ribbon { background: var(--dark); }
+  html[data-theme="walnut-tan"] .marquee-ribbon::before { background: linear-gradient(to right, var(--dark), transparent); }
+  html[data-theme="walnut-tan"] .marquee-ribbon::after { background: linear-gradient(to left, var(--dark), transparent); }
+  html[data-theme="walnut-tan"] .skip-link { background: var(--dark); }
+  html[data-theme="walnut-tan"] .btn-outline { color: var(--white); border-color: var(--border); }
+  html[data-theme="walnut-tan"] .btn-outline:hover { background: var(--dark); color: var(--white); }
+  html[data-theme="walnut-tan"] .btn-white { background: var(--dark); color: var(--white); border: 1px solid var(--border); }
+  html[data-theme="walnut-tan"] .btn-white:hover { background: #706451; color: var(--white); }
+  html[data-theme="walnut-tan"] .btn-add-cart { background: var(--dark); }
+  html[data-theme="walnut-tan"] .ai-powered-badge { background: var(--dark); }
+  html[data-theme="walnut-tan"] .asana-tag { background: rgba(34,27,19,0.92); }
+  html[data-theme="walnut-tan"] .partner-card,
+  html[data-theme="walnut-tan"] .feature-card,
+  html[data-theme="walnut-tan"] .stats-section,
+  html[data-theme="walnut-tan"] .ecosystem-visual,
+  html[data-theme="walnut-tan"] .product-card,
+  html[data-theme="walnut-tan"] .service-card,
+  html[data-theme="walnut-tan"] .testimonial-card,
+  html[data-theme="walnut-tan"] .why-card,
+  html[data-theme="walnut-tan"] .pricing-card,
+  html[data-theme="walnut-tan"] .info-card { background: #7A6E5B !important; border-color: var(--border) !important; }
+  html[data-theme="walnut-tan"] .stats-section { border-top-color: var(--border-light); }
+  html[data-theme="walnut-tan"] .benefits-band { background: var(--bg-warm) !important; }
+  html[data-theme="walnut-tan"] ::-webkit-scrollbar-track { background: var(--bg); }
+  html[data-theme="walnut-tan"] ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #7A5A32, #C9A96E); border: 2px solid var(--bg); }
+  html[data-theme="walnut-tan"] ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #C9A96E, #7A5A32); }
+  html[data-theme="walnut-tan"] { scrollbar-color: #7A5A32 var(--bg); }
+
+  /* ---------- 5. WALNUT-SAND (light walnut) ---------- */
+  html[data-theme="walnut-sand"] {
+    --bg: #B3A488; --bg-warm: #AA9B80;
+    --primary: #8A6A42; --primary-hover: #755832;
+    --navy: #332A1E; --navy-light: #5C4F3D;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #D8BC8F;
+    --dark: #2A2119; --text: #4A3B2C; --text-light: #6E604C; --text-muted: #9A8C75;
+    --white: #FFFFFF; --border: #E2D5BE; --border-light: #EFE7DA;
+    --gradient-sunset: linear-gradient(135deg, #8A6A42 0%, #A88654 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #AA9B80 0%, #FBF7F1 100%);
+    --gradient-teal: linear-gradient(135deg, #332A1E 0%, #4A3B2C 100%);
+    --gradient-deep: linear-gradient(135deg, #241C14 0%, #332A1E 55%, #8A6A42 100%);
+    --gradient-text: linear-gradient(120deg, #8A6A42 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(138,106,66,.25); --glow-gold: 0 6px 24px rgba(201,169,110,.30); --glow-teal: 0 6px 24px rgba(51,42,30,.15);
+    --shadow-sm: 0 1px 8px rgba(51,42,30,.06); --shadow: 0 2px 20px rgba(51,42,30,.10); --shadow-lg: 0 8px 40px rgba(51,42,30,.16);
+  }
+  html[data-theme="walnut-sand"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.1) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(170,134,84,.08) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(51,42,30,.06) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+
+  /* ---------- 6. WALNUT-LATTE (light walnut) ---------- */
+  html[data-theme="walnut-latte"] {
+    --bg: #D2C7AF; --bg-warm: #C9BDA4;
+    --primary: #8A6A42; --primary-hover: #755832;
+    --navy: #332A1E; --navy-light: #5C4F3D;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #D8BC8F;
+    --dark: #2A2119; --text: #4A3B2C; --text-light: #6E604C; --text-muted: #9A8C75;
+    --white: #FFFFFF; --border: #E2D5BE; --border-light: #EFE7DA;
+    --gradient-sunset: linear-gradient(135deg, #8A6A42 0%, #A88654 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #C9BDA4 0%, #FBF7F1 100%);
+    --gradient-teal: linear-gradient(135deg, #332A1E 0%, #4A3B2C 100%);
+    --gradient-deep: linear-gradient(135deg, #241C14 0%, #332A1E 55%, #8A6A42 100%);
+    --gradient-text: linear-gradient(120deg, #8A6A42 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(138,106,66,.25); --glow-gold: 0 6px 24px rgba(201,169,110,.30); --glow-teal: 0 6px 24px rgba(51,42,30,.15);
+    --shadow-sm: 0 1px 8px rgba(51,42,30,.06); --shadow: 0 2px 20px rgba(51,42,30,.10); --shadow-lg: 0 8px 40px rgba(51,42,30,.16);
+  }
+  html[data-theme="walnut-latte"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.1) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(170,134,84,.08) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(51,42,30,.06) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+
+  /* ---------- 7. WALNUT-CREAM (light walnut) ---------- */
+  html[data-theme="walnut-cream"] {
+    --bg: #EDE6D8; --bg-warm: #E5DCCA;
+    --primary: #8A6A42; --primary-hover: #755832;
+    --navy: #332A1E; --navy-light: #5C4F3D;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #D8BC8F;
+    --dark: #2A2119; --text: #4A3B2C; --text-light: #6E604C; --text-muted: #9A8C75;
+    --white: #FFFFFF; --border: #E2D5BE; --border-light: #EFE7DA;
+    --gradient-sunset: linear-gradient(135deg, #8A6A42 0%, #A88654 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #E5DCCA 0%, #FBF7F1 100%);
+    --gradient-teal: linear-gradient(135deg, #332A1E 0%, #4A3B2C 100%);
+    --gradient-deep: linear-gradient(135deg, #241C14 0%, #332A1E 55%, #8A6A42 100%);
+    --gradient-text: linear-gradient(120deg, #8A6A42 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(138,106,66,.25); --glow-gold: 0 6px 24px rgba(201,169,110,.30); --glow-teal: 0 6px 24px rgba(51,42,30,.15);
+    --shadow-sm: 0 1px 8px rgba(51,42,30,.06); --shadow: 0 2px 20px rgba(51,42,30,.10); --shadow-lg: 0 8px 40px rgba(51,42,30,.16);
+  }
+  html[data-theme="walnut-cream"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.1) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(170,134,84,.08) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(51,42,30,.06) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+
+  /* ---------- 8. WALNUT-IVORY (light walnut) ---------- */
+  html[data-theme="walnut-ivory"] {
+    --bg: #F8F4EC; --bg-warm: #F1E9DB;
+    --primary: #8A6A42; --primary-hover: #755832;
+    --navy: #332A1E; --navy-light: #5C4F3D;
+    --gold: #C9A96E; --gold-hover: #B8955A; --amber: #D8BC8F;
+    --dark: #2A2119; --text: #4A3B2C; --text-light: #6E604C; --text-muted: #9A8C75;
+    --white: #FFFFFF; --border: #E2D5BE; --border-light: #EFE7DA;
+    --gradient-sunset: linear-gradient(135deg, #8A6A42 0%, #A88654 50%, #C9A96E 100%);
+    --gradient-sunset-soft: linear-gradient(135deg, #F1E9DB 0%, #FBF7F1 100%);
+    --gradient-teal: linear-gradient(135deg, #332A1E 0%, #4A3B2C 100%);
+    --gradient-deep: linear-gradient(135deg, #241C14 0%, #332A1E 55%, #8A6A42 100%);
+    --gradient-text: linear-gradient(120deg, #8A6A42 0%, #C9A96E 100%);
+    --glow-coral: 0 6px 24px rgba(138,106,66,.25); --glow-gold: 0 6px 24px rgba(201,169,110,.30); --glow-teal: 0 6px 24px rgba(51,42,30,.15);
+    --shadow-sm: 0 1px 8px rgba(51,42,30,.06); --shadow: 0 2px 20px rgba(51,42,30,.10); --shadow-lg: 0 8px 40px rgba(51,42,30,.16);
+  }
+  html[data-theme="walnut-ivory"] body {
+    background: radial-gradient(1100px 520px at 85% -10%, rgba(201,169,110,0.1) 0%, transparent 60%), radial-gradient(900px 460px at -10% 8%, rgba(170,134,84,.08) 0%, transparent 55%), radial-gradient(1000px 600px at 50% 120%, rgba(51,42,30,.06) 0%, transparent 60%), var(--bg);
+    background-attachment: fixed;
+  }
+
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body class="page-transition">
@@ -143,7 +468,7 @@
   </section>
 
   <!-- Partners & Categories Combined -->
-  <section class="section" style="background: #f9f6f2;">
+  <section class="section partners-band" style="background: #f9f6f2;">
     <div class="container">
       <div class="partners-two-col">
         <!-- Top: Trusted by organisations worldwide -->
@@ -156,7 +481,7 @@
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/Ministry of AYUSH.webp" alt="Ministry of AYUSH" style="width: 100%; height: 100%; object-fit: contain; padding: 6px; background: white;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Ministry of AYUSH</h4>
@@ -164,7 +489,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/advaita-yoga-academy.webp" alt="Advaita Yoga Academy" style="width: 100%; height: 100%; object-fit: contain; padding: 6px; background: white;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Advaita Yoga Academy</h4>
@@ -172,7 +497,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/IN_ambafrance.webp" alt="French Embassy in India" style="width: 100%; height: 100%; object-fit: contain; padding: 6px; background: white;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">L'Ambassade de France en Inde</h4>
@@ -180,7 +505,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/rotary-logo.webp" alt="Rotary International" style="width: 100%; height: 100%; object-fit: contain; padding: 12px; background: white;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Rotary International</h4>
@@ -188,7 +513,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/lions-club-logo.svg" alt="Lions Clubs International" style="width: 100%; height: 100%; object-fit: contain; padding: 10px; background: white;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Lions Clubs International</h4>
@@ -196,7 +521,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/Relax Kerala Ayurveda logo.webp" alt="Relax Kerala Ayurveda" style="width: 100%; height: 100%; object-fit: contain; padding: 4px; background: white;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Relax Kerala Ayurveda</h4>
@@ -204,7 +529,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/Vrikshasana-hero.webp" alt="Global Studios" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Global Studios</h4>
@@ -212,7 +537,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/school-wellness.webp" alt="Schools & Universities" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Schools & Universities</h4>
@@ -220,7 +545,7 @@
             </div>
 
             <div class="partner-card" style="background: var(--white); border-radius: 16px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.1)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
-              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #f5f0eb; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <div style="width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid var(--bg); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                 <img src="../images/healthcare-wellness.webp" alt="Community Health Partners" style="width: 100%; height: 100%; object-fit: cover;">
               </div>
               <h4 style="margin: 0 0 0.2rem; font-size: 0.85rem;">Community Health Partners</h4>
@@ -283,7 +608,7 @@
   </section>
 
   <!-- Partner Benefits -->
-  <section class="section" style="background: var(--white); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
+  <section class="section benefits-band" style="background: var(--white); border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
     <div class="container">
       <div class="section-header section-header-center">
         <div class="label">Partner Benefits</div>
@@ -400,13 +725,89 @@
 
   <script src="../js/auth.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!Auth.isAuthenticated()) {
-        window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
-        return;
-      }
-    });
+    /* TEMP: auth redirect disabled while previewing themes */
+    // document.addEventListener('DOMContentLoaded', () => {
+    //   if (!Auth.isAuthenticated()) {
+    //     window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+    //     return;
+    //   }
+    // });
   </script>
   <script defer src="../js/main.js"></script>
+
+  <!-- ===== THEME PICKER (side panel) ===== -->
+  <div id="tp" aria-label="Theme switcher">
+    <button class="tp-toggle" id="tp-toggle" type="button" aria-expanded="true" aria-controls="tp-panel">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 3a9 9 0 1 0 0 18h1.5a1.8 1.8 0 0 0 1.4-2.9 1.6 1.6 0 0 1 1.3-2.6H17A4 4 0 0 0 21 11.5C21 6.8 17 3 12 3z"/>
+        <circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="7.5" r="1"/>
+      </svg>
+      <span>Themes</span>
+    </button>
+    <div class="tp-panel" id="tp-panel" role="group" aria-label="Choose a theme">
+      <div class="tp-head">
+        <div class="tp-title">Choose your ambience</div>
+        <div class="tp-sub">Eight walnut shades. Saved automatically.</div>
+      </div>
+      <div class="tp-list">
+        <button class="tp-opt active" data-theme-btn="walnut-ivory" type="button" style="--sw:#F8F4EC"><span class="tp-swatch"></span><span class="tp-name">Ivory</span></button>
+        <button class="tp-opt" data-theme-btn="walnut-cream" type="button" style="--sw:#EDE6D8"><span class="tp-swatch"></span><span class="tp-name">Cream</span></button>
+        <button class="tp-opt" data-theme-btn="walnut-latte" type="button" style="--sw:#D2C7AF"><span class="tp-swatch"></span><span class="tp-name">Latte</span></button>
+        <button class="tp-opt" data-theme-btn="walnut-sand" type="button" style="--sw:#B3A488"><span class="tp-swatch"></span><span class="tp-name">Sand</span></button>
+        <button class="tp-opt" data-theme-btn="walnut-tan" type="button" style="--sw:#665A46"><span class="tp-swatch"></span><span class="tp-name">Tan</span></button>
+        <button class="tp-opt" data-theme-btn="walnut-mid" type="button" style="--sw:#524736"><span class="tp-swatch"></span><span class="tp-name">Mid</span></button>
+        <button class="tp-opt" data-theme-btn="walnut-soft" type="button" style="--sw:#3F3629"><span class="tp-swatch"></span><span class="tp-name">Soft</span></button>
+        <button class="tp-opt" data-theme-btn="walnut" type="button" style="--sw:#2E261D"><span class="tp-swatch"></span><span class="tp-name">Walnut</span></button>
+      </div>
+      <div class="tp-foot">Your choice stays with this device.</div>
+    </div>
+  </div>
+  <style>
+    #tp{position:fixed;top:5.5rem;right:1rem;z-index:6000;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+    .tp-toggle{display:inline-flex;align-items:center;gap:.4rem;border:none;cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#F3EBDD;background:rgba(42,33,22,.92);border:1px solid rgba(201,169,110,.45);border-radius:999px;padding:.5rem .9rem;box-shadow:0 6px 24px rgba(0,0,0,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:all .25s ease}
+    .tp-toggle:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,0,0,.34)}
+    .tp-panel{width:236px;background:rgba(42,33,22,.94);border:1px solid rgba(201,169,110,.35);border-radius:18px;padding:1.1rem 1.1rem .95rem;box-shadow:0 20px 60px rgba(0,0,0,.35);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);opacity:1;transform:translateY(0);transform-origin:top right;transition:opacity .28s ease,transform .28s ease;pointer-events:auto}
+    #tp.closed .tp-panel{opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none}
+    .tp-head{padding-bottom:.7rem;border-bottom:1px solid rgba(201,169,110,.22);margin-bottom:.7rem}
+    .tp-title{color:#F3EBDD;font-size:.82rem;font-weight:700;letter-spacing:.02em}
+    .tp-sub{color:#B5A68C;font-size:.68rem;margin-top:.15rem;line-height:1.4}
+    .tp-list{display:flex;flex-direction:column;gap:.35rem}
+    .tp-opt{display:flex;align-items:center;gap:.6rem;border:none;background:transparent;cursor:pointer;padding:.38rem .5rem;border-radius:10px;text-align:left;transition:background .2s ease;width:100%;font-family:inherit}
+    .tp-opt:hover{background:rgba(201,169,110,.12)}
+    .tp-swatch{width:22px;height:22px;border-radius:50%;background:var(--sw);border:2px solid rgba(243,235,221,.28);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);flex-shrink:0;transition:transform .2s ease,border-color .2s ease}
+    .tp-opt:hover .tp-swatch{transform:scale(1.1)}
+    .tp-name{color:#C9BCA5;font-size:.76rem;font-weight:600;transition:color .2s ease}
+    .tp-opt.active{background:rgba(201,169,110,.14)}
+    .tp-opt.active .tp-swatch{border-color:#D4B87F;box-shadow:0 0 0 3px rgba(212,184,127,.28)}
+    .tp-opt.active .tp-name{color:#F3EBDD}
+    .tp-foot{color:#8F8169;font-size:.62rem;margin-top:.7rem;padding-top:.6rem;border-top:1px solid rgba(201,169,110,.16)}
+    @media (max-width:640px){
+      #tp{top:4.4rem;right:.6rem}
+      .tp-panel{width:210px}
+    }
+  </style>
+  <script>
+    (function(){
+      var panel=document.getElementById('tp');
+      var toggle=document.getElementById('tp-toggle');
+      toggle.addEventListener('click',function(){
+        var closed=panel.classList.toggle('closed');
+        toggle.setAttribute('aria-expanded', String(!closed));
+      });
+      function apply(name){
+        document.documentElement.setAttribute('data-theme',name);
+        document.querySelectorAll('#tp [data-theme-btn]').forEach(function(b){
+          b.classList.toggle('active', b.getAttribute('data-theme-btn')===name);
+        });
+        try{localStorage.setItem('moow_theme_preview',name);}catch(e){}
+      }
+      document.querySelectorAll('#tp [data-theme-btn]').forEach(function(b){
+        b.addEventListener('click',function(){ apply(b.getAttribute('data-theme-btn')); });
+      });
+      var saved='walnut-ivory';
+      try{saved=localStorage.getItem('moow_theme_preview')||'walnut-ivory';}catch(e){}
+      apply(saved);
+    })();
+  </script>
 </body>
 </html>
