@@ -335,9 +335,18 @@
         : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     }
 
+    function getRedirectPath() {
+      try {
+        var r = new URLSearchParams(window.location.search).get('redirect');
+        if (!r || r.charAt(0) !== '/' || r.charAt(1) === '/') return null;
+        if (/login\.html|register\.html|forgot-password\.html|reset-password\.html/i.test(r)) return null;
+        return r;
+      } catch (e) { return null; }
+    }
+
     (function() {
       if (Auth.isAuthenticated()) {
-        window.location.href = '/home';
+        window.location.href = getRedirectPath() || '/home';
         return;
       }
 
@@ -376,7 +385,7 @@
 
         try {
           var user = await Auth.login(email, password);
-          var redirect = user && user.is_admin ? '/pages/admin/dashboard.html' : '/home';
+          var redirect = user && user.is_admin ? '/pages/admin/dashboard.html' : (getRedirectPath() || '/home');
           window.location.href = redirect;
         } catch (error) {
           console.error('Login failed:', error);

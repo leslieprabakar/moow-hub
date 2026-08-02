@@ -126,10 +126,39 @@ const Auth = {
   },
 
   /**
-   * Check if user is authenticated
+   * Check if user is authenticated with a valid (non-expired) session
    */
   isAuthenticated() {
-    return !!this.getToken();
+    if (!this.getToken()) return false;
+    if (this.isSessionExpired()) {
+      this.clearLocalSession();
+      return false;
+    }
+    return true;
+  },
+
+  /**
+   * Session timeout check based on tracked inactivity (moow_sa timestamp)
+   */
+  isSessionExpired() {
+    try {
+      const last = sessionStorage.getItem('moow_sa');
+      if (!last) return false;
+      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 60 * 1000;
+      return (Date.now() - parseInt(last, 10)) > timeout;
+    } catch {
+      return false;
+    }
+  },
+
+  /**
+   * Remove local credentials without a full logout redirect
+   */
+  clearLocalSession() {
+    localStorage.removeItem('moow_token');
+    localStorage.removeItem('moow_refresh_token');
+    localStorage.removeItem('moow_user');
+    this.updateUI(null);
   },
 
   /**

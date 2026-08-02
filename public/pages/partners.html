@@ -153,10 +153,6 @@
       <div class="hero-eyebrow">Moow.Hub® — Partners</div>
       <h1>From <span class="italic-gold">the Heart of India</span> to Every Corner of the Globe</h1>
       <p class="hero-description" style="margin: 1.5rem auto 0; max-width: 600px;">Moow.Hub® partners with schools, hospitals, NGOs, corporates, Rotary, Lions Clubs International, distributors, retailers, government bodies, and community organisations worldwide.</p>
-        <div class="hero-buttons" style="margin-top: 2rem; justify-content: center;">
-          <a href="contact.html" class="btn btn-primary">Become a Partner</a>
-          <a href="agreement.html" class="btn btn-outline">Review Agreement</a>
-        </div>
     </div>
   </section>
 
@@ -418,13 +414,12 @@
 
   <script src="../js/auth.js"></script>
   <script>
-    /* TEMP: auth redirect disabled while previewing themes */
-    // document.addEventListener('DOMContentLoaded', () => {
-    //   if (!Auth.isAuthenticated()) {
-    //     window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
-    //     return;
-    //   }
-    // });
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+    });
   </script>
   <script defer src="../js/main.js"></script>
 </body>

@@ -1398,6 +1398,7 @@ p {
   content: '';
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background:
     radial-gradient(700px 400px at 90% 0%, rgba(255, 126, 95, 0.18) 0%, transparent 60%),
     radial-gradient(700px 400px at 5% 100%, rgba(201, 169, 110, 0.16) 0%, transparent 60%);

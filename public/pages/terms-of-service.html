@@ -152,10 +152,6 @@
       <div class="hero-eyebrow">Moow.Hub® — Legal</div>
       <h1>Terms of <span class="italic-gold">Service</span></h1>
       <p class="hero-description" style="margin: 1.5rem auto 0; max-width: 600px; font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.9; color: rgba(26, 36, 68, 0.85);">Terms and conditions governing your use of the Moow.Hub® website, products, and services worldwide.</p>
-        <div class="hero-buttons" style="margin-top: 2rem; justify-content: center;">
-          <a href="contact.html" class="btn btn-primary">Contact Us</a>
-          <a href="/home" class="btn btn-outline">Back to Home</a>
-        </div>
     </div>
   </section>
 
@@ -418,5 +414,13 @@
 
   <script src="../js/auth.js"></script>
   <script defer src="../js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!Auth.isAuthenticated()) {
+        window.location.href = '/pages/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+    });
+  </script>
 </body>
 </html>
