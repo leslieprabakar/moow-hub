@@ -144,7 +144,7 @@ const Auth = {
     try {
       const last = sessionStorage.getItem('moow_sa');
       if (!last) return false;
-      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 60 * 1000;
+      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 1000;
       return (Date.now() - parseInt(last, 10)) > timeout;
     } catch {
       return false;
@@ -357,13 +357,13 @@ const Auth = {
 };
 
 /**
- * Session Manager — 20-minute inactivity timeout with countdown warning
+ * Session Manager — 20-second inactivity timeout with countdown warning
  * Tracks user activity, shows a non-intrusive countdown before expiry,
  * and saves pending data before logging out.
  */
 const SessionManager = {
-  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 60 * 1000,
-  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 60 * 1000,
+  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 1000,
+  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 5 * 1000,
   CHECK_MS: 1000,
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
@@ -424,7 +424,7 @@ const SessionManager = {
     el.innerHTML =
       '<div class="scd-inner">' +
         '<svg class="scd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
-        '<span class="scd-msg">Session expires in <strong id="scd-time">20:00</strong></span>' +
+        '<span class="scd-msg">Session expires in <strong id="scd-time">0:20</strong></span>' +
         '<button class="scd-btn" id="scd-extend" type="button">Keep Active</button>' +
         '<button class="scd-x" id="scd-dismiss" type="button" aria-label="Dismiss">&times;</button>' +
       '</div>';
@@ -526,7 +526,7 @@ const SessionManager = {
   extend() {
     this.markActive();
     this.hideCountdown();
-    this.toast('Session extended — you\'re active for another ' + Math.round(this.TIMEOUT / 60000) + ' minutes');
+    this.toast('Session extended — you\'re active for another ' + Math.round(this.TIMEOUT / 1000) + ' seconds');
   },
 
   async expire() {
