@@ -313,13 +313,10 @@
         }
         var roleCell = tr.cells[3];
         if (roleCell) {
-          if (adminBox.checked) {
-            roleCell.innerHTML = '<span class="badge badge-admin">Admin</span>';
-          } else if (partnerBox.checked) {
-            roleCell.innerHTML = '<span class="badge badge-partner">Partner</span>';
-          } else {
-            roleCell.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">User</span>';
-          }
+          roleCell.innerHTML =
+            (adminBox.checked ? '<span class="badge badge-admin">Admin</span> ' : '') +
+            (partnerBox.checked ? '<span class="badge badge-partner">Partner</span> ' : '') +
+            (!adminBox.checked && !partnerBox.checked ? '<span style="color:var(--text-muted);font-size:0.85rem;">User</span>' : '');
         }
         var nameCell = tr.cells[0];
         var displayName = nameCell ? nameCell.textContent.trim() : 'This user';
