@@ -130,12 +130,20 @@ async function sendPasswordReset(user, resetToken) {
   return sendEmail(user.email, 'Password Reset Request - Moow.Hub', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">Password Reset Request</h1><p>Hi ${user.full_name},</p><p>Click below to reset your password:</p><a href="${url}" style="display:inline-block;background:#d4735e;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:20px 0;">Reset Password</a><p style="color:#666;font-size:14px;">If the button doesn't work, copy this link: ${url}</p><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'password_reset' });
 }
 
-async function sendRoleNotificationEmail(user, role) {
-  const roleLabel = role === 'admin' ? 'Admin' : role === 'partner' ? 'Partner' : 'User';
+async function sendRoleNotificationEmail(user, roles) {
+  const isAdmin = !!roles.is_admin;
+  const isPartner = !!roles.is_partner;
+  const roleLabels = [];
+  if (isAdmin) roleLabels.push('Admin');
+  if (isPartner) roleLabels.push('Partner');
+  if (roleLabels.length === 0) roleLabels.push('User');
+  const roleLabel = roleLabels.join(' & ');
   const loginUrl = `${config.SITE_URL}/pages/login.html`;
-  const access = role === 'admin'
+  const access = isAdmin && isPartner
+    ? `<p>You now have access to the <a href="${config.SITE_URL}/pages/admin/dashboard.html">Moow.Hub Admin Panel</a> as well as partnership schedules, pricing, brand assets, and marketing resources.</p>`
+    : isAdmin
     ? `<p>You now have access to the <a href="${config.SITE_URL}/pages/admin/dashboard.html">Moow.Hub Admin Panel</a>, where you can manage orders, products, customers, and partners.</p>`
-    : role === 'partner'
+    : isPartner
     ? '<p>You now have access to partnership schedules, pricing, brand assets, and marketing resources.</p>'
     : '<p>Your account no longer holds Admin or Partner privileges.</p>';
   const body = `<h1 style="color:#1a2744;margin-bottom:20px;">Your Role Has Been Updated</h1><p>Hi ${sanitizeString(user.full_name) || 'there'},</p><p>Your Moow.Hub account role has been updated to <strong>${roleLabel}</strong>.</p>${access}<p>To apply this change, please <strong>log out and log back in</strong> to your account:</p><a href="${loginUrl}" style="display:inline-block;background:#d4735e;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:20px 0;">Log In to Moow.Hub</a><p style="color:#666;font-size:14px;">If the button doesn't work, copy this link: ${loginUrl}</p><p>Best,<br>The Moow.Hub Team</p>`;
@@ -1049,15 +1057,14 @@ async function handleAdmin(req, res, path, url) {
     const newAdmin = typeof is_admin === 'boolean' ? is_admin : prevAdmin;
     const newPartner = typeof is_partner === 'boolean' ? is_partner : prevPartner;
     if (prevAdmin !== newAdmin || prevPartner !== newPartner) {
-      const role = newAdmin ? 'admin' : newPartner ? 'partner' : 'user';
       try {
         const { data: authUser } = await db.auth.admin.getUserById(id);
         const email = authUser?.user?.email;
         if (email) {
           const name = prevProfile?.full_name || email.split('@')[0].replace(/[._-]/g, ' ');
-          sendRoleNotificationEmail({ email, full_name: name }, role).catch(e => console.error('Role notification email failed:', e));
+          await sendRoleNotificationEmail({ email, full_name: name }, { is_admin: newAdmin, is_partner: newPartner });
         }
-      } catch (e) { console.error('Failed to look up user for role email:', e); }
+      } catch (e) { console.error('Failed to send role notification email:', e); }
     }
 
     return res.status(200).json({ success: true, message: 'Role updated' });

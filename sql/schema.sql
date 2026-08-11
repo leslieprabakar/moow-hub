@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS wishlist (
 CREATE TABLE IF NOT EXISTS email_log (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     order_id UUID REFERENCES orders(id) ON DELETE SET NULL,
-    email_type VARCHAR(30) NOT NULL CHECK (email_type IN ('welcome', 'order_confirmation', 'shipping_update', 'delivery_confirmation', 'cancellation', 'password_reset')),
+    email_type VARCHAR(30) NOT NULL CHECK (email_type IN ('welcome', 'order_confirmation', 'shipping_update', 'delivery_confirmation', 'cancellation', 'password_reset', 'role_update')),
     recipient VARCHAR(255) NOT NULL,
     subject VARCHAR(255) NOT NULL,
     status VARCHAR(10) DEFAULT 'sent' CHECK (status IN ('sent', 'failed', 'pending')),
