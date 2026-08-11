@@ -387,7 +387,7 @@ const SessionManager = {
 
   init() {
     if (this.initialized) return;
-    if (!Auth.isAuthenticated()) return;
+    if (!Auth.getToken()) return;
     if (this.isAuthPage()) return;
 
     this.lastActivity = this.loadActivity();
@@ -445,22 +445,40 @@ const SessionManager = {
   track() {
     if (this._tracked) return;
     let last = 0;
-    this._trackFn = () => {
+    const makeFn = (hideWarning) => () => {
       const now = Date.now();
       if (now - last < this.THROTTLE_MS) return;
       last = now;
-      this.markActive();
+      this.markActive(hideWarning);
     };
-    ['mousedown','keydown','scroll','touchstart','touchend','touchmove','click','pointerdown'].forEach(e => {
+    this._trackFn = makeFn(true);
+    const trackNoHide = makeFn(false);
+    ['mousedown','keydown','touchstart','touchend','click','pointerdown'].forEach(e => {
       document.addEventListener(e, this._trackFn, { passive: true });
     });
+    ['scroll','touchmove'].forEach(e => {
+      document.addEventListener(e, trackNoHide, { passive: true });
+    });
+    window.addEventListener('focus', () => this.resume());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') this.resume();
+    });
+    window.addEventListener('pageshow', () => this.resume());
     this._tracked = true;
   },
 
-  markActive() {
+  resume() {
+    if (!Auth.getToken()) { this.stop(); return; }
+    if (!this.lastActivity) this.lastActivity = this.loadActivity();
+    const remaining = this.TIMEOUT - (Date.now() - this.lastActivity);
+    if (remaining <= 0) { this.expire(); return; }
+    if (remaining <= this.WARNING_AT) this.showCountdown(remaining);
+  },
+
+  markActive(hideWarning) {
     this.lastActivity = Date.now();
     this.persist();
-    if (this.warningVisible) this.hideCountdown();
+    if (hideWarning !== false && this.warningVisible) this.hideCountdown();
   },
 
   startCheck() {
