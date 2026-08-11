@@ -357,7 +357,7 @@ const Auth = {
 };
 
 /**
- * Session Manager — 5-minute inactivity timeout with countdown warning
+ * Session Manager — inactivity timeout with countdown warning
  * Tracks user activity, shows a non-intrusive countdown before expiry,
  * and saves pending data before logging out.
  */
@@ -368,6 +368,7 @@ const SessionManager = {
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
   RE_SHOW_MS: 30000,
+  IS_MOBILE: typeof window !== 'undefined' && (window.innerWidth <= 768 || (navigator.maxTouchPoints || 0) > 0),
 
   lastActivity: null,
   checkTimer: null,
@@ -431,6 +432,7 @@ const SessionManager = {
       '</div>';
     document.body.appendChild(el);
     this.countdownEl = el;
+    if (this.IS_MOBILE) this.bindMobilePosition();
 
     document.getElementById('scd-extend').addEventListener('click', (e) => {
       e.stopPropagation();
@@ -440,6 +442,31 @@ const SessionManager = {
       e.stopPropagation();
       this.dismiss();
     });
+  },
+
+  bindMobilePosition() {
+    const pos = () => {
+      const el = this.countdownEl;
+      if (!el) return;
+      const h = el.offsetHeight || 52;
+      const vv = window.visualViewport;
+      const top = vv
+        ? (vv.pageTop + vv.height - h - 12)
+        : (window.scrollY + window.innerHeight - h - 12);
+      el.style.position = 'absolute';
+      el.style.top = top + 'px';
+      el.style.left = '12px';
+      el.style.right = '12px';
+      el.style.bottom = 'auto';
+    };
+    this._posBar = pos;
+    window.addEventListener('scroll', pos, { passive: true });
+    window.addEventListener('resize', pos);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', pos);
+      window.visualViewport.addEventListener('scroll', pos);
+    }
+    pos();
   },
 
   track() {
@@ -486,7 +513,7 @@ const SessionManager = {
   },
 
   check() {
-    if (!Auth.isAuthenticated()) { this.stop(); return; }
+    if (!Auth.getToken()) { this.stop(); return; }
     const remaining = this.TIMEOUT - (Date.now() - this.lastActivity);
     if (remaining <= 0) { this.expire(); return; }
     if (remaining <= this.WARNING_AT) this.showCountdown(remaining);
@@ -496,6 +523,10 @@ const SessionManager = {
     if (!this.countdownEl) return;
     this.warningVisible = true;
     this.countdownEl.classList.add('visible');
+    this.countdownEl.style.opacity = '1';
+    this.countdownEl.style.transform = 'translateY(0)';
+    this.countdownEl.style.pointerEvents = 'auto';
+    void this.countdownEl.offsetHeight;
     this.renderTime(ms);
     if (!this.countdownTimer) {
       this.countdownTimer = setInterval(() => {
@@ -512,7 +543,7 @@ const SessionManager = {
     const sec = s % 60;
     const el = document.getElementById('scd-time');
     if (el) el.textContent = m + ':' + String(sec).padStart(2, '0');
-    if (this.countdownEl) this.countdownEl.classList.toggle('scd-urgent', s <= 60);
+    if (this.countdownEl) this.countdownEl.classList.toggle('scd-urgent', s <= Math.ceil(this.WARNING_AT / 1000));
   },
 
   hideCountdown() {
@@ -520,6 +551,9 @@ const SessionManager = {
     if (this.countdownEl) {
       this.countdownEl.classList.remove('visible');
       this.countdownEl.classList.remove('scd-urgent');
+      this.countdownEl.style.opacity = '';
+      this.countdownEl.style.transform = '';
+      this.countdownEl.style.pointerEvents = '';
     }
     if (this.countdownTimer) {
       clearInterval(this.countdownTimer);
@@ -580,6 +614,15 @@ const SessionManager = {
 
   stop() {
     clearTimeout(this.reShowTimer);
+    if (this._posBar) {
+      window.removeEventListener('scroll', this._posBar);
+      window.removeEventListener('resize', this._posBar);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', this._posBar);
+        window.visualViewport.removeEventListener('scroll', this._posBar);
+      }
+      this._posBar = null;
+    }
     if (this.checkTimer) { clearInterval(this.checkTimer); this.checkTimer = null; }
     if (this.countdownTimer) { clearInterval(this.countdownTimer); this.countdownTimer = null; }
     this.warningVisible = false;

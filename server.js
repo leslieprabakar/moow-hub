@@ -127,6 +127,7 @@ const server = http.createServer(async (req, res) => {
 
   const ext = path.extname(filePath);
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+  res.setHeader('Cache-Control', /^\.(html|js|css)$/.test(ext) ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600');
   try {
     const content = fs.readFileSync(filePath);
     if (!res.headersSent) res.writeHead(200, { 'Content-Type': contentType });
