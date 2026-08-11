@@ -144,7 +144,7 @@ const Auth = {
     try {
       const last = sessionStorage.getItem('moow_sa');
       if (!last) return false;
-      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 1000;
+      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 5 * 60 * 1000;
       return (Date.now() - parseInt(last, 10)) > timeout;
     } catch {
       return false;
@@ -357,13 +357,13 @@ const Auth = {
 };
 
 /**
- * Session Manager — 20-second inactivity timeout with countdown warning
+ * Session Manager — 5-minute inactivity timeout with countdown warning
  * Tracks user activity, shows a non-intrusive countdown before expiry,
  * and saves pending data before logging out.
  */
 const SessionManager = {
-  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 20 * 1000,
-  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 5 * 1000,
+  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 5 * 60 * 1000,
+  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 60 * 1000,
   CHECK_MS: 1000,
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
@@ -421,10 +421,11 @@ const SessionManager = {
     el.className = 'session-countdown';
     el.setAttribute('role', 'alert');
     el.setAttribute('aria-live', 'polite');
+    const warnSec = Math.ceil(this.WARNING_AT / 1000);
     el.innerHTML =
       '<div class="scd-inner">' +
         '<svg class="scd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
-        '<span class="scd-msg">Session expires in <strong id="scd-time">0:20</strong></span>' +
+        '<span class="scd-msg">Session expires in <strong id="scd-time">' + Math.floor(warnSec / 60) + ':' + String(warnSec % 60).padStart(2, '0') + '</strong></span>' +
         '<button class="scd-btn" id="scd-extend" type="button">Keep Active</button>' +
         '<button class="scd-x" id="scd-dismiss" type="button" aria-label="Dismiss">&times;</button>' +
       '</div>';
@@ -450,14 +451,9 @@ const SessionManager = {
       last = now;
       this.markActive();
     };
-    ['mousedown','mousemove','keydown','scroll','touchstart','touchend','touchmove','click','pointerdown'].forEach(e => {
+    ['mousedown','keydown','scroll','touchstart','touchend','touchmove','click','pointerdown'].forEach(e => {
       document.addEventListener(e, this._trackFn, { passive: true });
     });
-    window.addEventListener('focus', this._trackFn);
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') this._trackFn();
-    });
-    window.addEventListener('pageshow', this._trackFn);
     this._tracked = true;
   },
 
@@ -526,7 +522,11 @@ const SessionManager = {
   extend() {
     this.markActive();
     this.hideCountdown();
-    this.toast('Session extended — you\'re active for another ' + Math.round(this.TIMEOUT / 1000) + ' seconds');
+    const totalSec = Math.round(this.TIMEOUT / 1000);
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+    const label = mins > 0 ? (mins + (secs ? 'm ' + secs + 's' : ' minute' + (mins > 1 ? 's' : ''))) : (secs + ' seconds');
+    this.toast('Session extended — you\'re active for another ' + label);
   },
 
   async expire() {
