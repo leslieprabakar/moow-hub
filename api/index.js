@@ -130,6 +130,18 @@ async function sendPasswordReset(user, resetToken) {
   return sendEmail(user.email, 'Password Reset Request - Moow.Hub', emailTemplate(`<h1 style="color:#1a2744;margin-bottom:20px;">Password Reset Request</h1><p>Hi ${user.full_name},</p><p>Click below to reset your password:</p><a href="${url}" style="display:inline-block;background:#d4735e;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:20px 0;">Reset Password</a><p style="color:#666;font-size:14px;">If the button doesn't work, copy this link: ${url}</p><p>Best,<br>The Moow.Hub Team</p>`), { emailType: 'password_reset' });
 }
 
+async function sendRoleNotificationEmail(user, role) {
+  const roleLabel = role === 'admin' ? 'Admin' : role === 'partner' ? 'Partner' : 'User';
+  const loginUrl = `${config.SITE_URL}/pages/login.html`;
+  const access = role === 'admin'
+    ? `<p>You now have access to the <a href="${config.SITE_URL}/pages/admin/dashboard.html">Moow.Hub Admin Panel</a>, where you can manage orders, products, customers, and partners.</p>`
+    : role === 'partner'
+    ? '<p>You now have access to partnership schedules, pricing, brand assets, and marketing resources.</p>'
+    : '<p>Your account no longer holds Admin or Partner privileges.</p>';
+  const body = `<h1 style="color:#1a2744;margin-bottom:20px;">Your Role Has Been Updated</h1><p>Hi ${sanitizeString(user.full_name) || 'there'},</p><p>Your Moow.Hub account role has been updated to <strong>${roleLabel}</strong>.</p>${access}<p>To apply this change, please <strong>log out and log back in</strong> to your account:</p><a href="${loginUrl}" style="display:inline-block;background:#d4735e;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin:20px 0;">Log In to Moow.Hub</a><p style="color:#666;font-size:14px;">If the button doesn't work, copy this link: ${loginUrl}</p><p>Best,<br>The Moow.Hub Team</p>`;
+  return sendEmail(user.email, 'Your Moow.Hub Account Role Has Been Updated', emailTemplate(body), { emailType: 'role_update' });
+}
+
 async function sendOrderConfirmationEmail(order, userEmail, userFullName) {
   const { data: orderItems } = await getAdminDB().from('order_items').select('*').eq('order_id', order.id);
   const paymentLabels = { cod: 'Cash on Delivery', razorpay: 'Razorpay', stripe: 'Stripe', upi: 'UPI', card: 'Credit/Debit Card', netbanking: 'Net Banking', paypal: 'PayPal' };
@@ -1028,8 +1040,26 @@ async function handleAdmin(req, res, path, url) {
     const updates = {};
     if (typeof is_admin === 'boolean') updates.is_admin = is_admin;
     if (typeof is_partner === 'boolean') updates.is_partner = is_partner;
+    const { data: prevProfile } = await db.from('profiles').select('full_name, is_admin, is_partner').eq('id', id).single();
     const { error: updateErr } = await db.from('profiles').update(updates).eq('id', id);
     if (updateErr) return res.status(500).json({ error: 'Failed to update role: ' + updateErr.message });
+
+    const prevAdmin = !!prevProfile?.is_admin;
+    const prevPartner = !!prevProfile?.is_partner;
+    const newAdmin = typeof is_admin === 'boolean' ? is_admin : prevAdmin;
+    const newPartner = typeof is_partner === 'boolean' ? is_partner : prevPartner;
+    if (prevAdmin !== newAdmin || prevPartner !== newPartner) {
+      const role = newAdmin ? 'admin' : newPartner ? 'partner' : 'user';
+      try {
+        const { data: authUser } = await db.auth.admin.getUserById(id);
+        const email = authUser?.user?.email;
+        if (email) {
+          const name = prevProfile?.full_name || email.split('@')[0].replace(/[._-]/g, ' ');
+          sendRoleNotificationEmail({ email, full_name: name }, role).catch(e => console.error('Role notification email failed:', e));
+        }
+      } catch (e) { console.error('Failed to look up user for role email:', e); }
+    }
+
     return res.status(200).json({ success: true, message: 'Role updated' });
   }
 

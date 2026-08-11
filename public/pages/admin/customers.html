@@ -57,6 +57,46 @@
     .pagination button { padding: 0.4rem 0.8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; }
     .pagination button.active { background: var(--primary); color: white; border-color: var(--primary); }
     .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .role-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 440px;
+      background: rgba(30, 41, 59, 0.97);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      line-height: 1.45;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+    .role-toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .role-toast-icon { flex-shrink: 0; color: #28a745; display: inline-flex; }
+    .role-toast strong { color: var(--primary); }
+    .role-toast-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 1.2rem; cursor: pointer; padding: 0 2px; line-height: 1; margin-left: auto; flex-shrink: 0; }
+    .role-toast-close:hover { color: #fff; }
+    @media (max-width: 768px) {
+      .role-toast {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        max-width: none;
+        align-items: flex-start;
+      }
+    }
   </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)}</script><script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -281,10 +321,52 @@
             roleCell.innerHTML = '<span style="color:var(--text-muted);font-size:0.85rem;">User</span>';
           }
         }
+        var nameCell = tr.cells[0];
+        var displayName = nameCell ? nameCell.textContent.trim() : 'This user';
+        var roleLabel = adminBox.checked && partnerBox.checked ? 'Admin &amp; Partner' : (adminBox.checked ? 'Admin' : partnerBox.checked ? 'Partner' : 'User');
+        showRoleToast(escapeHtml(displayName) + ' was set to <strong>' + roleLabel + '</strong>. They must log out and log back in for the change to take effect.');
       } catch (error) {
         console.error('updateCustomerRole error:', error);
         loadCustomers(currentPage);
       }
+    }
+
+    var roleToastTimer = null;
+    function showRoleToast(message) {
+      var existing = document.getElementById('role-toast');
+      if (existing) existing.remove();
+      var el = document.createElement('div');
+      el.id = 'role-toast';
+      el.className = 'role-toast';
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      el.innerHTML =
+        '<span class="role-toast-icon" aria-hidden="true">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
+        '</span>' +
+        '<span>' + message + '</span>' +
+        '<button class="role-toast-close" type="button" aria-label="Dismiss">&times;</button>';
+      document.body.appendChild(el);
+      requestAnimationFrame(function() { el.classList.add('visible'); });
+      el.querySelector('.role-toast-close').addEventListener('click', function() { hideRoleToast(el); });
+      clearTimeout(roleToastTimer);
+      roleToastTimer = setTimeout(function() { hideRoleToast(el); }, 8000);
+    }
+
+    function hideRoleToast(el) {
+      if (!el) el = document.getElementById('role-toast');
+      if (!el) return;
+      el.classList.remove('visible');
+      setTimeout(function() { el.remove(); }, 300);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     function renderPagination(totalPages) {
