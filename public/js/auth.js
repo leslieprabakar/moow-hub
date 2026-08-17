@@ -144,7 +144,7 @@ const Auth = {
     try {
       const last = sessionStorage.getItem('moow_sa');
       if (!last) return false;
-      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 30 * 1000;
+      const timeout = (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 10 * 1000;
       return (Date.now() - parseInt(last, 10)) > timeout;
     } catch {
       return false;
@@ -362,8 +362,8 @@ const Auth = {
  * and saves pending data before logging out.
  */
 const SessionManager = {
-  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 30 * 1000,
-  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 20 * 1000,
+  TIMEOUT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.timeout) || 10 * 1000,
+  WARNING_AT: (window.__SESSION_CONFIG && window.__SESSION_CONFIG.warningAt) || 3 * 1000,
   CHECK_MS: 1000,
   COUNTDOWN_MS: 1000,
   THROTTLE_MS: 1000,
