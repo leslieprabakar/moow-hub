@@ -405,7 +405,7 @@ async function handleAuth(req, res, path) {
       const { data: profile } = await db.from('profiles').select('id, full_name').eq('id', authUser.id).single();
       if (profile) {
         const resetToken = crypto.randomBytes(32).toString('hex');
-        await db.from('profiles').update({ reset_token: resetToken, reset_token_expires: new Date(Date.now() + 3600000).toISOString() }).eq('id', profile.id);
+        await db.from('profiles').update({ reset_token: resetToken, reset_token_expires: new Date(Date.now() + 300000).toISOString() }).eq('id', profile.id);
         const emailResult = await sendPasswordReset({ ...profile, email: authUser.email }, resetToken);
         return res.status(200).json({ success: true, message: 'If email exists, reset link sent' });
       }
